@@ -1,4 +1,4 @@
-# GNU SETL - an extension and implementation oF SETL
+# GNU SETL - an extension and implementation of SETL
 
 SETL is a high-level programming language based on sets and
 especially mappings.  GNU SETL is an implementation of
