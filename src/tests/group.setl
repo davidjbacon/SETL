@@ -1,0 +1,50 @@
+$ Group Theory!
+
+PROGRAM group_theory;
+
+  CONST tbl = [[1,2,3,4,5,6],
+               [2,1,5,6,3,4],
+               [3,4,1,2,6,5],
+               [4,3,6,5,1,2],
+               [5,6,2,1,4,3],
+               [6,5,4,3,2,1]];
+  VAR test;
+
+  test := 1;
+  g := POW {1,2,3};
+  PRINT (g);
+  PRINT (GROUP g);
+  PRINTA (STDERR, TIME, 'ms.');
+
+  test := 2;
+  g := {1..6};
+  PRINT (g);
+  PRINT (GROUP g);
+  PRINTA (STDERR, TIME, 'ms.');
+
+  OP BOP (a, b);
+    CASE test OF
+    (1):  RETURN a MOD b; $ symmetric difference of sets
+    (2):  RETURN tbl(a)(b);
+    ELSE ASSERT FALSE;
+    END CASE;
+  END OP BOP;
+
+  $ This operator is supposed to tell you whether the argument
+  $ is a group (the operator is assumed to be BOP):
+  OP GROUP (g);
+    VAR lids;  $ Temp. for the set of left identities
+    lids := {i IN g | (FORALL a IN g | (i BOP a) = a)};
+    RETURN
+      $ Closure:
+      (FORALL a IN g, b IN g | (a BOP b) IN g) AND
+      $ Associativity:
+      (FORALL a IN g, b IN g, c IN g |
+        ((a BOP b) BOP c) = (a BOP (b BOP c))) AND
+      $ Left identity:
+      (lids /= {}) AND
+      $ Left inverses:
+      (FORALL x IN g, i IN lids | (EXISTS y IN g | (x BOP y) = i));
+  END;
+
+END group_theory;

@@ -1,0 +1,11 @@
+-- $Id: magic.setl,v 1.4 2022/12/11 17:09:27 setlorg Exp $
+
+-- Not much magic here any more.  (A version for an ancient
+-- X-Windows customization generator did some real oogabooga.)
+
+LOOP DOING READ(t); WHILE NOT EOF DO
+  ASSERT IS_TUPLE t;
+  ASSERT #t >= 4;
+  ASSERT FORALL s IN t | IS_STRING s;
+  PRINT (JOIN(t,' '));
+END LOOP DOING READ(t);

@@ -1,0 +1,382 @@
+#! /bin/sh
+#
+# $Id: setup-parms,v 1.45 2022/12/11 17:09:26 setlorg Exp $
+#
+# Free software (c) dB - see file COPYING for license (GPL).
+#
+#
+# Initialize or modify the config parms file.
+#
+# Use:  setup-parms {config-file} {custom-root}
+#
+# where {config-file} is typically config.parms, and {custom-root} is a
+# path to the top of the customization package source tree.
+#
+# The {config-file} receives command-line options to be passed later to
+# GNU-style configure scripts.
+#
+# If $configure_args (defined by the environment) is non-empty, it is
+# assumed to be what was passed on the command line to the top-level
+# configure script, and is stored directly in the config parms file
+# without a prompt for confirmation.
+#
+# Otherwise, if $default_config_file (also environmental) names a
+# non-empty file, the config parms are copied from that file.
+#
+# Otherwise, the user is prompted for customization package names, an
+# installation prefix, and additional configure options.
+#
+# The default installation prefix is taken from $prefix if already
+# defined by the environment and non-empty.  Otherwise, it is taken
+# from the {config-file} if there already is one.  Otherwise, Sherlock
+# progresses from the probable to the barely plausible in tracking down
+# a suggestion to offer (see this script's code for the precise bathos).
+#
+# This script does not manage the timestamp file ("witness") associated
+# with the config-file.  For that, see the top-level Makefile.
+#
+# Prompts and other chat go to stderr (though the only known caller, a
+# recipe in main.mk, redirects that to its own stdout), and input is
+# from stdin.  SIGINT (e.g. ctrl-C) and premature end-of-file are among
+# the acceptable ways to make this script exit with a non-zero status.
+
+
+# TODO: (1) allow retries on invalid inputs; (2) provide a "back"
+# feature such as taking a single hyphen on a line to mean "return to
+# previous prompt"; and (3) let the user choose to have no --prefix arg
+# generated (though having an arbitrary one posted does no real harm,
+# as it can be overridden at "make install" time).  Meanwhile, running
+# this script or "make setup" under a readline wrapper such as rlwrap
+# can be helpful in the unlikely event you need to do it often.
+
+
+# The presumed location of this script:
+myloc=`dirname "$0"`
+
+# Args to this script:
+config_file=$1
+custom_root=$2
+
+
+#
+# The 47,000' foot view:
+#
+main ()
+{
+  old_parms=`cat "$config_file" 2>/dev/null`
+  new_parms=$configure_args
+  if test -z "$new_parms"; then
+    new_parms=`cat "$default_config_file" 2>/dev/null`
+  fi
+  if test -z "$new_parms"; then
+    get_new_parms
+  fi
+  if test -z "$configure_args"; then
+    # The new parms came from user input, not from the configure
+    # command line; ask the user to confirm that they are OK:
+    confirm_new_parms
+  fi
+  update_config_parms_file  # write $new_parms to file if changed
+}
+
+
+#
+# Config parms did not come from $configure_args or the file named by
+# $default_config_file, so we have to get serious and ask the user:
+#
+get_new_parms ()
+{
+  if test -n "$old_parms"; then
+    rpt
+    rpt "Here are the config parms currently in $config_file:"
+    rpt
+    rpt "$old_parms"
+  fi
+  # The config parms to be passed to the GNU-style configure scripts are:
+  #
+  #  1. --with-* args corresponding to customization package selections
+  #  2. --prefix {installation root}
+  #  3. any other options the user wants to pass to the configure scripts
+  #
+  get_with_pax    # get "--with-*" args into $with_pax
+  get_prefix_arg  # get "--prefix {installation root}" into $prefix_arg
+  get_other_args  # get any other parms into $other_args
+
+  new_parms="$with_pax $prefix_arg $other_args"  # our result
+}
+
+
+#
+# If any customization packages are available, offer them to the user
+# and turn the 0 or more selections into --with-* args in $with_pax:
+#
+get_with_pax ()
+{
+  avail_pax=`"$myloc/src/pax-avail" "$custom_root"`
+  if test -n "$avail_pax"; then
+
+    # Get list of customization packages selected by user, into $pax.
+    rpt
+    rpt '==== Selection of customization packages ===='
+    rpt
+    rpt 'Package name  -  description:'
+    rpt
+    for pak in $avail_pax; do
+      whatami=`cat $custom_root/$pak/whatami`
+      printf '%12s  -  %s\n' "$pak" "$whatami" >&2
+    done
+    rpt
+    rpt 'Please enter package names on one line, separated by spaces.'
+    rpt 'Note that building some packages may require at least a basic'
+    rpt '"setl" command to exist already.  Enter an empty line for no'
+    rpt 'customization packages.'
+    rpt
+#   IFS= read -p 'pax: ' -r pax || exit 1
+    rpt_n 'pax: '
+    IFS= read -r pax || exit 1
+    rpt
+    if test -z "$pax"; then
+      rpt 'No customization packages selected.'
+    else
+      rpt "Customization packages selected:  $pax"
+      bad_pax=
+      for pak in $pax; do
+        word_in_list "$pak" $avail_pax || bad_pax="$bad_pax $pak"
+      done
+      if test -n "$bad_pax"; then
+        rpt
+        rpt "===> Unrecognized package name(s): $bad_pax"
+        rpt
+        exit 1
+      fi
+    fi
+  else  # $avail_pax is empty
+    pax=
+  fi
+
+  # Turn $pax into a possibly null string of --with-* args -> $with_pax.
+  with_pax=`for pak in $pax; do printf ' %s' "--with-$pak"; done`
+
+} # end get_with_pax ()
+
+
+#
+# Get the name of an installation root dir into $raw_prefix, and
+# "--prefix $raw_prefix" into $prefix_arg.
+#
+get_prefix_arg ()
+{
+  # The next few tortuous manoeuvres work out a $default_prefix to offer
+  # to the user as the default installation prefix.
+
+  # Try first for an already nonempty $prefix, which will appear as an
+  # environment variable here even if it was just a command-line arg
+  # ("prefix=...") on the "make" that might have invoked us via the
+  # top-level Makefile:
+  default_prefix=$prefix
+
+  # Failing that, take any --prefix spec from the old parms file as the
+  # default prefix:
+  if test -z "$default_prefix"; then
+    if test -n "$old_parms"; then
+      # A weakness here is that the envt in which we are doing this
+      # eval might not be the same as that of the later eval of each
+      # configure script.  So beware of command expansions ($(...) and
+      # `...`) with side-effects!
+      eval set -- "$old_parms"
+      for p in "$@"; do
+        shift
+        # Abbreviations of --prefix (such as --pref) that might be
+        # found in $old_parms are not recognized here, even though
+        # they would be accepted by the GNU-type configure scripts.
+        # Same goes for the form --prefix=... (with the = sign).
+        case $p in
+        --prefix) break ;;  # from "for p" loop
+        esac
+      done
+      test $# = 0 || default_prefix=$1
+    fi
+  fi
+
+  # Failing that, see if some "bin" on the PATH leads to 'setl':
+  if test -z "$default_prefix"; then
+    # Split $PATH at colons into the shell positional parameters "$@":
+    saved_IFS=$IFS
+    IFS=:
+    set -- $PATH
+    IFS=$saved_IFS
+    for p in "$@"; do
+      c=$p/setl
+      if test -x "$c" && test ! -d "$c"; then
+        case $p in
+        */bin)
+          default_prefix=${p%/bin}
+          break  # from "for p" loop
+          ;;
+        */bin/)
+          default_prefix=${p%/bin/}
+          break  # from "for p" loop
+          ;;
+        esac
+      fi
+    done
+  fi
+
+  # Failing that, offer the first of $HOME, /usr/local, /opt, and /usr
+  # that has a bin subdir in the PATH:
+  if test -z "$default_prefix"; then
+    # Split $PATH at colons into the shell positional parameters "$@":
+    saved_IFS=$IFS
+    IFS=:
+    set -- $PATH
+    IFS=$saved_IFS
+    for d in "$HOME" /usr/local /opt /usr; do
+      if word_in_list "$d/bin" "$@" ||
+         word_in_list "$d/bin/" "$@"; then
+        default_prefix=$d
+        break  # from "for d" loop
+      fi
+    done
+  fi
+
+  # Failing that, offer /tmp on the principle of doing least harm:
+  : ${default_prefix:=/tmp}
+
+  # Get --prefix arg, offering $default_prefix as a default.
+  rpt
+  rpt 'Please enter the installation directory prefix (default'
+  rpt "$default_prefix).  You can still override this choice at"
+  rpt 'installation time with "make prefix=<dir> install".'
+  rpt
+  rpt 'What you give here is subject to one level of shell expansion'
+  rpt 'at configure script invocation time, so abbreviations such as'
+  rpt '$HOME and ~user are allowed.'
+  rpt
+# read -p "prefix: [$default_prefix]" -r raw_prefix || exit 1
+  rpt_n "prefix: [$default_prefix]"
+  read -r raw_prefix || exit 1
+  rpt
+
+  # Treat empty input as if "$default_prefix" had been entered:
+  : ${raw_prefix:=$default_prefix}
+  prefix_arg="--prefix $raw_prefix"  # our result
+
+} # end get_prefix_arg ()
+
+
+#
+# Get any other configure args the user wants, into $other_args:
+#
+get_other_args ()
+{
+  rpt
+  rpt 'Please enter any other configure args you may need, such as'
+  rpt '--docdir=<dir> to override where to install HTML and PDF files,'
+  rpt 'or --htmldir=<dir> for an even finer-grained spec.'
+  rpt
+  rpt "(The shell command $myloc/src/configure --help"
+  rpt 'lists many of the other args that are possible here.)'
+  rpt
+  rpt 'If you are cross-compiling, this is the place to provide a'
+  rpt '--host arg such as --host=ppcbe-qnx6.3.2 .'
+  rpt
+  rpt 'You can also put args like CC=<compiler>, CPPFLAGS=<includes>,'
+  rpt 'CFLAGS=<compiler-args>, and LDFLAGS=<linker-args> here.'
+  rpt
+  rpt 'And if you want to force the copy of the GNU MP library that is'
+  rpt 'bundled with GNU SETL to be used even if the host system appears'
+  rpt 'to have one, use the arg --with-bundled-gmp here.'
+  rpt
+  rpt 'What you give here is incorporated directly into the configure'
+  rpt 'command line args, and gets one level of shell eval.'
+  rpt
+  rpt 'Please give any extra args on one line.  The args so far are:'
+  rpt
+  rpt "$with_pax $prefix_arg"
+  rpt
+# read -p 'extra: ' -r other_args || exit 1
+  rpt_n 'extra: '
+  read -r other_args || exit 1
+  rpt
+} # end get_other_args ()
+
+
+#
+# Meaningfully dialogue with the user to confirm new config parms or
+# exit this setup script with an error:
+#
+confirm_new_parms ()
+{
+  rpt
+  rpt "So finally, here is what will be stored in $config_file"
+  rpt 'as command-line args for the GNU-style configure scripts:'
+  rpt
+  rpt "$new_parms"
+  rpt
+  "$myloc/ask-yes" 'OK?' || exit 1
+}
+
+
+#
+# Update config parms file if necessary, and report results on stderr:
+#
+update_config_parms_file ()
+{
+  # Refresh $old_parms from the $config_file to narrow the race window
+  # a little:
+  old_parms=`cat "$config_file" 2>/dev/null`
+  rpt
+  if test x"$new_parms" = x"$old_parms" && test -r "$config_file"; then
+    rpt "$config_file remains unchanged:"
+  else
+    if test -n "$old_parms"; then
+      rpt "$config_file changed from this:"
+      rpt
+      rpt "$old_parms"
+      rpt
+      rpt 'to this:'
+    else
+      rpt "New contents of $config_file:"
+    fi
+    # Possible TODO:  back up the old file.
+    rm -f "$config_file"
+    prt "$new_parms" >"$config_file"
+  fi
+  rpt
+  cat "$config_file" >&2
+}
+
+
+#
+# Polite alternatives to echo that treat all args literally;
+# prt spews to stdout and rpt spews to stderr:
+#
+prt ()
+{
+  printf '%s\n' "$*"
+}
+rpt ()
+{
+  printf '%s\n' "$*" >&2
+}
+rpt_n ()
+{
+  printf '%s' "$*" >&2
+}
+
+#
+# See if word $1 exactly matches a word in the remaining args:
+#
+word_in_list ()
+{
+  word=$1
+  shift
+  for x in "$@"; do
+    test x"$word" = x"$x" && return 0  # found
+  done
+  return 1  # not found
+}
+
+
+main
+rpt

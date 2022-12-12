@@ -1,0 +1,27 @@
+  a := 'abc';
+
+  b := 'ab' + 'cde';
+
+  c := 'don''t';
+
+  d := 'won\'t';
+
+  e := 'hi '
+	+ 'there';
+
+  f := 'bye ' +
+	'bye';
+
+  g := '\nthere\ is\1an\tescape!';
+
+  z := 'hex\xfe\xFE\xa\x0octal\377';
+
+  h := a+b+c+d+e+f+g+z;
+
+  i := PRETTY h;
+
+  PRINT(h);
+
+  PRINT(i);
+
+  ASSERT h = UNPRETTY i;

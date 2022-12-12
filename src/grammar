@@ -1,0 +1,1293 @@
+/*  Yacc-style grammar for SETL  */
+
+/*  $Id: grammar,v 1.18 2022/12/10 23:35:26 setlorg Exp $  */
+
+/*  Free software (c) dB - see file COPYING for license (GPL).  */
+
+/*
+ * General notes:
+ *
+ *  -  The file named grammar is filtered (see tran/Makefile.am)
+ *      through include.awk to expand '%include "filename"' lines,
+ *      and mawk.awk to remove #if 0 ... #endif sections, producing
+ *      a y.y file for yacc (or more likely bison) to feed on.  The
+ *      Nodebuilders and Tokens files need to be generated (also from
+ *      the grammar file) before y.y is, as they are what we %include
+ *      if this is the grammar file (otherwise this is y.y and the
+ *      %includes have already been expanded).
+ *
+ *  -  Nodebuilders and another file called Nodetypes are generated
+ *      from the grammar file by buildfile rules that extract the
+ *      mnemonic names and signatures of the parse tree node-building
+ *      functions from the carefully-written "$$ = ..."  lines in
+ *      the grammar file (including those within #if 0 sections).
+ *      Nodebuilders #defines those node-building functions as calls
+ *      to a much smaller and more generic set of functions.
+ *
+ *  -  The syntax diagrams in the Schwartz/Dewar/Dubinsky/Schonberg
+ *      book are not very good.  Their descriptive text is
+ *      generally used where there are conflicts or ambiguities.
+ *
+ *  -  This parser accepts a slightly more liberal language than it
+ *      strictly needs to, in some cases due to the LR(1)-ness of
+ *      yacc grammars.  This has the benefit of reducing the size
+ *      and complexity of the parser in a few places, and most
+ *      of the things deferred to "semantic analysis" are just
+ *      as appropriate there and/or are related to similar
+ *      checks needed there anyway.  Outstanding examples are
+ *      the fact that "constants" are allowed to be arbitrary
+ *      expressions, and many read-only, write-only, and
+ *      read-write contexts are not as restricted syntactically
+ *      as they could be at this stage.  Any number of labels
+ *      can occur in front of all statements and be either the
+ *      "Name:" kind or the "(expr_list):" kind.
+ *
+ *  -  EXPR clauses and YIELD statements are back in.
+ *
+ *  -  P. 334 of the book suggests that general loops can be used
+ *      as iterators in formers, but I see no other evidence for
+ *      this.  It would seem to imply that the word FOR is
+ *      optional after the colon in a set or tuple former.
+ *      This dubious "feature" is in for now, just in case
+ *      it was intended:  I allow "FOR iterator" or loop_head
+ *      or both after the colon in a former where only an iterator
+ *      used to be allowed.  See the production for "former".
+ *
+ *  -  Likewise, I allow "FOR iterator" to be combined with
+ *      other loop headers.  Note that in both formers and loop
+ *      controllers, the iterator must precede the loop_head
+ *      when both are present.  To reiterate (no pun intended),
+ *      the FOR keyword is optional before the iterator in a
+ *      set or tuple former, but mandatory before the iterator
+ *      in a loop controller.
+ *
+ *  -  The expressions [e IN s] and {e IN s} are ambiguous, and
+ *      are flagged as syntax errors.
+ *
+ *  -  In a few cases, I allow things which I think were just
+ *      mistakenly left out, most notably declarations of
+ *      procedures with all arguments optional, and calls of
+ *      procedures with all optional arguments omitted.
+ *
+ *  -  REPR clauses are parsed a little more liberally than they
+ *      should be (but only a little).  Also, I allow more than
+ *      one REPR clause among declarations.  They don't do
+ *      anything anyway.
+ *
+ *  -  "Machine code" is currently accepted in expression and
+ *      statement contexts.  It is enclosed in [: ... :].  The
+ *      lexer (tokenizer.c) is not supposed to let it through if
+ *      the "strict language" switch is used at compile time.
+ *      It doesn't currently recognize it at all; no rep for
+ *      internal [: and :] is currently proposed; and it has no
+ *      known or projected meaning.  Its token code is Machine.
+ *
+ *  -  "Embedded C++ code" (token code C_code) is also a dubious
+ *      proposed "feature" with an arcane bracketing syntax,
+ *      in this case \c ... \s.  It is only recognized by the
+ *      lexer if the preprocessor symbol EMBEDDED_C is defined.
+ *
+ *  -  An empty statement (i.e., just a semicolon) is currently
+ *      accepted as a synonym for PASS.  I will try to remember
+ *      not to allow it when the "strict language" switch is on.
+ *
+ *  -  The associativity of "**" is "right", as in Fortran and SETL2,
+ *      rather than "left" as in CIMS SETL.  The relational operators
+ *      such as "=" are "nonassoc" rather than "left".
+ *
+ *  -  Apart from the foregoing caveats, this parser is supposed
+ *      to accept the full SETL language as I understand it to be
+ *      defined, and not much more.  The compile-time "strict"
+ *      switch is intended to disallow all constructs and library
+ *      functions that are not "pure" SETL, but will almost
+ *      certainly let a few minor extra goodies through in
+ *      initial implementations.  (It has not yet been well
+ *      repected, in fact.)
+ *
+ *  -  The FORALL keyword can only be used to start a universal
+ *      quantifier or, if preceded by the LOOP keyword, to
+ *      start a loop controller.  That is, you can't introduce
+ *      a loop with "(FORALL" any more.  The reason is simply
+ *      that I couldn't find a reasonable way to construct an
+ *      LR(1) grammar that could distinguish a case label
+ *      of the form "(FORALL ..., ...):" from a loop header
+ *      of the form "(FORALL ..., ...)" without standing on my
+ *      head and making a mess at the same time.  (One can't
+ *      tell which one is looking at till one reaches the colon
+ *      or misses it after the right parenthesis.)  Since the use
+ *      of FORALL as a loop controller appears to be deprecated
+ *      nowadays (the only instances I have found in the textbook
+ *      are on pp. 2-3, and it doesn't appear in the relevant
+ *      part of the syntax diagrams), this cannot be a great loss.
+ *      A recursive descent parser probably would have had an
+ *      easier time supporting it.  But what's the point, eh?
+ *
+ *  -  In SETL2, EXIT is sort of equivalent to what QUIT is in SETL.
+ *      Actually, it can take an expression argument so that the loop
+ *      can return a value (sheesh), but this grammar ignores that for
+ *      now and just makes it syntactically equivalent to QUIT.
+ *
+ *  -  This grammar currently provokes 146 shift/reduce conflict
+ *      messages from yacc or bison; the default of shift is good
+ *      in all these cases.
+ *
+ *  -  The handling of syntax errors is currently very unsophisticated,
+ *      particularly in the case of one of my most common errors:
+ *      missing END.
+ *
+ *  -  It would be nice to soup this up to allow semicolons to be
+ *      omitted in contexts similar to those in Icon.  Again easier
+ *      with a recursive-descent parser, one would hope.
+ */
+
+
+%{ /* "Declarations"  */
+
+/* This shows that "grammar" probably should have been put in the "tran"
+ * subdir; but it is probably not worth moving it at this stage:  */
+#include "setltran.h"
+
+#define YYMAXDEPTH 10000  /* why mess around? */
+
+/* Stuff needed to manage "END tokens..." and the like */
+#define init(x)  {init_ctrlscope(x); init_loopscope(x);}
+#define push(x)  push_ctrlscope(x)
+#define pop(x)   pop_ctrlscope(x)
+#define scope(i) check_ctrlscope(i)
+#define pushloop(x) push_loopscope(x)
+#define poploop  pop_loopscope()
+#define match(x) match_loop(x)
+#define chkarg(x) check_cmd_arg(x)
+#define oksemi   ok_autosemi()
+#define nosemi   no_autosemi()
+
+/* Node builders... */
+#define null ((node *)NULL)
+
+%include "Nodebuilders"
+
+%} /* end of "Declarations" */
+
+
+%include "Tokens"
+
+%nonassoc Low
+%left Left2 Bop2
+%left Left3 Bop3
+%left Left4 Bop4
+%right Right5 Uop5
+/* %left Left6 Bop6 '=' IN */
+%nonassoc Nonassoc6 Bop6 '=' IN
+%left Left7 Bop7 Bop_name
+%left Left8 Bop8
+%left Left9 Bop9
+%left Left10 Bop10
+%left Left11 Bop11 '+' '-'
+%left Left12 Bop12 '*' '/'
+%right Right13 Bop13 /* exponentiation (**) - was left-assoc in CIMS SETL */
+%left Left14 Bop14
+%right Right15 Uop15
+%nonassoc High
+
+
+/* The distinguished nonterminal */
+%start program
+
+
+%%
+
+program		:	{init(0);} setl_program
+				{ root = $2; }
+		;
+setl_program	:	unnamed_program
+				{ $$ = $1; }
+		|	complex_program
+				{ $$ = $1; }
+		|	/* empty */
+				{ $$ = null; }
+		;
+unnamed_program	:	body opt_routines
+				{ $$ = unnamed_program($1,$1,$2); }
+		;
+complex_program	:	compilation_units
+				{ $$ = complex_program($1,$1); }
+		;
+compilation_units :	compilation_units compilation_unit
+				{ $$ = compilation_units($1,$1,$2); }
+		|	compilation_unit
+				{ $$ = compilation_units($1,null,$1); }
+		;
+compilation_unit :	package_spec
+				{ $$ = $1; }
+		|	package_body
+				{ $$ = $1; }
+		|	program_unit
+				{ $$ = $1; }
+		;
+package_spec	:	PACKAGE {push($1);} Name semi
+			 opt_c_code
+			 opt_decls
+			 opt_routine_specs
+			 end_pop {scope(0);} semi
+				{ $$ = package_spec($1,$3,$5,$6,$7); }
+		;
+package_body	:	PACKAGE BODY {push($1);} Name semi
+			 opt_c_code
+			 opt_uses
+			 opt_decls
+			 opt_routines
+			 end_pop {scope(0);} semi
+				{ $$ = package_body($1,$4,$6,$7,$8,$9); }
+		;
+program_unit	:	PROGRAM {push($1);} Name semi
+			 opt_uses
+			 body
+			 opt_routines
+			 end_pop {scope(0);} semi
+				{ $$ = program_unit($1,$3,$5,$6,$7); }
+		;
+opt_c_code	:	C_code
+				{ $$ = embedded_c_code($1,$1); }
+		|	/* empty */
+				{ $$ = null; }
+		;
+opt_uses	:	uses
+				{ $$ = $1; }
+		|	/* empty */
+				{ $$ = null; }
+		;
+uses		:	uses use
+				{ $$ = uses($1,$1,$2); }
+		|	use
+				{ $$ = uses($1,null,$1); }
+		;
+use		:	USE name_list semi
+				{ $$ = use($1,$2); }
+		;
+opt_routine_specs :	routine_specs
+				{ $$ = $1; }
+		|	/* empty */
+				{ $$ = null; }
+		;
+routine_specs	:	routine_specs routine_spec
+				{ $$ = routine_specs($1,$1,$2); }
+		|	routine_spec
+				{ $$ = routine_specs($1,null,$1); }
+		;
+routine_spec	:	PROC Name '(' form_specs opt_star ')' semi
+				{ $$ = proc_spec($1,$2,$4,$5); }
+		|	PROC Name '(' ')' semi
+				{ $$ = proc_spec($1,$2,null,null); }
+		|	PROC Name semi
+				{ $$ = proc_spec($1,$2,null,null); }
+		|	OP Bop_name '(' form_spec ',' form_spec ')' semi
+				{ $$ = binop_spec($1,$2,$4,$6); }
+		|	OP Uop_name '(' form_spec ')' semi
+				{ $$ = unop_spec($1,$2,$4); }
+		|	COMMAND Command_name '(' form_specs opt_star ')' semi
+				{ $$ = cmd_spec($1,$2,$4,$5); }
+		|	COMMAND Command_name '(' ')' semi
+				{ $$ = cmd_spec($1,$2,null,null); }
+		|	COMMAND Command_name semi
+				{ $$ = cmd_spec($1,$2,null,null); }
+		;
+name_list	:	name_list ',' Name
+				{ $$ = name_list($1,$1,$3); }
+		|	Name
+				{ $$ = name_list($1,null,$1); }
+		;
+opt_routines	:	opt_routines routine
+				{ $$ = routines($1,$1,$2); }
+		|	/* empty */
+				{ $$ = null; }
+		;
+routine		:	procdef
+				{ $$ = $1; }
+		|	opdef
+				{ $$ = $1; }
+		|	cmddef
+				{ $$ = $1; }
+		;
+procdef		:	proc_push Name '(' form_specs opt_star ')' semi body end_pop semi
+				{ $$ = procdef($1,$2,$4,$5,$8); }
+		|	proc_push Name '(' ')' semi body end_pop semi
+				{ $$ = procdef($1,$2,null,null,$6); }
+		|	proc_push Name semi body end_pop semi
+				{ $$ = procdef($1,$2,null,null,$4); }
+		;
+proc_push	:	PROC {push($1);}
+		;
+opdef		:	op_push Bop_name '(' form_spec ',' form_spec ')' semi body end_pop semi
+				{ $$ = binopdef($1,$2,$4,$6,$9); }
+		|	op_push Uop_name '(' form_spec ')' semi body end_pop semi
+				{ $$ = unopdef($1,$2,$4,$7); }
+		;
+op_push		:	OP {push($1);}
+		;
+cmddef		:	cmd_push Command_name '(' form_specs opt_star ')' semi body end_pop semi
+				{ $$ = cmddef($1,$2,$4,$5,$8); }
+		|	cmd_push Command_name '(' ')' semi body end_pop semi
+				{ $$ = cmddef($1,$2,null,null,$6); }
+		|	cmd_push Command_name semi body end_pop semi
+				{ $$ = cmddef($1,$2,null,null,$4); }
+		;
+cmd_push	:	COMMAND {push($1);}
+		;
+form_specs	:	form_specs ',' form_spec
+				{ $$ = form_specs($1,$1,$3); }
+		|	form_spec
+				{ $$ = form_specs($1,null,$1); }
+		;
+form_spec	:	RD Name
+				{ $$ = rd_spec($1,$2); }
+		|	WR Name
+				{ $$ = wr_spec($1,$2); }
+		|	RW Name
+				{ $$ = rw_spec($1,$2); }
+		|	Name
+				{ $$ = rd_spec($1,$1); }
+		;
+opt_star	:	Variadic  /* '(*)' */
+				{ $$ = $1; }
+		|	/* empty */
+				{ $$ = null; }
+		;
+body		:	opt_decls stmts opt_refinements
+				{ $$ = body($1,$1,$2,$3); }
+		;
+opt_decls	:	decls
+				{ $$ = $1; }
+		|	/* empty */
+				{ $$ = null; }
+		;
+decls		:	decls decl
+				{ $$ = decls($1,$1,$2); }
+		|	decl
+				{ $$ = decls($1,null,$1); }
+		;
+decl		:	var_decl
+				{ $$ = $1; }
+		|	const_decl
+				{ $$ = $1; }
+		|	init_decl
+				{ $$ = $1; }
+		|	sel_decl
+				{ $$ = $1; }
+		|	repr_decl
+				{ $$ = $1; }
+		;
+var_decl	:	VAR var_list ':' BACK semi
+				{ $$ = var_decl($1,$2,$4); }
+		|	VAR var_list semi
+				{ $$ = var_decl($1,$2,null); }
+		;
+var_list	:	var_list ',' var
+				{ $$ = var_list($1,$1,$3); }
+		|	var
+				{ $$ = var_list($1,null,$1); }
+		;
+var		:	Name Becomes expr
+				{ $$ = var($1,$1,$3); }
+		|	Name
+				{ $$ = var($1,$1,null); }
+		;
+const_decl	:	CONST ascription_list semi
+				{ $$ = const_decl($1,$2); }
+		;
+ascription_list	:	ascription_list ',' ascription
+				{ $$ = ascription_list($1,$1,$3); }
+		|	ascription
+				{ $$ = ascription_list($1,null,$1); }
+		;
+ascription	:	Name '=' expr
+				{ $$ = ascription($1,$1,$3); }
+		|	Name Becomes expr
+				{ $$ = ascription($1,$1,$3); }
+		|	Name
+				{ $$ = ascription($1,$1,null); }
+		;
+init_decl	:	INIT initial_list semi
+				{ $$ = init_decl($1,$2); }
+		;
+initial_list	:	initial_list ',' initial
+				{ $$ = initial_list($1,$1,$3); }
+		|	initial
+				{ $$ = initial_list($1,null,$1); }
+		;
+initial		:	Name Becomes expr
+				{ $$ = initial($1,$1,$3); }
+		;
+sel_decl	:	SEL sel_list semi
+				{ $$ = sel_decl($1,$2); }
+		;
+sel_list	:	sel_list ',' sel
+				{ $$ = sel_list($1,$1,$3); }
+		|	sel
+				{ $$ = sel_list($1,null,$1); }
+		;
+sel		:	Name '(' expr ')'
+				{ $$ = sel($1,$1,$3); }
+		;
+opt_refinements	:	opt_refinements refinement
+				{ $$ = refinements($1,$1,$2); }
+		|	/* empty */
+				{ $$ = null; }
+		;
+refinement	:	Ref_name Doublecolon stmts
+				{ $$ = refinement($1,$1,$3); }
+		;
+stmts		:	stmts stmt
+				{ $$ = stmts($1,$1,$2); }
+		|	stmt
+				{ $$ = stmts($1,null,$1); }
+		;
+stmt		:	Name ':' stmt
+				{ $$ = labelled_stmt($1,$1,$3); }
+		|	ASSERT expr semi
+				{ $$ = assert_stmt($1,$2); }
+		|	CONTINUE loop_tokens semi
+				{ $$ = continue_stmt($1,$2); }
+		|	EXIT loop_tokens semi
+				{ $$ = quit_stmt($1,$2); }
+		|	FAIL semi
+				{ $$ = fail_stmt($1); }
+		|	GOTO Name semi
+				{ $$ = goto_stmt($1,$2); }
+		|	GO TO Name semi
+				{ $$ = goto_stmt($1,$3); }
+		|	PASS semi
+				{ $$ = pass_stmt($1); }
+		|	Null semi
+				{ $$ = pass_stmt($1); }
+		|	QUIT loop_tokens semi
+				{ $$ = quit_stmt($1,$2); }
+		|	RETURN expr semi
+				{ $$ = return_stmt($1,$2); }
+		|	RETURN semi
+				{ $$ = return_stmt($1,null); }
+		|	STOP expr semi
+				{ $$ = stop_stmt($1,$2); }
+		|	STOP semi
+				{ $$ = stop_stmt($1,null); }
+		|	SUCCEED semi
+				{ $$ = succeed_stmt($1); }
+		|	YIELD expr semi
+				{ $$ = yield_stmt($1,$2); }
+		|	if_push expr THEN stmts opt_elifs end_pop semi
+				{ $$ = if_stmt($1,$2,$4,$5,null); }
+		|	if_push expr THEN stmts opt_elifs ELSE stmts end_pop semi
+				{ $$ = if_stmt($1,$2,$4,$5,$7); }
+		|	case_push OF stmts ELSE stmts end_pop semi
+				{ $$ = case_of_stmt($1,$3,$5); }
+		|	case_push OF stmts end_pop semi
+				{ $$ = case_of_stmt($1,$3,null); }
+		|	case_push expr OF stmts ELSE stmts end_pop semi
+				{ $$ = case_ex_stmt($1,$2,$4,$6); }
+		|	case_push expr OF stmts end_pop semi
+				{ $$ = case_ex_stmt($1,$2,$4,null); }
+			/* SETL2 forms: */
+		|	case_push when_stmts OTHERWISE Implies stmts end_pop semi
+				{ $$ = case_of_when_stmt($1,$2,$5); }
+		|	case_push when_stmts end_pop semi
+				{ $$ = case_of_when_stmt($1,$2,null); }
+		|	case_push expr when_stmts OTHERWISE Implies stmts end_pop semi
+				{ $$ = case_ex_when_stmt($1,$2,$3,$6); }
+		|	case_push expr when_stmts end_pop semi
+				{ $$ = case_ex_when_stmt($1,$2,$3,null); }
+		|	'(' expr_list ')' ':' stmt
+				{ $$ = choice_stmt($1,$2,$5); }
+		|	loop_push loop_head DO
+			 stmts
+			 end_pop {poploop;} semi
+				{ $$ = loop_stmt($1,null,$2,$4); }
+			/* Actually, the following rule serves to support the
+			   first commented-out SETL2 form below, but raises the
+			   number of shift/reduce conflicts in this grammar from
+			   14 to 120.  This is better than the commented-out rule,
+			   however, which takes you to only 18 such conflicts but
+			   at the cost of a bad parser!  */
+		|	loop_push loop_head
+			 stmts
+			 end_pop {poploop;} semi
+				{ $$ = loop_stmt($1,null,$2,$3); }
+		|	loop_push FOR iterator loop_head DO
+			 stmts
+			 end_pop {poploop;} semi
+				{ $$ = loop_stmt($1,$3,$4,$6); }
+		|	loop_push FORALL iterator loop_head DO
+			 stmts
+			 end_pop {poploop;} semi
+				{ $$ = loop_stmt($1,$3,$4,$6); }
+		|	looparen_push loop_head ')'
+			 stmts
+			 end_pop {poploop;} semi
+				{ $$ = loop_stmt($1,null,$2,$4); }
+		|	looparen_push FOR iterator loop_head ')'
+			 stmts
+			 end_pop {poploop;} semi
+				{ $$ = loop_stmt($1,$3,$4,$6); }
+#if 0
+		|	looparen_push FORALL iterator loop_head ')'
+			 stmts
+			 end_pop {poploop;} semi
+				{ $$ = loop_stmt($1,$3,$4,$6); }
+#endif
+			/* SETL2 forms: */
+#if 0
+		|	loop_push
+			 stmts
+			 end_pop {poploop;} semi
+				{ $$ = loop_stmt($1,null,null,$3); }
+#endif
+		|	FOR {push($1);pushloop($1);} iterator LOOP
+			 stmts
+			 end_pop {poploop;} semi
+				{ $$ = loop_stmt($1,$3,null,$5); }
+		|	WHILE {push($1);pushloop($1);} expr LOOP
+			 stmts
+			 end_pop {poploop;} semi
+				{ $$ = loop_stmt($1,null,
+					loop_head($1,null,null,
+					 loop_while($1,$3),
+					 null,null,null),
+					$5); }
+		|	UNTIL {push($1);pushloop($1);} expr LOOP
+			 stmts
+			 end_pop {poploop;} semi
+				{ $$ = loop_stmt($1,null,
+					loop_head($1,null,null,null,null,
+					 loop_until($1,$3),
+					 null),
+					$5); }
+		|	lhs_or_call Becomes expr semi
+				{ $$ = assignment_stmt($1,$1,$2,$3); }
+		|	lhs_or_call Accum Becomes expr semi
+				{ $$ = assignment_stmt($1,$1,$2,$4); }
+		|	lhs_or_call semi
+				{ $$ = call_stmt($1,$1); }
+		|	Sysproc '(' expr_list opt_star ')' semi
+				{ $$ = syscall_stmt($1,$1,$3,$4); }
+		|	Sysproc '(' ')' semi
+				{ $$ = syscall_stmt($1,$1,null,null); }
+		|	Sysproc semi
+				{ $$ = syscall_stmt($1,$1,null,null); }
+		|	lhs_or_call FROME rw semi
+				{ $$ = from_stmt($1,$1,$2,$3); }
+		|	lhs_or_call FROMB rw semi
+				{ $$ = from_stmt($1,$1,$2,$3); }
+		|	lhs_or_call FROM rw semi
+				{ $$ = from_stmt($1,$1,$2,$3); }
+		|	CALL '(' expr ')' semi
+				{ $$ = indirect_call_stmt($1,$3,null,null); }
+		|	CALL '(' expr ',' expr_list opt_star ')' semi
+				{ $$ = indirect_call_stmt($1,$3,$5,$6); }
+		|	command semi
+				{ $$ = cmd_stmt($1,$1); }
+		|	Machine semi
+				{ $$ = machine_stmt($1,$1); }
+	/*
+	 *  As you can imagine, this would cause no end of
+	 *  shift-reduce conflicts with things like lhs_or_call
+	 *  (but leave it in as a comment, just as is, please,
+	 *  because the rest of the compiler pretends it exists
+	 *  just in case it ever does--I need a constant called
+	 *  N_expr_stmt to be created from this comment):
+	 */
+#if 0
+	/* Please do not delete these 2 lines:  */
+		|	expr semi
+				{ $$ = expr_stmt($1,$1); }
+#endif
+		|	C_code
+				{ $$ = embedded_c_code($1,$1); }
+				/* (Counts as statement even without semicolon) */
+		|	semi
+				{ $$ = null_stmt($1); }
+		|	error semi
+		;
+	/*
+	 *  These "safe_stmts" just leave out WHILE and UNTIL, and are
+	 *  for use only within the fancy old SETL loop headers, where
+	 *  WHILE and UNTIL would be ambiguous.  Of course, anywhere
+	 *  else, those SETL2 compatibility forms are recognized as such:
+	 */
+safe_stmts	:	safe_stmts safe_stmt
+				{ $$ = stmts($1,$1,$2); }
+		|	safe_stmt
+				{ $$ = stmts($1,null,$1); }
+		;
+safe_stmt	:	Name ':' safe_stmt
+				{ $$ = labelled_stmt($1,$1,$3); }
+		|	ASSERT expr semi
+				{ $$ = assert_stmt($1,$2); }
+		|	CONTINUE loop_tokens semi
+				{ $$ = continue_stmt($1,$2); }
+		|	EXIT loop_tokens semi
+				{ $$ = quit_stmt($1,$2); }
+		|	FAIL semi
+				{ $$ = fail_stmt($1); }
+		|	GOTO Name semi
+				{ $$ = goto_stmt($1,$2); }
+		|	GO TO Name semi
+				{ $$ = goto_stmt($1,$3); }
+		|	PASS semi
+				{ $$ = pass_stmt($1); }
+		|	Null semi
+				{ $$ = pass_stmt($1); }
+		|	QUIT loop_tokens semi
+				{ $$ = quit_stmt($1,$2); }
+		|	RETURN expr semi
+				{ $$ = return_stmt($1,$2); }
+		|	RETURN semi
+				{ $$ = return_stmt($1,null); }
+		|	STOP expr semi
+				{ $$ = stop_stmt($1,$2); }
+		|	STOP semi
+				{ $$ = stop_stmt($1,null); }
+		|	SUCCEED semi
+				{ $$ = succeed_stmt($1); }
+		|	YIELD expr semi
+				{ $$ = yield_stmt($1,$2); }
+		|	if_push expr THEN stmts opt_elifs end_pop semi
+				{ $$ = if_stmt($1,$2,$4,$5,null); }
+		|	if_push expr THEN stmts opt_elifs ELSE stmts end_pop semi
+				{ $$ = if_stmt($1,$2,$4,$5,$7); }
+		|	case_push OF stmts ELSE stmts end_pop semi
+				{ $$ = case_of_stmt($1,$3,$5); }
+		|	case_push OF stmts end_pop semi
+				{ $$ = case_of_stmt($1,$3,null); }
+		|	case_push expr OF stmts ELSE stmts end_pop semi
+				{ $$ = case_ex_stmt($1,$2,$4,$6); }
+		|	case_push expr OF stmts end_pop semi
+				{ $$ = case_ex_stmt($1,$2,$4,null); }
+			/* SETL2 forms: */
+		|	case_push when_stmts OTHERWISE Implies stmts end_pop semi
+				{ $$ = case_of_when_stmt($1,$2,$5); }
+		|	case_push when_stmts end_pop semi
+				{ $$ = case_of_when_stmt($1,$2,null); }
+		|	case_push expr when_stmts OTHERWISE Implies stmts end_pop semi
+				{ $$ = case_ex_when_stmt($1,$2,$3,$6); }
+		|	case_push expr when_stmts end_pop semi
+				{ $$ = case_ex_when_stmt($1,$2,$3,null); }
+		|	'(' expr_list ')' ':' stmt
+				{ $$ = choice_stmt($1,$2,$5); }
+		|	loop_push loop_head DO
+			 stmts
+			 end_pop {poploop;} semi
+				{ $$ = loop_stmt($1,null,$2,$4); }
+		|	loop_push FOR iterator loop_head DO
+			 stmts
+			 end_pop {poploop;} semi
+				{ $$ = loop_stmt($1,$3,$4,$6); }
+		|	loop_push FORALL iterator loop_head DO
+			 stmts
+			 end_pop {poploop;} semi
+				{ $$ = loop_stmt($1,$3,$4,$6); }
+		|	looparen_push loop_head ')'
+			 stmts
+			 end_pop {poploop;} semi
+				{ $$ = loop_stmt($1,null,$2,$4); }
+		|	looparen_push FOR iterator loop_head ')'
+			 stmts
+			 end_pop {poploop;} semi
+				{ $$ = loop_stmt($1,$3,$4,$6); }
+#if 0
+		|	looparen_push FORALL iterator loop_head ')'
+			 stmts
+			 end_pop {poploop;} semi
+				{ $$ = loop_stmt($1,$3,$4,$6); }
+#endif
+			/* SETL2 forms: */
+		|	FOR {push($1);pushloop($1);} iterator LOOP
+			 stmts
+			 end_pop {poploop;} semi
+				{ $$ = loop_stmt($1,$3,null,$5); }
+		|	lhs_or_call Becomes expr semi
+				{ $$ = assignment_stmt($1,$1,$2,$3); }
+		|	lhs_or_call Accum Becomes expr semi
+				{ $$ = assignment_stmt($1,$1,$2,$4); }
+		|	lhs_or_call semi
+				{ $$ = call_stmt($1,$1); }
+		|	Sysproc '(' expr_list opt_star ')' semi
+				{ $$ = syscall_stmt($1,$1,$3,$4); }
+		|	Sysproc '(' ')' semi
+				{ $$ = syscall_stmt($1,$1,null,null); }
+		|	Sysproc semi
+				{ $$ = syscall_stmt($1,$1,null,null); }
+		|	lhs_or_call FROME rw semi
+				{ $$ = from_stmt($1,$1,$2,$3); }
+		|	lhs_or_call FROMB rw semi
+				{ $$ = from_stmt($1,$1,$2,$3); }
+		|	lhs_or_call FROM rw semi
+				{ $$ = from_stmt($1,$1,$2,$3); }
+		|	CALL '(' expr ')' semi
+				{ $$ = indirect_call_stmt($1,$3,null,null); }
+		|	CALL '(' expr ',' expr_list opt_star ')' semi
+				{ $$ = indirect_call_stmt($1,$3,$5,$6); }
+		|	command semi
+				{ $$ = cmd_stmt($1,$1); }
+		|	Machine semi
+				{ $$ = machine_stmt($1,$1); }
+#if 0
+		|	expr semi
+				{ $$ = expr_stmt($1,$1); }
+#endif
+		|	C_code
+				{ $$ = embedded_c_code($1,$1); }
+				/* (Counts as statement even without semicolon) */
+		|	semi
+				{ $$ = null_stmt($1); }
+		|	error semi
+		;
+if_push		:	IF {push($1);}
+		;
+opt_elifs	:	opt_elifs elif
+				{ $$ = elifs($1,$1,$2); }
+		|	/* empty */
+				{ $$ = null; }
+		;
+elif		:	ELSEIF expr THEN stmts
+				{ $$ = elif($1,$2,$4); }
+		;
+case_push	:	CASE {push($1);}
+		;
+when_stmts	:	when_stmts when_stmt
+				{ $$ = when_stmts($1,$1,$2); }
+		|	when_stmt
+				{ $$ = when_stmts($1,null,$1); }
+		;
+when_stmt	:	WHEN expr_list Implies stmts
+				{ $$ = when_stmt($1,$2,$4); }
+		;
+loop_push	:	LOOP {push($1);pushloop($1);}
+		;
+looparen_push	:	'(' {push($1);pushloop($1);}
+		;
+loop_tokens	:	/* empty */
+				{ $$ = match($0); }
+		;
+loop_head	:	opt_loop_init opt_loop_doing opt_loop_while opt_loop_step opt_loop_until opt_loop_term
+				{ $$ = loop_head($1,$1,$2,$3,$4,$5,$6); }
+		;
+opt_loop_init	:	INIT safe_stmts
+				{ $$ = loop_init($1,$2); }
+		|	/* empty */
+				{ $$ = null; }
+		;
+opt_loop_doing	:	DOING safe_stmts
+				{ $$ = loop_doing($1,$2); }
+		|	/* empty */
+				{ $$ = null; }
+		;
+opt_loop_while	:	WHILE expr
+				{ $$ = loop_while($1,$2); }
+		|	/* empty */
+				{ $$ = null; }
+		;
+opt_loop_step	:	STEP safe_stmts
+				{ $$ = loop_step($1,$2); }
+		|	/* empty */
+				{ $$ = null; }
+		;
+opt_loop_until	:	UNTIL expr
+				{ $$ = loop_until($1,$2); }
+		|	/* empty */
+				{ $$ = null; }
+		;
+opt_loop_term	:	TERM safe_stmts
+				{ $$ = loop_term($1,$2); }
+		|	/* empty */
+				{ $$ = null; }
+		;
+iterator	:	simpliter_list '|' expr
+				{ $$ = iterator($1,$1,$3); }
+		|	simpliter_list
+				{ $$ = iterator($1,$1,null); }
+		;
+simpliter_list	:	simpliter_list ',' simpliter
+				{ $$ = simpliter_list($1,$1,$3); }
+		|	simpliter
+				{ $$ = simpliter_list($1,null,$1); }
+		;
+simpliter	:	lhs IN expr
+				{ $$ = simpliter1($1,$1,$3); }
+		|	lhs '=' compound_or_predef '(' lhs_list ')'
+				{ $$ = simpliter2($1,$1,$3,$5); }
+		|	lhs '=' compound_or_predef '{' lhs_list '}'
+				{ $$ = simpliter3($1,$1,$3,$5); }
+		;
+compound_or_predef :	compound
+				{ $$ = $1; }
+		|	Syscon
+				{ $$ = $1; }
+		|	Sysval
+				{ $$ = $1; }
+		|	Sysvar
+				{ $$ = $1; }
+		;
+expr_list	:	expr_list ',' expr
+				{ $$ = expr_list($1,$1,$3); }
+		|	expr
+				{ $$ = expr_list($1,null,$1); }
+		;
+lhs_list	:	lhs_list ',' lhs
+				{ $$ = lhs_list($1,$1,$3); }
+		|	lhs
+				{ $$ = lhs_list($1,null,$1); }
+		;
+rw_list		:	rw_list ',' rw
+				{ $$ = rw_list($1,$1,$3); }
+		|	rw
+				{ $$ = rw_list($1,null,$1); }
+		;
+lhs_or_dash_list :	lhs_or_dash_list ',' lhs_or_dash
+				{ $$ = lhs_or_dash_list($1,$1,$3); }
+		|	lhs_or_dash
+				{ $$ = lhs_or_dash_list($1,null,$1); }
+		;
+lhs_or_dash	:	lhs
+				{ $$ = $1; }
+		|	'-'
+				{ $$ = $1; }
+		;
+lhs_or_call	:	nameseq
+				{ $$ = lhs1($1,$1); }
+		|	'[' lhs_or_dash_list ']'
+				{ $$ = lhs2($1,$2); }
+		|	lhs_or_call selector
+				{ $$ = lhs3($1,$1,$2); }
+		|	lhs_or_call '(' ')'
+				{ $$ = lhs3($1,$1,null); }
+		|	Sysvar
+				{ $$ = $1; }
+		;
+lhs		:	nameseq
+				{ $$ = lhs1($1,$1); }
+		|	'[' lhs_or_dash_list ']'
+				{ $$ = lhs2($1,$2); }
+		|	lhs selector
+				{ $$ = lhs3($1,$1,$2); }
+		|	Sysvar
+				{ $$ = $1; }
+		;
+rw		:	nameseq
+				{ $$ = rw1($1,$1); }
+		|	'[' rw_list ']'
+				{ $$ = rw2($1,$2); }
+		|	rw selector
+				{ $$ = rw3($1,$1,$2); }
+		|	Sysvar
+				{ $$ = $1; }
+		;
+selector	:	'(' expr_list opt_star ')'
+				{ $$ = selector1($1,$2,$3); }
+		|	'{' expr_list '}'
+				{ $$ = selector2($1,$2); }
+		|	'(' expr Dots expr ')'
+				{ $$ = selector3($1,$2,$4); }
+		|	'(' expr Dots ')'
+				{ $$ = selector3($1,$2,null); }
+		|	'(' Dots expr ')'
+				{ $$ = selector3($1,null,$3); }
+		|	'.' nameseq
+				{ $$ = selector4($1,$2); }
+		;
+expr		:	operand Becomes expr
+				{ $$ = assignment($1,$1,$2,$3); }
+		|	operand Accum Becomes expr
+				{ $$ = assignment($1,$1,$2,$4); }
+		|	term			%prec Low
+				{ $$ = $1; }
+		;
+term		:	term Bop2 term    	%prec Left2
+				{ $$ = binary($1,$1,$2,$3); }
+		|	term Bop2 '/' term    	%prec Left2
+				{ $$ = bincomb($1,$1,$2,$4); }
+		|	term Bop3 term    	%prec Left3
+				{ $$ = binary($1,$1,$2,$3); }
+		|	term Bop3 '/' term    	%prec Left3
+				{ $$ = bincomb($1,$1,$2,$4); }
+		|	term Bop4 term    	%prec Left4
+				{ $$ = binary($1,$1,$2,$3); }
+		|	term Bop4 '/' term    	%prec Left4
+				{ $$ = bincomb($1,$1,$2,$4); }
+		|	Uop5 term    		%prec Right5
+				{ $$ = unary($1,$1,$2); }
+		|	term Bop6 term    	%prec Nonassoc6
+				{ $$ = binary($1,$1,$2,$3); }
+/*		|	term Bop6 '/' term    	%prec Left6
+				{ $$ = bincomb($1,$1,$2,$4); } */
+		|	term '=' term    	%prec Nonassoc6
+				{ $$ = binary($1,$1,$2,$3); }
+/*		|	term '=' '/' term    	%prec Left6
+				{ $$ = bincomb($1,$1,$2,$4); } */
+		|	term IN term    	%prec Nonassoc6
+				{ $$ = binary($1,$1,$2,$3); }
+/*		|	term IN '/' term    	%prec Left6
+				{ $$ = bincomb($1,$1,$2,$4); } */
+		|	term Bop7 term    	%prec Left7
+				{ $$ = binary($1,$1,$2,$3); }
+		|	term Bop7 '/' term    	%prec Left7
+				{ $$ = bincomb($1,$1,$2,$4); }
+		|	term Bop_name term    	%prec Left7
+				{ $$ = binary($1,$1,$2,$3); }
+		|	term Bop_name '/' term	%prec Left7
+				{ $$ = bincomb($1,$1,$2,$4); }
+		|	term Bop8 term    	%prec Left8
+				{ $$ = binary($1,$1,$2,$3); }
+		|	term Bop8 '/' term    	%prec Left8
+				{ $$ = bincomb($1,$1,$2,$4); }
+		|	term Bop9 term    	%prec Left9
+				{ $$ = binary($1,$1,$2,$3); }
+		|	term Bop9 '/' term    	%prec Left9
+				{ $$ = bincomb($1,$1,$2,$4); }
+		|	term Bop10 term    	%prec Left10
+				{ $$ = binary($1,$1,$2,$3); }
+		|	term Bop10 '/' term    	%prec Left10
+				{ $$ = bincomb($1,$1,$2,$4); }
+		|	term Bop11 term    	%prec Left11
+				{ $$ = binary($1,$1,$2,$3); }
+		|	term Bop11 '/' term    	%prec Left11
+				{ $$ = bincomb($1,$1,$2,$4); }
+		|	term '+' term    	%prec Left11
+				{ $$ = binary($1,$1,$2,$3); }
+		|	term '+' '/' term    	%prec Left11
+				{ $$ = bincomb($1,$1,$2,$4); }
+		|	term '-' term    	%prec Left11
+				{ $$ = binary($1,$1,$2,$3); }
+		|	term '-' '/' term    	%prec Left11
+				{ $$ = bincomb($1,$1,$2,$4); }
+		|	term Bop12 term    	%prec Left12
+				{ $$ = binary($1,$1,$2,$3); }
+		|	term Bop12 '/' term    	%prec Left12
+				{ $$ = bincomb($1,$1,$2,$4); }
+		|	term '/' term    	%prec Left12
+				{ $$ = binary($1,$1,$2,$3); }
+		|	term '/' '/' term    	%prec Left12
+				{ $$ = bincomb($1,$1,$2,$4); }
+		|	term '*' term    	%prec Left12
+				{ $$ = binary($1,$1,$2,$3); }
+		|	term '*' '/' term    	%prec Left12
+				{ $$ = bincomb($1,$1,$2,$4); }
+		|	term Bop13 term    	%prec Right13  /* was Left13 */
+				{ $$ = binary($1,$1,$2,$3); }
+/* better that "** /" be treated as a syntax error:  */
+/*		|	term Bop13 '/' term    	%prec Right13
+				{ $$ = bincomb($1,$1,$2,$4); } */
+		|	term Bop14 term    	%prec Left14
+				{ $$ = binary($1,$1,$2,$3); }
+		|	term Bop14 '/' term    	%prec Left14
+				{ $$ = bincomb($1,$1,$2,$4); }
+		|	Uop15 term    		%prec Right15
+				{ $$ = unary($1,$1,$2); }
+		|	'-' term    		%prec Right15
+				{ $$ = unary($1,$1,$2); }
+		|	'+' term    		%prec Right15
+				{ $$ = unary($1,$1,$2); }
+		|	Uop_name term    	%prec Right15
+				{ $$ = unary($1,$1,$2); }
+		|	Bop1 '/' term    	%prec Right15
+				{ $$ = uncomb($1,$1,$3); }
+		|	Bop2 '/' term    	%prec Right15
+				{ $$ = uncomb($1,$1,$3); }
+		|	Bop3 '/' term    	%prec Right15
+				{ $$ = uncomb($1,$1,$3); }
+		|	Bop4 '/' term    	%prec Right15
+				{ $$ = uncomb($1,$1,$3); }
+/*		|	Bop6 '/' term    	%prec Right15
+				{ $$ = uncomb($1,$1,$3); } */
+		|	Bop7 '/' term    	%prec Right15
+				{ $$ = uncomb($1,$1,$3); }
+		|	Bop_name '/' term    	%prec Right15
+				{ $$ = uncomb($1,$1,$3); }
+		|	Bop8 '/' term    	%prec Right15
+				{ $$ = uncomb($1,$1,$3); }
+		|	Bop9 '/' term    	%prec Right15
+				{ $$ = uncomb($1,$1,$3); }
+		|	Bop10 '/' term    	%prec Right15
+				{ $$ = uncomb($1,$1,$3); }
+		|	Bop11 '/' term    	%prec Right15
+				{ $$ = uncomb($1,$1,$3); }
+		|	'+' '/' term    	%prec Right15
+				{ $$ = uncomb($1,$1,$3); }
+		|	'-' '/' term    	%prec Right15
+				{ $$ = uncomb($1,$1,$3); }
+		|	Bop12 '/' term    	%prec Right15
+				{ $$ = uncomb($1,$1,$3); }
+		|	'/' '/' term    	%prec Right15
+				{ $$ = uncomb($1,$1,$3); }
+		|	'*' '/' term    	%prec Right15
+				{ $$ = uncomb($1,$1,$3); }
+/*		|	Bop13 '/' term    	%prec Right15
+				{ $$ = uncomb($1,$1,$3); } */
+		|	Bop14 '/' term    	%prec Right15
+				{ $$ = uncomb($1,$1,$3); }
+		|	operand
+				{ $$ = $1; }
+		;
+operand		:	Integer
+				{ $$ = $1; }
+		|	Real_
+				{ $$ = $1; }
+		|	String
+				{ $$ = $1; }
+		|	compound
+				{ $$ = $1; }
+		|	Syscon
+				{ $$ = $1; }
+		|	Sysval
+				{ $$ = $1; }
+		|	Sysvar
+				{ $$ = $1; }
+		|	'(' expr ')'
+				{ $$ = expr($1,$2); }
+		|	case_expr
+				{ $$ = $1; }
+		|	if_expr
+				{ $$ = $1; }
+		|	'[' ']'
+				{ $$ = tuple1($1,null); }
+		|	'[' expr_list ']'
+				{ $$ = tuple1($1,$2); }
+		|	'[' former ']'
+				{ $$ = tuple2($1,$2); }
+		|	'{' '}'
+				{ $$ = set1($1,null); }
+		|	'{' expr_list '}'
+				{ $$ = set1($1,$2); }
+		|	'{' former '}'
+				{ $$ = set2($1,$2); }
+		|	operand selector
+				{ $$ = applic($1,$1,$2); }
+		|	operand '(' ')'
+				{ $$ = applic($1,$1,null); }
+		|	Sysproc '(' expr_list opt_star ')'
+				{ $$ = syscall($1,$1,$3,$4); }
+		|	Sysproc '(' ')'
+				{ $$ = syscall($1,$1,null,null); }
+		|	Sysproc
+				{ $$ = syscall($1,$1,null,null); }
+		|	EXPR stmts END
+				{ $$ = expr_clause($1,$2); }
+		|	EXPR stmts END EXPR
+				{ $$ = expr_clause($1,$2); }
+		|	EXISTS simpliter_list '|' expr
+				{ $$ = exists($1,$2,$4); }
+		|	NOTEXISTS simpliter_list '|' expr
+				{ $$ = notexists($1,$2,$4); }
+		|	FORALL simpliter_list '|' expr
+				{ $$ = forall($1,$2,$4); }
+		|	PROC compound
+				{ $$ = procval($1,$2); }
+		|	'(' PROC ')' compound
+				{ $$ = procval($2,$4); }
+		|	ROUTINE compound
+				{ $$ = procval($1,$2); }
+		|	'(' ROUTINE ')' compound
+				{ $$ = procval($2,$4); }
+		|	COMMAND Command_name
+				{ $$ = cmdval($1,$2); }
+				/* Minor quibble - should really support a dotted (compound)
+				 * form for the operand of COMMAND.  */
+		|	CALL '(' expr ')'
+				{ $$ = indirect_call($1,$3,null,null); }
+		|	CALL '(' expr ',' expr_list opt_star ')'
+				{ $$ = indirect_call($1,$3,$5,$6); }
+				/* someday a nicer syntax, perhaps? */
+		|	command
+				{ $$ = $1; }
+		|	Machine
+				{ $$ = $1; }
+		|	error
+		;
+command		:	Command_name cmdargs opt_star
+				{ $$ = command($1,$1,$2,$3); }
+		|	Command_name
+				{ $$ = command($1,$1,null,null); }
+		;
+#if 0
+opt_cmdargs	:	cmdargs
+				{ $$ = $1; }
+		|	/* empty */
+				{ $$ = null; }
+		;
+#endif
+cmdargs		:	cmdargs cmdarg {chkarg($2); /*
+			       */ $$ = cmdargs($1,$1,$2); }
+		|	cmdarg
+				{ $$ = cmdargs($1,null,$1); }
+		;
+cmdarg		:	Integer
+				{ $$ = $1; }
+		|	Real_
+				{ $$ = $1; }
+		|	String
+				{ $$ = $1; }
+		|	compound
+				{ $$ = $1; }
+		|	Syscon
+				{ $$ = $1; }
+		|	Sysval
+				{ $$ = $1; }
+		|	Sysvar
+				{ $$ = $1; }
+		|	'(' expr ')'
+				{ $$ = expr($1,$2); }
+		|	'[' ']'
+				{ $$ = tuple1($1,null); }
+		|	'[' expr_list ']'
+				{ $$ = tuple1($1,$2); }
+		|	'[' former ']'
+				{ $$ = tuple2($1,$2); }
+		|	'{' '}'
+				{ $$ = set1($1,null); }
+		|	'{' expr_list '}'
+				{ $$ = set1($1,$2); }
+		|	'{' former '}'
+				{ $$ = set2($1,$2); }
+		|	error
+		;
+compound	:	nameseq
+				{ $$ = compound($1,$1); }
+		;
+nameseq		:	nameseq '.' Name
+				{ $$ = nameseq($1,$1,$3); }
+		|	Name
+				{ $$ = nameseq($1,null,$1); }
+		;
+former		:	expr ':' loop_head
+				{ $$ = former1($1,$1,null,$3); }
+		|	expr ':' iterator loop_head
+				{ $$ = former1($1,$1,$3,$4); }
+		|	expr ':' FOR iterator loop_head
+				{ $$ = former1($1,$1,$4,$5); }
+		|	expr_list Dots expr
+				{ $$ = former2($1,$1,$3); }
+		|	operand IN expr '|' expr
+				{ $$ = former3($1,$1,$3,$5); }
+		;
+case_expr	:	case_of_expr
+				{ $$ = $1; }
+		|	case_ex_expr
+				{ $$ = $1; }
+		;
+case_of_expr	:	CASE OF choices ELSE expr END
+				{ $$ = case_of_expr($1,$3,$5); }
+		|	CASE OF choices ELSE expr END CASE
+				{ $$ = case_of_expr($1,$3,$5); }
+		|	CASE setl2_choices OTHERWISE Implies expr END CASE
+				{ $$ = case_of_expr($1,$2,$5); }
+		;
+case_ex_expr	:	CASE expr OF choices ELSE expr END
+				{ $$ = case_ex_expr($1,$2,$4,$6); }
+		|	CASE expr OF choices ELSE expr END CASE
+				{ $$ = case_ex_expr($1,$2,$4,$6); }
+		|	CASE expr setl2_choices OTHERWISE Implies expr END CASE
+				{ $$ = case_ex_expr($1,$2,$3,$6); }
+		;
+choices		:	choices ',' choice
+				{ $$ = choices($1,$1,$3); }
+		|	choice
+				{ $$ = choices($1,null,$1); }
+		;
+choice		:	'(' expr_list ')' ':' expr
+				{ $$ = choice($1,$2,$5); }
+		;
+setl2_choices	:	setl2_choices setl2_choice
+				{ $$ = choices($1,$1,$2); }
+		|	setl2_choice
+				{ $$ = choices($1,null,$1); }
+		;
+setl2_choice	:	WHEN expr_list Implies expr
+				{ $$ = choice($1,$2,$4); }
+		;
+if_expr		:	IF expr THEN expr opt_elif_exprs ELSE expr END
+				{ $$ = if_expr($1,$2,$4,$5,$7); }
+		|	IF expr THEN expr opt_elif_exprs ELSE expr END IF
+				{ $$ = if_expr($1,$2,$4,$5,$7); }
+		;
+opt_elif_exprs	:	opt_elif_exprs elif_expr
+				{ $$ = elif_exprs($1,$1,$2); }
+		|	/* empty */
+				{ $$ = null; }
+		;
+elif_expr	:	ELSEIF expr THEN expr
+				{ $$ = elif_expr($1,$2,$4); }
+		;
+
+repr_decl	:	REPR reprs END semi
+				{ $$ = repr_decl($1); }
+		|	REPR reprs END REPR semi
+				{ $$ = repr_decl($1); }
+		|	REPR error END REPR semi
+		;
+reprs		:	reprs repr semi
+		|	repr semi
+		;
+repr		:	name_list ':' mode
+		|	MODE Name ':' mode
+		|	BASE name_list ':' mode
+		|	BASE name_list
+		|	PLEX BASE name_list
+		;
+mode		:	ATOM
+		|	BOOLEAN
+		|	REAL
+		|	UNTYPED REAL
+		|	STRING
+		|	INTEGER
+		|	INTEGER expr Dots expr
+		|	UNTYPED INTEGER
+		|	TUPLE
+		|	TUPLE '(' mode_list ')'
+		|	TUPLE '(' mode_list ')' '(' expr ')'
+		|	PACKED TUPLE
+		|	PACKED TUPLE '(' mode_list ')'
+		|	PACKED TUPLE '(' mode_list ')' '(' expr ')'
+		|	SET
+		|	SET '(' mode ')'
+		|	SMAP
+		|	SMAP '(' mode_list ')'
+		|	SMAP '(' mode_list ')' mode
+		|	PACKED SMAP
+		|	PACKED SMAP '(' mode_list ')'
+		|	PACKED SMAP '(' mode_list ')' mode
+		|	MMAP
+		|	MMAP '{' mode_list '}'
+		|	MMAP '{' mode_list '}' mode
+		|	basetype SET '(' emode ')'
+		|	basetype MAP '(' emode ')' mode
+		|	basetype SMAP '(' emode ')' mode
+		|	basetype MMAP '{' emode '}' mode
+		|	PACKED basetype SMAP '(' emode ')' mode
+		|	PROC
+		|	PROC '(' mode_list ')'
+		|	PROC '(' mode_list ')' mode
+		|	OP '(' mode_list ')'
+		|	OP '(' mode_list ')' mode
+		|	ROUTINE
+		|	emode
+		|	GENERAL
+		|	'*'
+/*		|	ERROR */
+		;
+emode		:	ELMT Name
+		|	Name
+		;
+mode_list	:	mode_list ',' mode
+		|	mode
+		;
+basetype	:	LOCAL
+		|	REMOTE
+		|	SPARSE
+		;
+
+end_pop		:	END {pop($1);}
+		;
+
+/* This was an embarrassing attempt, given the LALR(1) context... */
+/* semi		:	{oksemi;} ';' {nosemi;} */
+semi		:	';'
+		;
+
+%%

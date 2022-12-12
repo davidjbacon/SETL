@@ -1,0 +1,42 @@
+PROGRAM dike;  $ Dijkstra's shortest-path-finding algorithm
+               $ (p.208, Aho Hopcroft & Ullman)
+ 
+  CONST g = {[[0,4],10.0],
+             [[0,1],2.0],
+             [[1,2],3.0],
+             [[2,3],4.0],
+             [[3,4],5.0],
+             [[1,4],7.0],
+             [[4,2],6.0]};
+  CONST infinity = 1.0E50;
+  VAR e, v;  $ make "global"
+ 
+  e := DOMAIN g;
+  v := DOMAIN e + RANGE e;
+  s := {0};
+  d := {};
+  LOOP FOR i IN v DO d +:= {[i,l(0,i)]}; END LOOP;
+  p := {};
+  LOOP FOR i IN v DO p +:= {[i,0]}; END LOOP;
+  LOOP WHILE s /= v DO
+    w := ARB {i IN v - s | FORALL j IN v - s | d(i) <= d(j)};
+    s +:= {w};
+    LOOP FOR i IN v - s DO
+      wv := d(w) + l(w,i);
+      IF wv < d(i) THEN
+        d(i) := wv;
+        p(i) := w;
+      END IF;
+    END LOOP;
+  END LOOP;
+  PRINT(d);  $ costs
+  PRINT(p);  $ predecessor vertices on path
+ 
+  PROC l(i,j);
+    IF [i,j] IN e THEN RETURN g(i,j);
+    ELSEIF i = j THEN RETURN 0.0;
+    ELSE RETURN infinity;
+    END IF;
+  END PROC;
+ 
+END PROGRAM;

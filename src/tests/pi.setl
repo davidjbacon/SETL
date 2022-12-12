@@ -1,0 +1,31 @@
+-- As borrowed from Zhiqing --
+
+program pi;
+
+  n := 20; d := 5;
+  j:=0; b:=2; k:=0; r:=1;
+
+  while k<d loop
+    r:=r*10;
+    k:=k+1;
+  end loop;
+
+  n := n div d + 1;
+  m := 3322*n*d div 1000 + 1;
+  a := m*[2];
+  a(m):=4;
+
+  b := 2;
+  for j in [1,2..n] loop
+    q := 0;
+    for k in [m,m-1..2] loop 
+      q := q + a(k) * r;
+      t := 2 * k - 1;
+      a(k) := q mod t;
+      q := (k-1) * (q div t);
+    end loop;
+    s := b + q div r;
+    print (s);
+    b := q mod r;
+  end loop;
+end;

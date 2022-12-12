@@ -1,0 +1,37 @@
+========================================================================
+Original contents:
+------------------------------------------------------------------------
+const cmd = 'sed -e "s/./&&/g"';
+const fil = (getenv 'srcdir'?'.')+'/filter.setl';
+const line = 72*'-';
+const heavy = 72*'=';
+open(fil,'r');
+s := getfile(fil);
+print(heavy);
+print('Original contents:');
+print(line);
+putchar(s);
+print(heavy);
+print('As filtered through ',cmd,':');
+print(line);
+putchar(filter(cmd,s));
+print(heavy);
+========================================================================
+As filtered through  sed -e "s/./&&/g" :
+------------------------------------------------------------------------
+ccoonnsstt  ccmmdd  ==  ''sseedd  --ee  ""ss//..//&&&&//gg""'';;
+ccoonnsstt  ffiill  ==  ((ggeetteennvv  ''ssrrccddiirr''??''..''))++''//ffiilltteerr..sseettll'';;
+ccoonnsstt  lliinnee  ==  7722**''--'';;
+ccoonnsstt  hheeaavvyy  ==  7722**''=='';;
+ooppeenn((ffiill,,''rr''));;
+ss  ::==  ggeettffiillee((ffiill));;
+pprriinntt((hheeaavvyy));;
+pprriinntt((''OOrriiggiinnaall  ccoonntteennttss::''));;
+pprriinntt((lliinnee));;
+ppuuttcchhaarr((ss));;
+pprriinntt((hheeaavvyy));;
+pprriinntt((''AAss  ffiilltteerreedd  tthhrroouugghh  '',,ccmmdd,,''::''));;
+pprriinntt((lliinnee));;
+ppuuttcchhaarr((ffiilltteerr((ccmmdd,,ss))));;
+pprriinntt((hheeaavvyy));;
+========================================================================

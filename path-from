@@ -1,0 +1,145 @@
+#! /bin/sh
+#
+# $Id: path-from,v 1.9 2022/12/11 17:09:26 setlorg Exp $
+#
+# Free software (c) dB - see file COPYING for license (GPL).
+#
+#
+# Guess relative path from $1 to $2 (default $2 is `pwd` or .)
+#
+# Use:  `path-from {there} [{here}]`
+#
+# No account is taken of symlinks or file existence.
+
+myname=`basename "$0"`
+
+there=$1
+here=${2-`pwd`}
+
+awk_prog='
+#
+# Canonicalize and split p at slashes into array of components r[1..n],
+# and return n.  If p is relative, it is effectively prefixed with
+# `pwd`/ before the split; p is not allowed to be the empty string.
+#
+# The array form in r is general enough to allow for relative pathnames,
+# but since we prepend `pwd`, we will always set r[1] to "", reflecting
+# an absolute pathname.  No other component of r will be "".
+#
+# Note that if n is 1, r[1] may be "."; but "." will otherwise never be
+# a component of r.
+#
+# In no case will r contain a component with a slash.
+#
+# For the purpose of recognizing pathname component separators,
+# slash is "/" or "\".  Newly produced slashes are always "/".
+#
+function split_nicely(p, r) {  # p is a string, r will refer to an array
+  if (p == "") {
+    print "split_nicely: p must not be the empty string." | "cat >&2"
+    exit 1
+  }
+  slash = "[/\\\\]"  # "/" or "\"
+  dot = "\\."        # literal dot
+  if (p !~ "^" slash) {  # p does not begin with a slash
+    "pwd" | getline wd
+    close("pwd")
+    p = wd "/" p         # prepend `pwd`/ to p, to make it absolute
+  }
+  gsub("(" slash dot ")+" slash, "/", p)  # turn /./, /././, etc. into /
+  sub("^" dot slash, "", p)               # also remove leading ./
+  sub(slash dot "$", "", p)               # and trailing /.
+  sub(slash "*$", "", p)                  # and then trailing slashes
+  n = split(p, r, slash "+")              # split on runs of slashes
+  if (n == 0) {
+    n = 1
+    r[1] = ""                             # p is effectively /
+  } else {
+    n = edit_path(r, n)                   # edit out x/.. occurrences
+  }
+  return n
+}
+
+#
+# Remove elements of r that come from "X/.." for each X other than "..".
+#
+# If X is empty (which can only occur in r[1], for the beginning of an
+# absolute pathname), remove only the ".." in r[2], as a leading "/../"
+# just means "/".  Otherwise, effectively remove "X/.." and repeat.
+#
+# Return the new size of r.
+#
+function edit_path(r, n) {
+  j = 0
+  k = r[1] == "" ? 1 : 0  # backup limit for j
+  for (i = 1; i <= n; ++i) {
+    if (r[i] != "..") {
+      q[++j] = r[i]  # copy component
+    } else {
+      if (j > k) {
+        if (q[j] != "..") {
+          --j  # consume one parent (the X referred to above)
+        } else {
+          q[++j] = r[i]  # ..
+        }
+      } else {  # j <= k
+        if (k == 0) {  # relative
+          q[++j] = r[i]  # ..
+        } else {
+          # do nothing, as /../ means /
+        }
+      }
+    }
+  }
+  # Copy q back to the reference arg r
+  for (i = 1; i <= j; ++i) {
+    r[i] = q[i]
+  }
+  for ( ; i <= n; ++i) {
+    delete r[i]  # fussy
+  }
+  return j
+}
+
+BEGIN {
+  myname = ARGV[1]
+  there = ARGV[2]
+  here = ARGV[3]
+
+  if (there == "" ||
+      here == "") {
+    print myname ": neither arg may be the empty string" | "cat >&2"
+    exit 1
+  }
+
+  # Work with pathnames massaged by absolution and canonicalization
+  # into arrays of strings.
+  #
+  na = split_nicely(there, a)  # string there -> array a
+  nb = split_nicely(here, b)   # string here  -> array b
+
+  # The algorithm to find the relative path from there to here (b to a)
+  # is to concatenate as many instances of "../" as needed to go up to
+  # where the paths diverge, and then follow the here side from that
+  # point down to the leaf level.
+  #
+  # Special case:  if there and here are the same, the result is ".".
+  #
+  i = 2;
+  while (i <= na &&
+         i <= nb &&
+         a[i] == b[i]) {
+    ++i
+  }  # i is now the index of where they first differ
+  back = ""
+  for (j = i; j <= na; ++j) back = back "../"
+  for (j = i; j <= nb; ++j) back = back b[j] "/"
+  if (back == "") {
+    print "."  # there and here match
+  } else {
+    sub(/\/$/, "", back)  # trim off trailing /
+    print back  # print relative path from there to here
+  }
+}'
+
+awk "$awk_prog" "$myname" "$there" "$here"

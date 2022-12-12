@@ -1,0 +1,175 @@
+$Id: BUGS,v 1.36 2022/12/10 23:35:25 setlorg Exp $
+
+Free software (c) dB - see file COPYING for license (GPL).
+
+
+Known bugs in GNU SETL
+----------------------
+
+- PI should probably be built in, so you don't have to put
+  "CONST pi = 4 * ATAN 1" or whatever at the top of so many programs.
+  But then it would break all the programs that already have that.
+  Anyway, such a two-letter reserved word would be too much namespace
+  pollution.
+
+- EXIT may be followed by loop header tokens as in good old CIMS SETL,
+  not an expression as in SETL2.  This is an incompatibility, not
+  strictly a bug.  Every effort has been made to keep incompatibilities
+  to a minimum.
+
+- In a few places, INTEGERs are not unbounded, but are limited to the
+  range of a C long int.  This includes subscripts and replication
+  counts applied to STRINGs and TUPLEs, which is reasonable given the
+  practical constraints imposed by memory sizes (long int is at least
+  64 bits anywhere it might matter nowadays); but the limitation also
+  includes the F, N, and L in F..L and F,N..L expressions.  A
+  workaround for the latter is to use a smaller and/or more compact
+  range and then do some linear arithmetic.
+
+- The LALR(1) parser in 'setltran' tends not to give very helpful error
+  diagnostics.
+
+- Error reporting usually points to the rightmost part of a larger
+  expression (if any) in which the error occurs, rather than
+  pinpointing the true offender.
+
+- Floating-point operations can produce numbers that when converted by
+  STR or printed, appear as tokens like nan, -nan, inf, or -inf.  But
+  nan and inf are treated as STRINGs on input because they have the
+  form of identifiers, and -nan and -inf are considered errors.  This
+  applies to READ, READA, READS, GETB, VAL, and UNSTR.
+
+- REAL, being implemented using C double, is subject to all the hazards
+  that attend floating-point arithmetic in general, and to all the
+  particular pitfalls associated with variations in hardware, levels of
+  C compiler optimization, etc.  Check carefully how your GNU SETL was
+  built before making too many assumptions.  IEEE 754 format and support
+  for representations of Inf, NaN, and denormal numbers is common, but
+  not universal.  One thing you can pretty well count on, though, is
+  that floating-point exceptions won't cause traps (SIGFPE signals).
+
+- There is no direct way to get an effect like sprintf's "g" format
+  combined with precision control:  FIXED is like "f", and FLOATING is
+  like "e".  STR on a REAL is sort of like "g" but without the means to
+  control the number of significant digits.  The TODO file suggests a
+  PRINTF without attempting to give any details.
+
+- You can write atoms (created by NEWAT or copied) and convert them to
+  strings, but you can't read them nor create them via UNSTR or READS.
+  This is actually a deliberate design decision, but may be surprising
+  on first encounter.
+
+- FSIZE is not compatible with SETL2.
+
+- Forms like [-,x] are allowed in "lhs" positions but not in WR-only
+  actual arg positions (e.g., READ([-,x])), due to limitations in the
+  current LALR(1) parser.  The workaround is to use a variable name
+  such as 'dummy' in place of the hyphen (e.g., READ([dummy,x])).
+
+- %s in FDATE format specs (standing for the 3-digit representation of
+  milliseconds within the second) conflicts with a (nonstandard) GNU
+  extension to strftime() meaning number of seconds since the beginning
+  of 1970.  But you can get the latter number directly as TOD DIV 1000.
+
+- The macro processor treats "#" as a very special character (unary # is
+  an argument stringifier, and binary ## is a concatenator).  Thus you
+  are denied access to the cardinality operator and to radix denotations
+  within macro definitions.  It is possible to get a # to show up in the
+  code emitted by a macro by means of this nasty workaround, though:
+
+    #define apply(op,arg) op##arg
+     ...
+    apply(#,x)  -- emits #x
+
+  Unfortunately, that does not extend to making #define card(x) apply(#,x)
+  possible, as the # in the rhs is a fail.
+
+- The ancient GNU CPP (2.7.2.1) on which setlcpp is based has some bugs
+  such as emitting only x on input x-backslash-newline-y when y is on a
+  line by itself.
+
+- With some effort, you can nest a tuple deeply enough to cause C stack
+  overflow in the garbage collector, e.g.:
+
+    t := [];
+    loop
+      t := [t];
+    end loop;
+
+  Note that the time taken by this program is quadratic in the number
+  of loop iterations, in the current implementation.  The interpreter
+  will, however, segfault after perhaps half an hour or so, given a
+  stack size limit of 8MB.  You can of course change this on most POSIXy
+  systems.  For example, in the Bash shell (bash), to make it 64MB, the
+  prior command "ulimit -s 65536" does the trick, and in tcsh and zsh,
+  "limit stacksize 64m" achieves that.
+
+  As of this writing, I know of no way other than by creating such a
+  pathologically nested structure to get 'setl' to crash (in this case
+  with a SIGSEGV or SIGBUS) without issuing its own diagnostic.
+
+- FIXED and FLOATING impose a limit of 10000 on the absolute value of
+  the width and precision arguments.  This could be construed as a
+  helpful check to avoid producing ridiculously long strings for REALs
+  that can never have anywhere near that number of significant digits,
+  but it's really more of a sop for flaky underlying snprintf()
+  implementations.  It's a restriction that should be lifted if
+  GNU SETL ever offers multi-precision REALs.
+
+- The fd-passing test fails under Cygwin.  That is now (29 Nov 2015)
+  classified as an "expected failure", which shows up as an XFAIL in
+  place of the usual PASS for that test on Cygwin when you make check.
+  This can't be fixed until Cygwin itself provides the requisite support.
+
+- SETL source code must be in 8-bit ASCII bytes, and characters in SETL
+  strings are implicitly 8 bits (_any_ 8 bits).  No locales other than
+  POSIX (C) are currently accounted for.
+
+- Strings to be matched by regular expressions cannot contain NUL (0)
+  characters.  (No problem when MAGIC is FALSE, though.)
+
+- The demo programs in src/run/freeglut-setl/progs/demos/*/*.c all
+  segfault during exit when you use the Esc key on the graphics window
+  to ask the program to terminate, on x86_64 NetBSD 7.0.2.  It appears
+  that /usr/X11R7/lib/modules/dri/swrast_dri.so is getting unloaded
+  (unmapped) before a certain function in that module is called from
+  the atexit list, namely _mesa_destroy_shader_compiler.
+
+- RANDOM n for INTEGER n gives 0 to n inclusive, while RANDOM r for
+  REAL r gives a result in [0,r).  Should the INTEGER case just be
+  fixed to give an integer in [0,n) instead, changing the language
+  spec (doubtful)?  Should there be some horrid modal switch like for
+  integer division?
+
+- The treatment of user-defined OP (OPERATOR) and COMMAND names is
+  lexical and global, making package-scoped (dotted) references to them
+  impossible.
+
+
+Build issues
+------------
+
+See INSTALL about known architecture-specific build issues you may
+encounter when building GNU SETL from the source distribution.
+
+
+Source code
+-----------
+
+Though some effort has gone into the comments and into making the code
+readable and maintainable, there is less consistency of overall style
+than there should be, and certainly less const-correctness.  Abstraction
+is often weak or subjugated to imaginary efficiency gains.  Some of the
+code dates back to 1989, and in fact mostly clings to C89 compliance
+albeit with some C99 (ISO C) assumptions in respect of C lib functions.
+Some POSIX.1-2008 functions not required by C99 must also be present.
+
+
+Run-time implementation
+-----------------------
+
+The memory management is not kind to small data caches, though it is
+aggressively fragmentation-resistant.
+
+A very large ulimit -n (number of open files, max fd + 1) causes a large
+memory footprint.

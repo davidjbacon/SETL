@@ -1,0 +1,83 @@
+\input texinfo @c -*-texinfo-*-
+@c %**start of header
+@c
+@c $Id: setl-ext.texi,v 1.18 2022/04/23 16:30:34 setlorg Exp $
+@c
+@c Free software (c) dB - see file COPYING for license (GPL).
+@c
+@setfilename setl-ext.info
+@settitle GNU SETL Extension Guide
+@finalout
+@c @setchapternewpage odd
+@paragraphindent none
+@c
+@c %**end of header
+
+@include version-setl-ext.texi
+@include include.texi
+
+
+@ifinfo
+@dircategory High-level programming
+@direntry
+* SETL extension:       (setl-ext).    GNU SETL Extension Guide.
+@end direntry
+@end ifinfo
+
+@titlepage
+@title GNU SETL Extension Guide
+@subtitle Edition @value{EDITION}, for GNU SETL Version @value{VERSION}
+@subtitle Updated @value{UPDATED}
+@author by dB
+@end titlepage
+
+@contents
+
+
+@ifnottex
+
+@node Top
+@top GNU SETL Extension Guide
+
+@ifinfo
+This info file describes how to extend GNU SETL's library of
+intrinsic functions using interfaces generated from C headers.
+
+SETL is of course the world's most wonderful programming language,
+and GNU SETL is a modest extension and implementation of SETL.
+This guide may be able to help you make it less modest.
+
+This file is designed to be viewed with @w{@code{info setl-ext}}.
+
+GNU SETL normally comes with HTML and PDF versions too, and current
+documents should always be at @uref{https://setl.org/setl/doc/}.
+@end ifinfo
+
+@c Placeholder menu:
+@menu
+* Overview::      All about extending GNU SETL.
+* Index::         Subject index.
+@end menu
+
+@end ifnottex
+
+
+@node Overview
+@unnumbered Extending GNU SETL
+@cindex Extending GNU SETL
+
+@emph{*** To be written.}
+
+Meanwhile, the README files under the @code{src/opt/} subdirectory of
+the source distribution give some general guidance.  Beyond that, it's
+currently a matter of your generalizing from existing examples.
+
+
+@node Index
+@unnumbered Index
+
+@printindex cp
+
+@bye
+
+@c setl-ext.texi ends here

@@ -1,0 +1,26 @@
+-- $Id: glutafunc-gen.setl,v 1.2 2022/12/11 17:09:27 setlorg Exp $
+
+while (s := getline stdin) /= om loop
+  print;
+  print(s);
+  s('proc ') := '';
+  p := s('\\(.*\\)');
+  s('\\(.*$') := '';
+  c := s;
+  c('Func') := 'Event';
+  c := +/[if c('[A-Z]') /= om then '_'+c else c end : c in c];
+  c := to_upper c;
+  f := s;
+  f('gluta') := 'glutSETL';
+  print('  dispatch_map('+c+') := p;');
+  print('  if p = om then');
+  q := p;
+  q('p') := '0';
+  print('    '+f+q+';');
+  print('  else assert is_routine p;  -- arg must be OM or ROUTINE');
+  r := p;
+  r('p') := c;
+  print('    '+f+r+';');
+  print('  end if;');
+  print('end '+s+';');
+end loop;

@@ -1,0 +1,2 @@
+#! /bin/sh
+"$srcdir/simple-test" perm "$srcdir/diff-read"

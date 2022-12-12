@@ -1,0 +1,18 @@
+PROGRAM dummy_name_for_kirk;
+t := [0];
+n := 300;
+FOR i IN [1..n] LOOP
+  j := ROUND -LOG RANDOM 1.0;
+  k := RANDOM 4;
+  x := [i..i+RANDOM 3-1];
+  IF RANDOM 1 = 0 THEN
+    j := #t-j;
+    IF RANDOM 2 = 0 THEN
+      j +:= RANDOM 5;
+    END IF;
+  END IF;
+  j MAX:= 0;
+  t(j+1..j+k) := x;
+END LOOP;
+PRINT(t);
+END dummy_name_for_kirk;

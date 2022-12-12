@@ -1,0 +1,11 @@
+fd := open('/bin/ls "'+getenv 'srcdir'+'"/*.setl','pipe-in');
+s := {};
+while (name := getline fd) /= om loop
+  t := split(filter('wc < '+name));
+  p := {};
+  p.lines := val t(1);
+  p.words := val t(2);
+  p.chars := val t(3);
+  s(name) := p;
+end loop;
+print(+/[p.lines : p = s (name)]);

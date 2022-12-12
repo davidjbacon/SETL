@@ -1,0 +1,15 @@
+const cmd = 'sed -e "s/./&&/g"';
+const fil = (getenv 'srcdir'?'.')+'/filter.setl';
+const line = 72*'-';
+const heavy = 72*'=';
+open(fil,'r');
+s := getfile(fil);
+print(heavy);
+print('Original contents:');
+print(line);
+putchar(s);
+print(heavy);
+print('As filtered through ',cmd,':');
+print(line);
+putchar(filter(cmd,s));
+print(heavy);

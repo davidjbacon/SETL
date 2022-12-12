@@ -1,0 +1,2 @@
+GETA('',s);
+print('x'+/[IF c = 'x' THEN 'xx' ELSE c END: c IN s]+'x');

@@ -1,0 +1,84 @@
+test_inputs := [getline stdin : until eof] + [
+ '"a\nb"',  -- embedded newline
+ "'a\nb'",  -- embedded newline
+ '"ab\0cd"'  -- embedded nul
+];
+
+for s in test_inputs loop
+  print (pretty s);
+  for p in [routine test_unstr,
+            routine test_reada,
+            routine test_reads,
+            routine test_denotype,
+            routine test_val] loop
+    print (try (p, s));
+  end loop;
+  print (try_read (s));
+end loop;
+
+proc try (p, s);  -- try applying routine p to string s
+  fd := pipe_from_child;  -- safe envt for risky call
+  if fd = -1 then  -- child
+    dup2 (stdout, stderr);  -- as in shell redirect 2>&1
+    print (call (p, s));  -- do test and feed result up to parent
+    stop;  -- exit child
+  end if;
+  -- If the child crashes rather than exiting normally, this gets the
+  -- error report:
+  r := getfile fd;  -- gather entire child output as string to return
+  close (fd);
+  return r;
+end proc;
+
+proc test_unstr (s);
+  x := unstr s;
+  return [type x, x];
+end proc;
+
+proc test_reada (s);
+  fd := pipe_from_child;  -- subchild to feed test string to our READA
+  if fd = -1 then  -- subchild
+    print (s);  -- feed test string up to this subchild's parent
+    stop;  -- exit subchild
+  end if;
+  reada (fd, x);  -- try to READA into x from what subchild spews
+  close (fd);
+  return [type x, x];
+end proc;
+
+proc test_reads (s);
+  reads (s, x);
+  return [type x, x];
+end proc;
+
+proc test_denotype (s);
+  return denotype s;
+end proc;
+
+proc test_val (s);
+  x := val s;
+  return [type x, x];
+end proc;
+
+proc try_read (s);  -- the READ test doesn't quite fit the try() model
+  fd := pump;  -- a child to test READ
+  if fd = -1 then  -- child
+    dup2 (stdout, stderr);  -- as in shell redirect 2>&1
+    -- The following is a fancy way of saying print(test_read()),
+    -- written this way to resemble what try() does:
+    p := routine test_read;
+    print (call (p));  -- do test and feed result up to parent
+    stop;  -- exit child
+  end if;
+  printa (fd, s);  -- pass the test string to the child
+  shutdown (fd, shut_wr);  -- + EOF in case s is nowt but whitespace
+  -- As with try(), if the child crashes, this gets the error report:
+  r := getfile fd;  -- gather entire child output as string to return
+  close (fd);
+  return r;
+end proc;
+
+proc test_read();
+  read (x);
+  return [type x, x];
+end proc;

@@ -1,0 +1,42 @@
+#! /bin/sh
+#
+# $Id: run-setl,v 1.4 2022/12/11 17:09:27 setlorg Exp $
+#
+# Free software (c) dB - see file COPYING for license (GPL).
+#
+#
+# Use
+#
+#  run-setl {args}
+#
+# as an alternative to
+#
+#  setl {args}
+#
+# to select the just-built version of setl rather than whatever
+# is on your PATH.
+
+
+# This top_builddir default only makes sense if you are currently
+# in the src/ subdir of the main build dir.  Otherwise, the
+# environmental definition of top_builddir lets this script run
+# from a different dir but still choose the just-built versions of
+# the GNU SETL executables rather than the installed versions:
+: ${top_builddir:=.}
+# In case spawned subprocesses want to refer to the build envt:
+export top_builddir
+
+SETLCPP=$top_builddir/cpp/setlcpp
+SETLTRAN=$top_builddir/tran/setltran
+SETLRUN=$top_builddir/run/setl
+
+if test -x "$SETLCPP" && \
+   test -x "$SETLTRAN" && \
+   test -x "$SETLRUN"; then
+  # use freshly built test version of setl
+  exec "$SETLRUN" --setlcpp="$SETLCPP" --setltran="$SETLTRAN" "$@"
+else
+  # fall back to installed version of setl, but spew 'type' output
+  echo "***  Warning - using setl in PATH:  "`type setl` >&2
+  exec setl "$@"
+fi

@@ -1,0 +1,19 @@
+for [i,j] in [[5 * 10**2,  3 * 10**2 ],
+              [5 * 10**20, 3 * 10**20],
+              [5 * 10**30, 3 * 10**3 ]] loop
+  print;
+  print(i,"div",j,"=", i div j);
+  print(-i,"div",j,"=", -i div j);
+  print(i,"div",-j,"=", i div -j);
+  print(-i,"div",-j,"=", -i div -j);
+  print;
+  print(i,"rem",j,"=", i rem j);
+  print(-i,"rem",j,"=", -i rem j);
+  print(i,"rem",-j,"=", i rem -j);
+  print(-i,"rem",-j,"=", -i rem -j);
+  print;
+  print(i,"mod",j,"=", i mod j);
+  print(-i,"mod",j,"=", -i mod j);
+  print(i,"mod",-j,"=", i mod -j);
+  print(-i,"mod",-j,"=", -i mod -j);
+end loop;

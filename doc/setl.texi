@@ -1,0 +1,832 @@
+\input texinfo @c -*-texinfo-*-
+@c %**start of header
+@c
+@c $Id: setl.texi,v 1.69 2022/12/10 23:35:26 setlorg Exp $
+@c
+@c Free software (c) dB - see file COPYING for license (GPL).
+@c
+@setfilename setl.info
+@settitle GNU SETL Om
+@finalout
+@c @setchapternewpage odd
+@paragraphindent none
+@c
+@c %**end of header
+
+@include version-setl.texi
+@include include.texi
+
+
+@c The pranava.
+
+
+@ifinfo
+@dircategory High-level programming
+@direntry
+* SETL:                 (setl).               GNU SETL Om.
+@end direntry
+@end ifinfo
+
+@titlepage
+@title GNU SETL Om
+@subtitle On the World's Most Wonderful Programming Language
+@subtitle Edition @value{EDITION}, for GNU SETL Version @value{VERSION}
+@subtitle Updated @value{UPDATED}
+@author by dB
+@end titlepage
+
+@contents
+
+
+@ifnottex
+
+@node Top
+@top GNU SETL Om
+
+@ifinfo
+This info is a brief description of GNU SETL, with links to the other
+documents in the same info set.
+
+SETL is of course the world's most wonderful programming language.
+GNU SETL implements it along with some proposed extensions.
+
+This file is designed to be viewed with @w{@code{info setl}}.
+
+GNU SETL normally comes with HTML and PDF versions too, and current
+documents should always be at @uref{https://setl.org/setl/doc/}.
+
+For info on the @code{setl} command, @refuser{,setl}.
+@end ifinfo
+
+@menu
+* Introduction::       About SETL.
+* To the Student of Programming Languages::  Syntax, values, maps, iterators, etc.
+* GNU SETL::           An open-source implementation of SETL.
+* SETL Variations::    How GNU SETL differs from CIMS SETL and SETL2.
+* Links::              Links to other manuals, documents, and sites.
+* Administrivia::      Copying GNU SETL; reporting bugs.
+* Index::              Subject index.
+@end menu
+
+@end ifnottex
+
+
+@node Introduction
+@unnumbered Introduction
+
+@menu
+* Overview::       General characteristics of SETL.
+* History::        Some background on SETL.
+@end menu
+
+@node Overview
+@section General characteristics of SETL
+
+The SETL programming language describes sets, and in particular maps,
+in notations similar to those of mathematical set theory.
+For example,
+
+@example
+@{1..n@}
+@end example
+
+is the set of integers @setl{1} through @setl{n}, and
+
+@anchor{primes}
+@example
+@{p in @{2..n@} | forall i in @{2..p-1@} | p mod i /= 0@}
+@end example
+
+is the set of primes through @setl{n}, which can be read out loud as
+@q{@dfn{the set of all @setl{p} in
+@setl{@{2..n@}} such that for all @setl{i} in @setl{@{2..p-1@}},
+the remainder of @setl{p} divided by @setl{i} is non-zero}},
+meaning each @setl{p} is prime that has no divisors in @setl{@{2..p-1@}}.
+
+The vertical bar, for @dfn{such that}, takes an iterator on the left
+and a boolean condition on the right, generally involving the
+iteration variables; @setl{forall} exercises another iterator
+and returns @setl{true} if its such-that condition is true
+on all iterations; @setl{/=} means inequality.
+
+Logically enough, the following is the same set of primes as the above:
+
+@example
+@{p in @{2..n@} | notexists i in @{2..p-1@} | p mod i = 0@}
+@end example
+
+Tuples, like sets, are central enough to the language to get their
+own syntax.  The value
+
+@example
+["age", 21]
+@end example
+
+is a 2-tuple or @dfn{ordered pair}.  There is no restriction
+on the types of the values within sets or tuples, and no
+predefined restriction on the degree to which they can be
+nested.
+
+A set consisting entirely of ordered pairs is a map.
+For a map @setl{f} having the value
+
+@example
+@{["name", "Jack"], ["age", 21]@}
+@end example
+
+@cindex multi-map
+the value of @setl{f("age")} (or @setl{f.age}) is thus @setl{21}, and
+@setl{f@{"age"@}} is the set of @emph{all} the values corresponding to
+@setl{"age"}.  In this instance @setl{f@{"age"@}} is just the singleton
+set @setl{@{21@}}, but this notation is useful when @setl{f} could be a
+@dfn{multi-map}, taking some domain points to more than one range value.
+
+SETL also has the customary control structures of a procedural
+programming language, such as @setl{if}, @setl{case}, @setl{while},
+and @setl{for}.  Loops can often be replaced by set-forming and
+tuple-forming expressions for a more concise and direct functional
+style, too.
+
+For more on iterators, maps, and the @dfn{strict value semantics} of SETL,
+@pxref{To the Student of Programming Languages}.
+
+@node History
+@section History
+
+@cindex high-level language
+@cindex Ada/Ed
+@cindex CIMS SETL
+SETL began as a tool for the high-level expression of complex algorithms.
+It soon found a role in @dfn{rapid software prototyping}, as was
+demonstrated by the NYU Ada/Ed project, where it was used to implement
+the first validated Ada 83 compiler and run-time system.
+The prototyping was rapid, but the CIMS SETL implementation was not;
+the team made @dfn{slow is beautiful} a mantra and point of pride.
+
+@cindex readability
+@cindex Dewar, R.B.K.
+@cindex Schwartz, J.T.
+But as Robert Dewar liked to point out, the readability of a
+program is more important than how quickly it can be written.
+Jack Schwartz's original monograph, @cite{Set Theory
+as a Language for Program Specification and Programming} (1970),
+made clarity of expression a primary goal of SETL from the outset:
+
+@quotation
+In the present paper we will outline a new programming language,
+designated as SETL, whose essential features are taken from the
+mathematical theory of sets.  SETL will have a precisely defined
+formal syntax as well as a semantic interpretation to be
+described in detail; thus it will permit one to write programs
+for compilation and execution.  It may be remarked in favor of
+SETL that the mathematical experience of the past half-century,
+and especially that gathered by mathematical logicians pursuing
+foundational studies, reveals the theory of sets to incorporate a
+very powerful language in terms of which the whole structure of
+mathematics can rapidly be built up from elementary foundations.
+By applying SETL to the specification of a number of fairly
+complex algorithms taken from various parts of compiler theory,
+we shall see that it inherits these same advantages from the
+general set theory upon which it is modeled.  It may also be
+noted that, perhaps partly because of its classical familiarity,
+the mathematical set-notion provides a comfortable framework,
+that is, requiring the imposition of relatively few artificial
+constructions upon the basic skeleton of an analysis.  We shall
+see that SETL inherits this advantage also, so that it will allow
+us to describe algorithms precisely but with relatively few of
+those superimposed conventions which make programs artificial,
+lengthy, and hard to read.
+@end quotation
+
+Sets and maps abound in abstract, human-oriented presentations of
+algorithms, and those can often be turned into concrete SETL programs
+with remarkably little change.
+
+@cindex Schwartz, J.T.
+In its focus on clarity of expression, SETL also seeks to help
+programmers avoid the trap of premature optimization.
+Quoting Schwartz again, this time from @cite{On Programming} (1973):
+
+@quotation
+On the one hand, programming is concerned with
+the specification of algorithmic processes in a form ultimately
+machinable.  On the other, mathematics describes some of these
+same processes, or in some cases merely their results, almost always
+in a much more succinct form, yet in a form whose precision all will
+admit.  Comparing the two, one gets a very strong even if initially
+confused impression that programming is somehow more difficult than
+it should be.  Why is this?  That is, why must there be so large a gap
+between a logically precise specification of an object to be
+constructed and a programming language account of a method for its
+construction?  The core of the answer may be given in a single word:
+efficiency.  However, as we shall see, we will want to take this
+word in a rather different sense than that which ordinarily
+preoccupies programmers.
+
+More specifically, the implicit dictions used in the language of
+mathematics, which dictions give this language much of its power,
+often imply searches over infinite or at any rate very large sets.
+Programming algorithms realizing these same constructions must of
+necessity be equivalent procedures devised so as to cut down on
+the ranges that will be searched to find the objects one is looking
+for.  In this sense, one may say that @emph{programming is
+optimization} and that mathematics is what programming becomes when
+we forget optimization and @emph{program in the manner appropriate
+for an infinitely fast machine with infinite amounts of memory}.
+At the most fundamental level, it is the mass of optimizations with
+which it is burdened that makes programming so cumbersome a process,
+and it is the sluggishness of this process that is the principal
+obstacle to the development of the computer art.
+@end quotation
+
+For a further survey of early SETL history, including
+numerous bibliographic references, please see
+@uref{https://cs.nyu.edu/media/publications/bacon_david.pdf,,
+dB's thesis}.
+
+Also,
+@uref{http://www.softwarepreservation.org/author/pmcjones,, Paul McJones}
+has compiled a more complete account of SETL history in the
+@uref{http://www.softwarepreservation.org/projects/SETL,,
+SETL Historical Sources Archive} at the
+@uref{https://www.computerhistory.org/,, Computer History Museum}.
+
+
+@node To the Student of Programming Languages
+@unnumbered To the Student of Programming Languages
+
+@cindex value semantics
+There are no pointers (no references, no aliases) in SETL, and
+it is natural to wonder how such a language could be convenient
+or even widely useful.
+
+The answer is the maps.  Where you might be tempted to think
+pointers are necessary, such as in a linked data structure, 
+it is usually better to make the nodes the range elements
+of a map over a more interesting domain than memory pointers,
+and let the node references be the keys of that map.
+
+This pointer-free aspect of SETL is sometimes called its
+strict @dfn{value semantics}.
+Conceptually, every assignment or parameter pass means
+copying.  For a set or tuple, copying applies recursively.
+
+Programming without pointers seems to be much simpler than
+with them, as all the hazards of aliasing and of @q{dangling}
+pointers disappear.  But what about the cost of all that copying?
+
+As Annie Liu observes in @uref{https://drive.google.com/file/d/1y-zHPdf6ADcBTK88SNO3lQzthWBlpAe1/view,,
+some notes on files received from Jack Schwartz},
+the value semantics makes powerful
+optimization techniques such as Paige's finite differencing
+much easier to implement than when aliases have to be considered.
+
+Alas, GNU SETL does not employ those advanced techniques.  It copies
+in many places where the copying could in principle be optimized
+or differenced away.  It is surprising how seldom that matters in the
+typical data processing setting, however.  Sets and in particular maps
+are efficiently implemented, which helps.
+
+Maps are central to SETL@.  Here is how a map
+@setl{count} might be built up, using a loop to tally input word
+frequencies:
+
+@example
+@group
+count := @{@};           -- @r{empty map}
+for word in split(getfile stdin) loop  -- @r{whitespace-delimited words}
+  count(word) +:= 1;   -- @r{init to 1, or add 1}
+end loop;
+@end group
+@end example
+
+We can now print a crude histogram from the @setl{count} map:
+
+@example
+@group
+for [word, freq] in count loop  -- @r{loop through the map}
+  print(freq * "*", word);   -- @r{print} freq @r{stars and the word}
+end loop;
+@end group
+@end example
+
+In that way of iterating over the map,
+successive ordered pairs are broken out from @setl{count} and assigned
+to @w{@setl{[word, freq]}}, meaning @setl{word} gets
+the string and @setl{freq} gets the associated tally on each
+iteration.
+
+@sc{Exercise 1}.  A set-building notation was introduced in the
+prime-numbers example (@pxref{primes}).
+So now, for any given map @setl{m}, what does
+
+@example
+@{[y, x] : [x, y] in m@}
+@end example
+
+represent?
+
+You may guess that it is the inverse of
+@setl{m} (which it is), but is that colon a misprinted vertical bar?
+
+@cindex iterator
+Actually, it is not.  The general form of the inside of a
+@dfn{set former} such as the above is:
+
+@c so if you expect m to be single-valued, may pref {[y, x] : y = m(x)}
+@c but that iter form isn't introd till later..
+
+@example
+@sv{expression} : @sv{iterator} | @sv{condition}
+@end example
+
+The @meta{expression} characterizes each member of the set
+being formed, and is evaluated for each iteration of the
+@meta{iterator} for which the @meta{condition} is @setl{true}.
+@dfn{Bound} variables (like @setl{word}, or like @setl{x} and @setl{y})
+are assigned values on each iteration, and will often appear in the
+@meta{condition} and @meta{expression}.
+
+The @meta{iterator} itself can actually be a series of chained
+iterators separated by commas, where the iterators to the right
+loop within those to the left, and can therefore refer to
+variables bound by them.
+
+A @dfn{tuple former} is just like a set former but uses
+square brackets (@setl{[]}) instead of curly braces (@setl{@{@}}).
+It constructs a tuple
+with elements in the order produced by iteration.
+
+The general form shown above has two main degenerate forms.
+You can omit the @meta{condition}, leaving
+
+@example
+@sv{expression} : @sv{iterator}
+@end example
+
+as in the map-inverse example above, in which case the condition
+defaults to @setl{true}.  Or you can omit the @meta{expression},
+leaving
+
+@example
+@sv{iterator} | @sv{condition}
+@end example
+
+as in the prime-numbers example (@pxref{primes}).  In that example,
+the @meta{expression} defaults to @setl{p}, the expression to
+the left of the first @setl{in}.
+
+@cindex quantified expressions
+The other major users of iterators in SETL, besides the loops and
+the set and tuple formers, are the quantified expressions,
+which have @setl{forall}, @setl{exists}, or @setl{notexists}
+followed by @w{@setl{@sv{iterator} | @sv{condition}}}.  For example,
+
+@example
+forall i in [2..10] | 11 mod i /= 0
+@end example
+
+is @setl{true}, because 11 is in fact prime.
+
+Let us now examine iterators in a little more detail.  The most common
+kind has the general form
+
+@example
+@sv{lhs} in @sv{s}
+@end example
+
+where the @meta{lhs} is anything that can be assigned to, and
+@meta{s} is an already existing set, string, or tuple.  For
+a @q{structured} @meta{lhs} such as @w{@setl{[x, y]}} or
+@w{@setl{[[x, y], z]}}, every member of @meta{s} must be a tuple that
+is structurally compatible with @meta{lhs}, by the same rule that
+governs parallel assignments such as
+
+@example
+[a, b] := [b, a]
+@end example
+
+which swaps the values of variables @setl{a} and @setl{b}.
+
+When used in a set or tuple former, the @meta{lhs} part of the
+above @w{@setl{@sv{lhs} in @sv{s}}} iterator form serves also
+as the default expression when the @meta{expression} is omitted.
+
+For SETL beginners with a background in formal set theory, the
+resemblance between iterator-based SETL set formers and abstract
+mathematical set builders provides a dual view of the set as an
+object to be built up by computation on the one hand and as an
+intensionally defined comprehension on the other.  In both cases,
+the @meta{expression} gives the @q{shape} of the elements.  There
+is a similar duality between the quantified expressions of SETL
+(@setl{forall}, @setl{exists}, @setl{notexists}) and those of
+mathematical logic.
+
+For SETL beginners @emph{without} a background in set theory or logic, but
+with some familiarity with other programming languages, the iterators
+in formers and quantified expressions may be the least obvious aspect
+of SETL@.  The thing to remember is that they represent loops.
+Where you see a set former that looks as if it contains undefined
+variables, look to see if those variables are actually the bound
+variables of an iterator that is just after the colon and/or just
+before the vertical bar.  An iterator will always have
+either the keyword @setl{in} or an equals sign (@setl{=}) in it.
+
+An additional role for the @setl{in} keyword is as the name of a
+binary operator;
+
+@example
+@sv{x} in @sv{s}
+@end example
+
+@c which may be typeset as
+@c 
+@c @example
+@c @math{x \epsilon S}
+@c @end example
+
+is a boolean-valued membership test for
+whether the value @meta{x} occurs in @meta{s}.
+
+@sc{Exercise 2}.  Given sets @setl{s1} and @setl{s2}, identify the
+iterator and the boolean expression in
+
+@example
+@{x in s1 | x in s2@}
+@end example
+
+@sc{Exercise 3}.  Given the same sets again, state whether that set
+is the same as
+
+@example
+@{x in s2 | x in s1@}
+@end example
+
+The answer to the latter is indeed yes, these both represent the
+intersection of @setl{s1} and @setl{s2} (which could be written in
+SETL more simply as @w{@setl{s1 * s2}}).  But in the absence of some
+fairly sophisticated code optimization, they get there by different
+means:  if @setl{s1} has a huge number of members, and @setl{s2} very
+few, it will take much longer to do it the first way (iterating through
+@setl{s1} and testing each member for membership in @setl{s2}) than the
+second.
+
+@cindex arbitrary @i{vs.}@: random
+The order in which members are selected during iteration over a set
+in SETL is left up to the implementation.  It is @dfn{arbitrary}.
+Similarly, the SETL @setl{arb} (@q{choice}) operator selects a set member
+arbitrarily, and the SETL @setl{from} statement selects and removes an
+arbitrary member from a set.  Programmers should treat this
+arbitrariness as nondeterministic, but @dfn{not random}.  @q{Random}
+implies some kind of stochastic process in the selection, and SETL has a
+separate operator to approximate that, called @libref{random}.
+
+SETL has further iterator forms such as
+
+@example
+y = f(x)
+@end example
+
+for iterating over a single-valued map @setl{f} while assigning
+successive corresponding domain and range values to @setl{x} and
+@setl{y} respectively.  For the single-valued map case, this
+iteration is equivalent to the form
+
+@example
+[x, y] in f
+@end example
+
+so we could tighten up the loop header in the word-counting example
+to read
+
+@example
+for freq = count(word) loop
+@end example
+
+in order to document and check that the map @setl{count} is
+expected to be single-valued.  If @setl{count} were any other kind of set,
+such as a multi-map or a set containing something other than ordered
+pairs, a run-time error would result.
+
+Once again, we see a strong syntactic resemblance between an iterator
+and a boolean expression; and @q{@w{@setl{freq = count(word)}}} is
+certainly true within the body of the above loop.
+
+That functional-style iterator form is also applicable
+when @setl{f} is a string or tuple, in which case @setl{x} successively
+takes on the values 1 through the length of the string or tuple, as
+@setl{y} gets assigned the corresponding characters of the string or
+members of the tuple.  This is also consistent with the
+notation for element access (@q{subscripting}) for these types.
+
+Multi-map iteration is indicated by braces rather than parentheses,
+as in multi-map selection:
+
+@example
+ys = f@{x@}     -- ys @r{gets range subset for each} x
+@end example
+
+These iterator shorthands also work like their
+corresponding selection operations:
+
+@example
+@group
+z = f(x, y)   -- @r{means} z = f([x, y])
+zs = f@{x, y@}  -- @r{means} zs = f@{[x, y]@}
+@end group  
+@end example
+
+
+@node GNU SETL
+@unnumbered GNU SETL
+
+@cindex @command{setl} command
+GNU SETL is an implementation of SETL, with a few extensions.
+The goal was always a
+@command{setl} command that would play well in a Unix-like
+environment, allowing it to be used as easily
+as say @command{awk}, @command{sed}, or @command{grep}.
+Even with an external interface consisting of little
+more than basic I/O, @command{setl} did indeed prove to be a valuable
+tool in a variety of roles, from combinatorial
+experiments to routine scientific data processing.  However,
+there came a time when it seemed worthwhile to add new
+facilities for working more directly with processes, signals, timers,
+and sockets.
+
+SETL is something of a natural for event-driven and distributed systems.
+Passing SETL maps etc.@: between processes is particularly easy,
+as most values can be serialized for transport by a
+simple @dfn{write} and deserialized by a simple @dfn{read}.
+
+Neither the SETL language nor the GNU SETL implementation is well
+suited to @q{programming in the large}.  But Unix has taught us how useful
+it can be to chain processes into pipelines in everyday data processing,
+and I personally have had great fun prototyping event-driven systems as
+trees of processes, all on the same general pattern as advertised in the
+case study in @uref{https://cs.nyu.edu/media/publications/bacon_david.pdf,,
+dB's thesis}.  The SETL programs in those systems range from tiny
+(buffers, dispatchers, multiplexers, etc.) to medium-sized.  The decentish
+high-level string handling in GNU SETL, and its rich repertoire of
+process management, let it deal pretty competently with external
+programs, especially the many text-based utilities in the Unix/POSIX
+canon.  Another reusable text-based pattern is seen in practice where
+@command{wish} interpreter is invoked as a subprocess and fed Tcl/Tk
+commands to build a GUI based on traversal of a nested SETL tuple
+that specifies the elements and layout in a rather declarative manner.
+Events from the widgets come back as text, and updates are sent as
+further Tcl/Tk commands.
+
+Here is a summary of GNU SETL's main extensions to SETL:
+
+@itemize @bullet
+
+@item
+a POSIX-based interface to networks, signals, timers, and processes;
+
+@item
+substring extraction and substitution by regular expression;
+
+@item
+support for SETL2 control structure syntax and packages;
+
+@item
+a dot notation @setl{f.x} as syntactic sugar for @setl{f("x")},
+letting a map @setl{f} act as a record with a field @setl{x}
+that may come and go dynamically; @c like a JavaScript object property
+
+@item
+procedure references and indirect calls;
+
+@item
+a notation that allows one variadic procedure to call
+another with trailing args presented as if they had come from
+the caller of the first procedure, for use in implementing things like
+logging functions where you want to pass the top-level caller's
+args to @libref{print} after some context args such as a timestamp.
+
+@end itemize
+
+For a list of GNU SETL functions, operators, and
+special values and variables, including extensions, @libtop{}.
+
+
+@node SETL Variations
+@unnumbered SETL Variations
+
+*** To be a summary of how GNU SETL differs from CIMS SETL and
+from SETL2.  May point to www.settheory.com and Jack's unfinished book,
+perhaps commenting on the different approach embodied in his
+Tk chapter @i{vs.}@: how I use wish pumps.
+
+*** This might also be the place for some brief mention of SETL's
+relatives such as Python, or at least a few words to mention that
+my thesis goes into that a bit.
+
+
+@node Links
+@unnumbered Links
+
+@menu
+* Other GNU SETL Manuals::  Links to the other manuals in this set.
+* External Links::          Links to SETL-related documents and sites.
+@end menu
+
+@node Other GNU SETL Manuals
+@section Other GNU SETL Manuals
+
+For how to compile and run programs, @usertop{}.
+
+For a tutorial introduction to the SETL language, @tuttop{}.
+
+For a reference treatment of the language supported by GNU SETL,
+@langtop{}.
+
+For full details on the built-in operators and functions in GNU SETL,
+@libtop{}.
+(Not a stub.  It is currently the main guide to GNU SETL.)
+
+For commentary on the internal interfaces and implementation of
+GNU SETL, @imptop{}.
+
+For how to extend the language with datatypes and intrinsic functions
+derived from C headers and libraries, @exttop{}.
+
+If you are a developer helping to maintain GNU SETL, please @mainttop{}.
+
+@node External Links
+@section External Links
+
+@cindex SETL Wiki
+@cindex Wilcox, Finn
+Finn Wilcox used to have a
+@uref{https://web.archive.org/web/20120210051343/http://www.setl-lang.org/wiki/index.php/Main_Page,,
+SETL Wiki} with example programs and other useful resources.
+
+@cindex De Leo, Roberto
+@cindex Linux Journal
+@uref{https://www.linuxjournal.com/article/6805,, @cite{An Invitation to SETL}}
+is an enthusiastic endorsement of SETL contributed by Roberto De Leo
+to the @cite{Linux Journal} on December 28, 2004.
+
+@cindex Dewar, R.B.K.
+Robert Dewar's quite comprehensive and very readable little book,
+@uref{https://setl.org/setl/doc-legacy/setlprog.pdf,,
+     @cite{The SETL Programming Language}},
+is still a pretty accurate guide to the core SETL language
+supported by GNU SETL if you leave out the stuff about macros
+(GNU SETL uses an adaptation of the GNU C Preprocessor instead),
+backtracking, the data representation sublanguage, and old-style
+modules (GNU SETL adopts SETL2 packages).
+
+@cindex Hummel, Robert
+@cindex SETL2
+GNU SETL supports both SETL and SETL2 syntax, so the examples in
+the adaptation of Robert Dewar's book by Robert Hummel,
+@uref{https://setl.org/setl/doc-legacy/intro.pdf,,
+     @cite{A Gentle Introduction to the SETL2 Programming Language}},
+should work without modification.  Note that SETL2 classes and
+closures are not supported by GNU SETL.
+
+@cindex Schwartz, J.T.
+@cindex Dewar, R.B.K.
+@cindex Dubinsky, E.
+@cindex Schonberg, E.
+The classic textbook on SETL,
+@cite{Programming with Sets:  An Introduction to SETL},
+by Schwartz, J.T., Dewar, R.B.K., Dubinsky, E., and Schonberg, E.
+(Springer-Verlag, New York, 1986), has been partly rewritten for SETL2
+at @uref{https://www.settheory.com} as @cite{Programming in SETL}@.
+The version of SETL described in the 1986 textbook is referred to in
+the GNU SETL documentation as @dfn{CIMS SETL}.
+
+@cindex SETL2
+@cindex Snyder, Kirk
+@cindex Paxia, Toto
+@uref{http://www.softwarepreservation.org/projects/SETL/index_html#SETL2,,
+SETL2}, a close
+relative of SETL created by Kirk Snyder and developed further by
+Toto Paxia, is described in
+@uref{http://www.softwarepreservation.org/projects/SETL/setl2/Snyder-SETL2_Programming_Language-1990.pdf,,
+@cite{The SETL2 Programming Language}} and
+@uref{http://www.softwarepreservation.org/projects/SETL/setl2/Snyder-SETL2_Update-1990.pdf,,
+@cite{SETL2: An Update on Current Developments}} (both 1990).
+
+@cindex SETL-S
+@cindex Dewar, R.B.K.
+@cindex VandeKopple, Julius J.
+@uref{http://www.softwarepreservation.org/projects/SETL/index_html#Setl-s,,
+SETL-S}, by
+@uref{https://cs.nyu.edu/~dewar/,, Robert Dewar} and
+@uref{https://www.vkbasses.com/bio.htm,, Julius VandeKopple},
+is a high-performance SETL subset implementation for DOS systems.
+
+@cindex PSETL
+@cindex Liu, Zhiqing
+PSETL, by Zhiqing Liu, uses the GNU SETL translator to feed an interpreter
+that records intermediate program states using a space-efficient encoding
+scheme based on the @dfn{persistent} data structures of Driscoll, Sarnak,
+Sleator, and Tarjan in @cite{J.Comp.Sys.Sci.}@:@tie{}@b{38}, 1989.
+This allows execution histories to be reviewed in complete detail,
+including @emph{all} values ever acquired by @emph{all} variables.
+Its graphical interface is also a good pedagogical and debugging tool.
+
+@cindex ISETL, ISETLW
+@cindex Levin, Gary
+@cindex Dubinsky, E.
+@cindex Pourtaud, Robin
+@uref{https://www.linkedin.com/in/robinpourtaud/,, Robin Pourtaud} has
+a very nice web site for
+@uref{https://devmath.fr/informatique/isetl-langage-de-programmation/,,
+ISETL and ISETLW},
+a descendant of Gary Levin's @dfn{Interactive SETL} and a
+Windows-specific version thereof.
+Under Ed Dubinsky's influence, ISETL has
+been widely used in the teaching of discrete mathematics.
+
+@cindex Slim
+@cindex Venter, Herman
+The @uref{https://setl.org/slim,, Slim} language by Herman Venter is
+another interesting cousin of SETL@.
+
+@cindex Pontelli, Enrico
+@cindex Rossi, Gianfranco
+@cindex JSetL
+Work on set-theoretic languages and programming continues on various
+fronts, and
+@uref{https://www.cs.nmsu.edu/~epontell/,, Enrico Pontelli}
+at the New Mexico State University maintains a site
+@uref{https://www.cs.nmsu.edu/~complog/sets/,, Programming with @{Sets@}}
+containing an extensive bibliography, information on workshops and
+conferences, links to implementation sites, etc.
+@email{gianfranco.rossi@@unipr.it, Gianfranco Rossi}
+at the Universit@`a di Parma likes to use sets for Constraint Logic
+Programming as shown at his
+@uref{http://www.clpset.unipr.it/jsetl/,, JSetL Home Page}.
+
+@c *** TODO cite the POPL confs
+
+The @uref{https://cs.nyu.edu/media/publications/bacon_david.pdf,,
+dB thesis},
+@cite{SETL for Internet Data Processing} (2000),
+a sort of SETL Rationale, describes most of the extensions to SETL that
+have shaped GNU SETL, and shows how to use them in practice.  It cites
+a great deal of other past work too.
+
+
+@node Administrivia
+@unnumbered Administrivia
+
+@menu
+* Copying::            How to copy, modify, and distribute GNU SETL.
+* Problems::           Reporting GNU SETL bugs.
+@end menu
+
+@node Copying
+@section Copying GNU SETL
+@cindex modifying GNU SETL
+@cindex @file{COPYING}
+@cindex Free Software Foundataion
+@cindex GNU Public License (GPL)
+@cindex source code, GNU SETL
+@cindex distributing GNU SETL source
+
+GNU SETL's source is licensed under the Free Software Foundation's
+GNU Public License (GPL).  See the file @file{COPYING} in the
+top-level directory of the GNU SETL source distribution for the
+rules on copying and modifying GNU SETL@.
+
+If you distribute GNU SETL executables
+(@command{setl}, @command{setlcpp}, @command{setltran})
+or documentation, e.g.@: by
+posting the files on an FTP or Web site,
+please concurrently provide similar access to the
+GNU SETL source distribution from which those files were built.
+
+All the source code for the GNU SETL system should be available under
+@uref{https://setl.org/setl/}; please contact dB <@email{David.Bacon@@nyu.edu}>
+otherwise.
+
+@node Problems
+@section Reporting Bugs
+
+@cindex bugs, reporting
+If you find a bug in GNU SETL, please send email
+to dB <@email{David.Bacon@@nyu.edu}>, including the output of
+@w{@code{setl --version}}, your command-line arguments,
+the environment variables, the input if possible, the output
+you got from the @command{setl}, @command{setlcpp}, or @command{setltran}
+command, and some description of the output you expected.
+For details on those commands, @usertop{}.
+
+
+@node Index
+@unnumbered Index
+
+@printindex cp
+
+@bye
+
+@c Was it Bacon that cooked up this Om? they'll all ask.
+
+@c setl.texi ends here

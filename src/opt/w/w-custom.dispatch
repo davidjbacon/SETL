@@ -1,0 +1,43 @@
+	case S_W_ADD_VERTEX:
+	  void_rd_rd(l_w_add_vertex, integer *, integer *);
+	  break;
+
+	case S_W_BOX:
+	  void_rd_rd_rd_rd(l_w_box, integer *, integer *, integer *, integer *);
+	  break;
+
+	case S_W_COLOR:
+	  void_rd(l_w_color, integer *);
+	  break;
+
+	case S_W_COLOUR:
+	  void_rd(l_w_color, integer *);
+	  break;
+
+	case S_W_EVENT:
+	  void_wr_wr_wr_wr(l_w_event, integer **, integer **, integer **, integer **);
+	  break;
+
+	case S_W_INIT:
+	  void_rd_rd(l_w_init, integer *, integer *);
+	  break;
+
+	case S_W_NEW_PATH:
+	  void_nullary(l_w_new_path);
+	  break;
+
+	case S_W_OPACITY:
+	  void_rd(l_w_opacity, integer *);
+	  break;
+
+	case S_W_POLYGON:
+	  void_nullary(l_w_polygon);
+	  break;
+
+	case S_W_SYNC:
+	  void_nullary(l_w_sync);
+	  break;
+
+	case S_W_VECTOR:
+	  void_rd_rd_rd_rd(l_w_vector, integer *, integer *, integer *, integer *);
+	  break;

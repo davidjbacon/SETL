@@ -1,0 +1,6 @@
+Graph:  {{1 2} {3 4}}
+Connected components:  {{{1 2}} {{3 4}}}
+Graph:  {{1 2} {2 3} {3 4}}
+Connected components:  {{{1 2} {2 3} {3 4}}}
+Graph:  {{1 2} {2 3} {4 5}}
+Connected components:  {{{4 5}} {{1 2} {2 3}}}

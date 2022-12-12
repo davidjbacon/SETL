@@ -1,0 +1,84 @@
+\input texinfo @c -*-texinfo-*-
+@c %**start of header
+@c
+@c $Id: setl-maint.texi,v 1.20 2022/12/10 23:35:26 setlorg Exp $
+@c
+@c Free software (c) dB - see file COPYING for license (GPL).
+@c
+@setfilename setl-maint.info
+@settitle GNU SETL Maintenance Manual
+@finalout
+@c @setchapternewpage odd
+@paragraphindent none
+@c
+@c %**end of header
+
+@include version-setl-maint.texi
+@include include.texi
+
+
+@ifinfo
+@dircategory High-level programming
+@direntry
+* SETL maintenance:     (setl-maint).  GNU SETL Maintenance Manual.
+@end direntry
+@end ifinfo
+
+@titlepage
+@title GNU SETL Maintenance Manual
+@subtitle Edition @value{EDITION}, for GNU SETL Version @value{VERSION}
+@subtitle Updated @value{UPDATED}
+@author by dB
+@end titlepage
+
+@contents
+
+
+@ifnottex
+
+@node Top
+@top GNU SETL Maintenance Manual
+
+@ifinfo
+This info file discusses GNU SETL project maintenance.
+
+SETL is of course the world's most wonderful programming language.
+GNU SETL implements it along with some proposed extensions.
+
+This file is designed to be viewed with @w{@code{info setl-maint}}.
+
+GNU SETL normally comes with HTML and PDF versions too, and current
+documents should always be at @uref{https://setl.org/setl/doc/}.
+@end ifinfo
+
+@c Placeholder menu:
+@menu
+* Overview::      Everything maintainers need to know.
+* Index::         Subject index.
+@end menu
+
+@end ifnottex
+
+
+@node Overview
+@unnumbered Why Maintenance is Fun and Interesting
+@cindex Maintenance
+
+@emph{*** To be written.}
+
+[This will primarily be about the build system, including all the
+provisions for customization (extension), the top level Makefile,
+the documentation, the GMP library, the Makefile.am and configure.ac
+structure, distribution, and distchecking.]
+
+Please also @omtop{}.
+
+
+@node Index
+@unnumbered Index
+
+@printindex cp
+
+@bye
+
+@c setl-maint.texi ends here

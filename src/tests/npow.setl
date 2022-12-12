@@ -1,0 +1,11 @@
+PROGRAM t;
+  a := 3; b := <<2,11,113,5709>>; c := <<7>>;
+  $ try changing BOP to + and see the output change:
+  PRINT (a NPOW b BOP c);
+  PRINT ((a NPOW b) BOP c);
+  PRINT (a NPOW (b BOP c));
+  $ and we assume LESS is like WITH
+  OP BOP(j,k);
+    RETURN (j+k);
+  END;
+END;

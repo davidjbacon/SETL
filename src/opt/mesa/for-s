@@ -1,0 +1,16 @@
+#! /bin/sh
+#
+#  $Id: for-s,v 1.7 2010/10/19 16:19:00 bacon Exp $
+#
+#  Use:  for-s 'SETL program fragment' ...
+#
+#  to iterate through the lines of standard input, putting each line
+#  in the string "s" for the use of your SETL loop body.  For example,
+#
+#    for-s 'PRINT(s);'
+#
+#  copies stdin to stdout, line by line.
+#
+frag=$1
+shift
+setl "LOOP DOING GET(s); WHILE NOT EOF DO $frag ; END LOOP;" "$@"

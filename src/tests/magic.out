@@ -1,0 +1,5 @@
+Initial setting of MAGIC:  #T
+Subject string:  'Dav*d'
+Pattern string:  'av*'
+With MAGIC TRUE, s(p) = 'av'
+With MAGIC FALSE, s(p) = 'av*'

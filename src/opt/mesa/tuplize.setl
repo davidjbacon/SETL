@@ -1,0 +1,80 @@
+-- $Id: tuplize.setl,v 1.10 2022/12/11 17:09:27 setlorg Exp $
+
+-- Read massaged prototypes on stdin and produce pre.tuples on stdout.
+
+-- Lines that are recognized as declaring pointers to functions are
+-- bypassed.
+
+-- The keyword 'extern' or 'static' may start each prototype, but will
+-- not appear in the corresponding output tuple.
+
+-- This program seems rather fussy for the little it's doing.  Ah well,
+-- the code appears to be mostly pretty old, too.
+
+LOOP DOING GET(s); WHILE NOT EOF DO
+  t := SPLIT(s);
+  ASSERT #t >= 4;
+  IF t(1) IN {'extern','static'} THEN
+    t := t(2..);
+  END IF;
+  IF t(#t) = ';' THEN
+    t(#t) := OM;
+  END IF;
+  IF EXISTS i IN [1..#t] | t(i) = '(' THEN
+    IF i < #t THEN
+      IF t(i+1) = '*' THEN
+        CONTINUE LOOP;
+      END IF;
+    END IF;
+  END IF;
+  u := [dcl(t,'(',TRUE)];
+  t := t(2..);
+  -- This extra conjunct (t(1) /= '__attribute__') is a late
+  -- reactive hack and not even imagined to be general:
+  LOOP WHILE #t > 0 AND t(1) /= '__attribute__' DO
+    u +:= [dcl(t,',)',FALSE)];
+    t := t(2..);
+  END LOOP;
+  -- A bunch of non-GL things (system functions like rand and exit)
+  -- have started being included by the #include of <GL/freeglut.h>
+  -- in stubprog.c; but fortunately, the GL naming convention
+  -- strictly has gl at the beginning of each function name (and no
+  -- system function has fewer than 2 chars in its name):
+  IF u(1)(2)(1..2) = 'gl' THEN
+    PRINT(u);
+  END IF;
+END LOOP;
+
+PROC dcl(RW t,terminator,sep_id);
+  VAR p,h,v,s,i,j;
+  p := [];
+  h := 2;
+  IF '(' NOTIN terminator THEN
+    v := 0;  -- parenthesis level
+    i := 0;
+    LOOP WHILE #t > 0 AND (t(1) NOTIN terminator OR v > 0) DO
+      i +:= 1;
+      s := t(1);
+      p +:= [s];
+      IF s = '(' THEN v +:= 1; END IF;
+      IF v > 0 THEN h := i; END IF;
+      IF s = ')' THEN v -:= 1; END IF;
+      t := t(2..);
+    END LOOP;
+  ELSE
+    LOOP WHILE #t > 0 AND t(1) NOTIN terminator DO
+      p +:= [t(1)];
+      t := t(2..);
+    END LOOP;
+  END IF;
+  RETURN IF p = ['void'] OR p = [] THEN OM
+         ELSE
+           IF sep_id THEN
+             IF #p = 1 THEN ['int',p(1)]
+             ELSE [JOIN(p(1..#p-1),' '), p(#p)]
+             END
+           ELSE
+             [JOIN(p,' ')]
+           END
+         END;
+END PROC dcl;

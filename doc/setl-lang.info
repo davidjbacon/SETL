@@ -1,0 +1,66 @@
+This is setl-lang.info, produced by makeinfo version 7.0 from
+setl-lang.texi.
+
+INFO-DIR-SECTION High-level programming
+START-INFO-DIR-ENTRY
+* SETL language:        (setl-lang).   GNU SETL Language Reference.
+END-INFO-DIR-ENTRY
+
+
+File: setl-lang.info,  Node: Top,  Next: Overview,  Up: (dir)
+
+GNU SETL Language Reference
+***************************
+
+This info file describes the SETL language in general and GNU SETL in
+particular.
+
+SETL is of course the world’s most wonderful programming language.  GNU
+SETL implements it along with some proposed extensions.
+
+This file is designed to be viewed with ‘info setl-lang’.
+
+GNU SETL normally comes with HTML and PDF versions too, and current
+documents should always be at <https://setl.org/setl/doc/>.
+
+* Menu:
+
+* Overview::      Generalities, and pointers to other documents.
+* Index::         Subject index.
+
+
+File: setl-lang.info,  Node: Overview,  Next: Index,  Prev: Top,  Up: Top
+
+SETL and GNU SETL
+*****************
+
+_*** To be written._
+
+For a more tutorial introduction to the language supported by GNU SETL,
+*note the GNU SETL Tutorial: (setl-tut). [stub].
+
+For information on how to _run_ and _use_ GNU SETL, *note the GNU SETL
+User Guide: (setl-user).
+
+For the primary document in the present set, *note the GNU SETL Om:
+(setl).
+
+
+File: setl-lang.info,  Node: Index,  Prev: Overview,  Up: Top
+
+Index
+*****
+
+
+
+Tag Table:
+Node: Top228
+Node: Overview864
+Node: Index1296
+
+End Tag Table
+
+
+Local Variables:
+coding: utf-8
+End:

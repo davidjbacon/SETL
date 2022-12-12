@@ -1,0 +1,11 @@
+#! /bin/sh
+# See Makefile.am
+f=$1
+log=t-$f.log
+out=$f.out
+patch=/tmp/$f.patch
+rm -f "$log"
+# This should really be whatever version of make is being used locally:
+make "$log"
+awk '/^\*\*\* /, /^FAIL/ {if ($0 !~ /^FAIL/) print}' "$log" > "$patch"
+patch -d "$srcdir" "$out" "$patch"

@@ -1,0 +1,534 @@
+-- shell cmd to compile and run a SETL pgm as a subprocess
+const setl_cmd := 'exec "$top_srcdir"/run-setl';
+
+const contexts := {
+ -- by convention, contexts.top = om for call from main pgm
+ ['q',      ['proc q;',       'q;']],  -- call from non-vproc q
+ ['qt',     ['proc q(t);',    'a := 1; q(a);']],
+ ['qtstar', ['proc q(t(*));', 'a := 47; q(a);']]  -- vproc q
+};
+
+const axes := {
+ ['context',   ['top','q','qtstar']],
+ ['vcall',     ['','(*)']],
+ ['user_sys',  ['user','system']],
+ ['vproc',     ['','(*)']],
+ ['nformal',   [0,1,2,3]],
+ ['inout',     ['rd','wr','rw']],
+ ['dir_indir', ['direct','indirect']],
+ ['nactual',   [0,1,2,3,4]]
+};
+
+const axis_names := [  -- in order of vec recording
+ 'context', 'user_sys',
+ 'inout','vproc',
+ 'dir_indir','actuals','vcall'
+];
+
+const formal_names := ['x','y','z','w'];  -- just names
+const actual_args := [  -- names and initial values
+ ['a',1],
+ ['b',[2]],
+ ['c',3],
+ ['d',4],
+ ['e',5]
+];
+
+const pid_test_fd = fd_for_pid_test();
+
+const system_examples := [
+--- no error cases in this lot yet
+ ['reads',['rd','wr'],'(*)',
+  [[['s',pretty 'five 5'],['a',4],['b',6]],
+   [['s',pretty '[one ]'],['t',1]],
+   [['s',pretty '(ignored)']]]],
+ ['any',['rw','rd'],'',
+  [[['s',pretty 'hi'],['p',pretty 'Hh']]]],
+ ['getpgid',['rd'],'',
+  [[['p',0]]]],
+ ['date',[],'',
+  [[],
+  [['i',1]]]],  -- i subscripts the string result of DATE
+ ['pid',['rd'],'(*)',
+  [[],
+  [['fd',pid_test_fd]]]],
+ ['fdate',['rd','rd'],'(*)',
+  [[['t',tod]],
+   [['t',tod],['fmt',pretty '%a']]]],
+ ['gsub',['rw','rd','rd'],'(*)',
+  [[['s',pretty 'Dabcd'],['p',pretty 'bc'],['r',pretty 'vi']],
+   [['s',pretty 'Dabcd'],['p',pretty 'bc']]]]
+];
+
+var p_counter;
+var em;  -- the "expectations map"
+var outmap, errmap;
+
+p_counter := 0;
+
+em := {};
+
+outmap := {};
+errmap := {};
+for context in axes.context,
+    vcall in axes.vcall,
+    user_sys in axes.user_sys loop
+  case user_sys
+  when 'user' =>
+    for vproc in axes.vproc,
+        nformal in axes.nformal,
+        inout in cart (nformal * [axes.inout]),
+        dir_indir in axes.dir_indir,
+        nactual in axes.nactual loop
+      name := 'p' + (p_counter +:= 1);
+      proc_string := gen_proc(name, inout, vproc);
+      actuals := actual_args(1..nactual);
+      -- components of vec are in same order as axis_names:
+      vec := [context, user_sys,
+              inout, vproc,
+              dir_indir, actuals, vcall];
+      call_string := gen_call(name, dir_indir, actuals, vcall);
+      expect(vec, proc_string, call_string);  -- fill em with expectations
+    end loop;
+  when 'system' =>
+    proc_string := '';
+    dir_indir := 'direct';
+    for [name, inout, vproc, all_actuals] in system_examples,
+        actuals in all_actuals loop
+--- remaining code here is same as user case:
+      vec := [context, user_sys,
+              inout, vproc,
+              dir_indir, actuals, vcall];
+      call_string := gen_call(name, dir_indir, actuals, vcall);
+      expect(vec, proc_string, call_string);  -- fill em with expectations
+    end loop;
+  end case user_sys;
+end loop;
+
+for axis_context in axes.context loop
+  proc_string := '';
+  call_string := '';
+  outage_string := '';
+  expected_errors := {};
+  for rec = em(context, user_sys,
+               inout, vproc,
+               dir_indir, actuals, vcall) | context = axis_context loop
+    if rec.errage /= om then
+      expected_errors{rec.errage} +:= {rec.vec};
+    else
+      proc_string +:= rec.proc_string;
+      call_string +:= rec.call_string;
+      outage_string +:= rec.outage;  -- expected output lines
+    end if;
+  end loop;
+  -- supposed to be the success stories:
+  setl_pgm := gen_pgm(axis_context, proc_string, call_string);
+  [pgm_outage, pgm_errage] := run(setl_cmd, setl_pgm);
+  putchar(pgm_outage);
+--- there might be better things to do with this errage than this:
+  if #pgm_errage > 0 then
+    printa(stderr, 'pgm_errage:');
+    nprinta(stderr, pgm_errage);
+  end if;
+  expected := split(outage_string,'\n');
+  printed := split(pgm_outage,'\n');
+  bad := false;
+  if #printed /= #expected then
+    printa(stderr,'expected',#expected-1,'lines but got',#printed-1);
+    bad := true;
+  else
+    for i in [1..#expected] loop
+      if printed(i) /= expected(i) then
+        printa(stderr,i,'expected',expected(i),'but got',printed(i));
+        bad := true;
+      end if;
+    end loop;
+  end if;
+  if bad then
+    --- could perhaps doc this useful back-door diagnostic output!
+    putfile('/tmp/'+axis_context+'.setl',     setl_pgm);
+    putfile('/tmp/'+axis_context+'.expected', outage_string);
+    putfile('/tmp/'+axis_context+'.printed',  pgm_outage);
+  end if;
+  for vecset = expected_errors{errage_string} loop
+    vec := random vecset;
+--- looping over all vec in vecset like this, rather than just
+--- pulling a sample as on the line above, makes this test pgm
+--- rather long for normal use, but is useful when you are
+--- modding the test pgm:
+for vec in vecset loop
+    rec := em(vec);
+    setl_pgm := gen_pgm(axis_context, rec.proc_string, rec.call_string);
+    [pgm_outage, pgm_errage] := run(setl_cmd, setl_pgm);
+    if rec.errage notin pgm_errage then
+      printa(stderr,'for vec',vec,'expected',pretty rec.errage,'but got:');
+      nprinta(stderr,pgm_errage);
+      if #pgm_errage = 0 and #pgm_outage > 0 then
+        printa(stderr,' on stdout:',pretty pgm_outage);
+        printa(stderr,' for pgm:');
+        nprinta(stderr,setl_pgm);
+      end if;
+    end if;
+end loop;
+  end for vecset;
+end for axis_context;
+
+
+printa(stderr,'axes',axes);
+printa(stderr,'#range outmap:',#range outmap);
+assert range errmap = range outmap;
+
+outcount := {[unstr pretty outage, #vec] : vec = outmap{outage}};
+printa(stderr,'#domain outcount:',#domain outcount);
+printa(stderr,'range of outcount:',range outcount);
+printa(stderr,[n : n = outcount(outage)]);
+printa(stderr,'outcount:',outcount);
+errcount := {[errage, #vecset] : vecset = errmap{errage}};
+printa(stderr,'#domain errcount:',#domain errcount);
+printa(stderr,'range of errcount:',range errcount);
+printa(stderr,[n : n = errcount(errage)]);
+for vecset = errmap{errage} loop
+  printa(stderr);
+  printa(stderr,errage);
+  printa(stderr,'occurred',#vecset,'times, distributed as follows:');
+  for name = axis_names(i) loop
+    repped := {vec(i) : vec in vecset};  -- choices represented
+    printa(stderr,i,name+':',[[v,#[vec in vecset | vec(i) = v]] : v in repped]);
+  end loop;
+  for vec in vecset loop
+    printa(stderr,vec);
+  end loop;
+end loop;
+
+proc expect(vec, proc_string, call_string);
+  [context, user_sys,
+   inout, vproc,
+   dir_indir, actuals, vcall] := vec;
+--- clumsy way to recover proc name, but oh well
+--- proc_string fence 'proc ' break('(') $ name
+  name := proc_string;
+  name('proc ') := '';
+  name := break(name, '(');
+  nformal := #inout;
+  nfixed := nformal - 1;  -- for variadic procs
+  nactual := #actuals;
+  vals := [v : [-,v] in actuals];
+  rec := {};  -- record to be put in em(vec)
+  -- keeping these sep at this stage because we will want to
+  -- make 2 chains for the valid ones rather than distinct pgms
+  rec.proc_string := proc_string;
+  rec.call_string := call_string;
+  if [0,'(*)'] in {[nformal,vproc],
+                   [nactual,vcall]} then
+    rec.errage := 'syntax error';  -- no arg before (*)
+  elseif dir_indir = 'indirect' and inout /= nformal*['rd'] then
+    -- the translator tends to pick this one up before other
+    -- compile-time errors that we generate:
+    rec.errage := 'cannot snarf a PROC having WR or RW arguments';
+  elseif vcall = '(*)' and context /= 'qtstar' then
+    -- most cases are covered by the 'else' here, but when either of
+    -- these other errors are present as well, the translator catches
+    -- them first:
+    if dir_indir = 'indirect' and inout /= nformal*['rd'] then
+      rec.errage := 'cannot snarf a PROC having WR or RW arguments';
+    elseif [user_sys,nformal] = ['system',0] then
+      rec.errage := 'variadic notation in selection is not allowed';
+    else
+      rec.errage := 'caller must be variadic to make (*) call';
+    end if;
+  elseif user_sys = 'system' then
+    pass;  --- let us see what errors we are generating for these...
+  elseif dir_indir = 'direct' then
+    if nformal = 0 and nactual > 0 then
+      assert vproc = '';  -- because '(*)' with nformal=0 was syntax error
+      rec.errage := 'this routine takes no args';
+    elseif [vproc,vcall] = ['','(*)'] then
+      rec.errage := 'trailing (*) only allowed for variadic callee';
+    elseif nactual = 0 and
+           ((vproc = '' and nformal > 0) or
+            (vproc = '(*)' and nformal > 1)) then
+      rec.errage := 'at least one arg required on this call';
+    elseif [vproc,vcall] = ['',''] and nactual > nformal then
+      rec.errage := 'too many args on this call';
+    elseif ([vproc,vcall] in {['',''],
+                              ['(*)','(*)']} and nactual < nformal) or
+           ([vproc,vcall] = ['(*)',''] and nactual < nfixed) then
+      rec.errage := 'too few args on this call';
+    elseif [vproc,vcall] = ['(*)','(*)'] and
+           inout(nformal) /= 'wr' and
+           not is_tuple vals(nactual) then
+      rec.errage := '(*) arg must be TUPLE';  -- run-time error
+    end if;
+  elseif dir_indir = 'indirect' then
+    -- as it happens, error messages from the translator begin in
+    -- lowercase, with the rest from the run-time vm; most abuses of
+    -- indirect calls are only caught at run time
+    if inout /= nformal*['rd'] then
+      rec.errage := 'cannot snarf a PROC having WR or RW arguments';
+    elseif [vproc,vcall] = ['','(*)'] then
+      rec.errage := 'Callee on indirect (*) call is not variadic';
+    elseif [vproc,vcall] = ['',''] and nactual /= nformal then
+      rec.errage := 'Need ' + nformal + ' arg(s) but have ' +
+                              nactual + ' on indirect call';
+--- it would suffice to test just vcall in the rest of these, as
+--- vproc is already known to be '(*)' for us to get this far:
+    elseif [vproc,vcall] = ['(*)',''] and nactual < nfixed then
+      rec.errage := 'Need at least ' + nfixed + ' arg(s) ' +
+                         'but have ' + nactual + ' on indirect call';
+    elseif [vproc,vcall] = ['(*)','(*)'] and nactual < nformal then
+      rec.errage := 'Need at least ' + nformal + ' arg(s) ' +
+                         'but have ' + nactual + ' on indirect (*) call';
+--- this elseif is identical to the last one under 'direct'
+    elseif [vproc,vcall] = ['(*)','(*)'] and
+           inout(nformal) /= 'wr' and
+           not is_tuple vals(nactual) then
+      rec.errage := '(*) arg must be TUPLE';  -- run-time error
+    end if;
+  end if;
+  if rec.errage = om then
+    case user_sys
+    when 'user' =>
+      lines := [];
+      lines(1) := name;
+      lines(2) := str nactual;  --- incorrect where nargs is not nactual
+      lines(4) := '55';
+      case [vproc,vcall]
+      when ['',''] =>
+        assert nactual = nformal;  -- by prev checks
+        lines(3) := join([if inout(i) = 'wr'
+                          then '*'
+                          else vals(i)
+                          end : i in [1..nactual]], ' ');
+        lines(5) := join([if inout(i) = 'rd'
+                          then vals(i)
+                          else [i*10]
+                          end : i in [1..nactual]], ' ');
+      when ['(*)',''] =>
+        nfixed := nformal - 1;
+        assert nactual >= nfixed;  -- by prev checks
+        lines(3) := join([if inout(i) = 'wr'
+                          then '*'
+                          else vals(i)
+                          end : i in [1..nfixed]] +
+                         [if inout(nformal) = 'wr'
+                          then '*'
+                          else vals(nformal..nactual)
+                          end], ' ');
+        lines(5) := join([if inout(i) = 'rd'
+                          then vals(i)
+                          else [i*10]
+                          end : i in [1..nfixed]] +
+                          if inout(nformal) = 'rd'
+                          then vals(nformal..nactual)
+                          else [if i = nformal then i*10 else '*' end :
+                                   i in [nformal..nactual]]
+                          end, ' ');
+      when ['(*)','(*)'] =>
+        nfixed := nformal - 1;
+        -- the # of "extra" (inserted) args is nactual-nformal for this case
+        assert nactual >= nformal;  -- by prev checks
+        lines(3) := join([if inout(i) = 'wr'
+                          then '*'
+                          else vals(i)
+                          end : i in [1..nfixed]] +
+                          if inout(nformal) = 'wr'
+                          then ['*']
+                          else [vals(nformal..nactual-1) + vals(nactual)]
+                          end, ' ');
+        lines(5) := join([if inout(i) = 'rd'
+                          then vals(i)
+                          else [i*10]
+                          end : i in [1..nfixed]] +
+                          if inout(nformal) = 'rd'
+                          then vals(nformal..nactual)
+                          else
+                            if nactual = nformal then
+                              [[nformal*10]]
+                            else  -- nactual > nformal
+--- we're not generating tests that exercise this in its full generality yet
+                              [nformal*10] +
+                              ['*' : i in [nformal+1..nactual-1]] +
+                              [[]]
+                            end
+                          end, ' ');
+      end case;
+      rec.outage := ''+/[line + '\n' : line in lines];
+    when 'system' =>
+--- let us run the pgm to get its "expected" output,
+--- which won't prove anything except that we later get the same
+--- result when running the successful pgm in a batch with the
+--- others or when we run the failing one again.  A piece of
+--- updateable SETL code that recorded expectations priorly as
+--- input "data" is probably where we're going on that though.
+      setl_pgm := gen_pgm(context, proc_string, call_string);
+      [rec.outage, rec.errage] := run(setl_cmd, setl_pgm);
+    end case;
+  end if;
+  rec.vec := vec;  -- a "back ptr" for later convenience
+  em(vec) := rec;
+end proc expect;
+
+proc gen_pgm(context, proc_string, call_string);
+  if context = 'top' then
+    setl_pgm := call_string +  -- call from main
+                proc_string;
+  else
+    [q,c] := contexts(context);  -- intermediary proc line, call line
+    setl_pgm := c + '\n' +  -- call to intermediary from main
+                q + '\n' +  -- context for the objective call
+                call_string +  -- the objective call
+                'end ' + q + '\n' +
+                proc_string;
+  end if;
+  return setl_pgm;
+end proc gen_pgm;
+
+proc gen_proc(name, inout, vproc);
+  nformal := #inout;
+  proc_head := 'proc ' + name;
+  proc_formals := join([inout(i) + ' ' + formal_names(i) :
+                        i in [1..nformal]], ',');
+  proc_body := 'print(' + join(formal_names(1..nformal), ',') + ');\n';
+  proc_body +:= ''+/[formal_names(i) + ' := [' + (i*10) + '];\n' :
+                     i in [1..nformal]];
+  proc_end  := 'end ' + proc_head;
+  proc_string := proc_head + '(' + proc_formals + vproc + ');\n' +
+                 'print(' + pretty name + ');\n' +
+                 'print(nargs);\n' +
+                 proc_body +
+                 'return 55;\n' +
+                 proc_end + ';\n';
+  return proc_string;
+end proc gen_proc;
+
+proc gen_call(name, dir_indir, actuals, vcall);
+  call_pre := ''+/[a + ' := ' + v + ';\n' : [a,v] in actuals];
+  -- note that non-empty vcall with nactual=0 produces syntax error:
+  -- for direct, it is p((*)); for indirect, call(routine p(*)).
+  call_args := join([a : [a,-] in actuals], ',');
+  call_core := case dir_indir
+  when 'direct' =>
+    name + '(' + call_args + vcall + ')'
+  when 'indirect' =>
+    if #actuals = 0 then
+      'call(routine ' + name + vcall + ')'
+    else
+      'call(routine ' + name + ',' + call_args + vcall + ')'
+    end if
+  otherwise =>
+    om  -- how tedious
+  end case;
+  call_post := 'print(' + call_args + ');\n';
+  call_string := call_pre +
+                 'print(' + call_core + ');\n' +
+                 call_post;
+  return call_string;
+end proc gen_call;
+
+proc run_pgm(setl_pgm, vec);
+  [outage, errage] := run(setl_cmd, setl_pgm);
+  putchar(outage);
+  outmap{outage} +:= {vec};
+  if #errage = 0 then
+    errage := '<success>';
+  else
+    -- keep just the error message lines that begin with 3 stars
+    -- and aren't the lines with the unhelpfully variable line
+    -- numbers in them nor the cluttery lines of *** only:
+    errage := join(
+      [line in split(errage,'\n') |
+       line(1..3) = '***' and line /= '***' and
+       line('Error .* of standard input:$') = om](2..3), '\n');
+  end if;
+  errmap{errage} +:= {vec};
+end proc run_pgm;
+
+proc run(cmd, input);
+#if defined USE_SHELL_REDIRECTION_OF_STDERR
+  -- Use shell redirection "2>&n", which is fragile if n > 9
+  [fd,fd2] := buffer_coproc();
+  --- may not work if fd2 > 9, depending on the shell:
+  outage := filter(cmd + ' 2>&' + fd2, input);
+  close(fd2);
+  errage := getfile fd;
+  close(fd);
+#elif defined SAVE_AND_REDIRECT_AND_RESTORE_STDERR
+  -- Do the redirection of stderr in the parent, but restore stderr
+  -- after executing cmd.  More conventional and usually easier is
+  -- to do the redirection only in the child, as in the preceding
+  -- fragile example and in the robust but longish succeeding one.
+  [fd,fd2] := buffer_coproc();
+  stderr_save := dup(stderr);
+  dup2(fd2,stderr);
+  close(fd2);
+  outage := filter(cmd, input);
+  dup2(stderr_save,stderr);
+  close(stderr_save);
+  errage := getfile fd;
+  close(fd);
+#else
+  -- Isolate the stderr redirection by doing everything in a subprocess.
+  fd3 := pipe_from_child();
+  if fd3 = -1 then  -- child
+    [fd,fd2] := buffer_coproc();
+    dup2(fd2,stderr);
+    close(fd2);
+    outage := filter(cmd, input);
+    close(stderr);  -- present eof to the stderr-buffering coproc
+    errage := getfile fd;
+    close(fd);  -- for neatness
+    write([outage, errage]);
+    stop;
+  end if;
+  reada(fd3, [outage, errage]);
+  close(fd3);
+#endif
+  return [outage, errage];
+end proc run;
+
+-- Return a pair [fd,fd2] such that whatever is written to fd2 will be
+-- buffered in its entirety by a coprocess and then be available to
+-- the caller via GETFILE fd.  For example, if stderr is redirected to
+-- fd2, a program's error output can be caught that way.
+proc buffer_coproc;
+  [fd1,fd2] := pipe();
+  fd := pipe_from_child();
+  if fd = -1 then  -- child
+    close(fd2);
+    input := getfile fd1;
+    close(fd1);  -- redundant; GETFILE auto-opened and auto-closed fd1
+    putchar(input);
+    stop;
+  end if;
+  close(fd1);
+  return [fd,fd2];
+end proc buffer_coproc;
+
+proc fd_for_pid_test;
+  fd := pipe_to_child();
+  if fd = -1 then  -- child
+    read;  -- wait for eof
+    stop;
+  end if;
+  return fd;
+end proc fd_for_pid_test;
+
+OP CART(t);  -- Cartesian product of a tuple of tuples
+  VAR first, rest;
+  RETURN IF #t = 0 THEN [[]]
+         ELSE           [[first]+rest : first IN t(1),
+                                        rest IN CART t(2..)]
+         END;
+END OP CART;
+
+
+#if 0
+-- in case you need to check that setl_cmd works
+call_string := 'p;\n';
+proc_string := 'proc p;\n' +
+               '  return;\n' +
+               'end;\n';
+setl_pgm := call_string + proc_string;
+output := filter(setl_cmd, setl_pgm);
+putchar(output);
+#endif

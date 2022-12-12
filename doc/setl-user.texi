@@ -1,0 +1,1376 @@
+\input texinfo @c -*-texinfo-*-
+@c %**start of header
+@c
+@c $Id: setl-user.texi,v 1.70 2022/12/10 23:35:26 setlorg Exp $
+@c
+@c Free software (c) dB - see file COPYING for license (GPL).
+@c
+@setfilename setl-user.info
+@settitle GNU SETL User Guide
+@finalout
+@c @setchapternewpage odd
+@paragraphindent none
+@c
+@c %**end of header
+
+@include version-setl-user.texi
+@include include.texi
+
+
+@ifinfo
+@dircategory High-level programming
+@direntry
+* SETL user guide:      (setl-user).          GNU SETL User Guide.
+* setl:                 (setl-user)setl.      GNU SETL command-line interface.
+* setlcpp:              (setl-user)setlcpp.   GNU SETL preprocessor.
+* setltran:             (setl-user)setltran.  GNU SETL translator (compiler).
+@end direntry
+@end ifinfo
+
+@titlepage
+@title GNU SETL User Guide
+@subtitle Edition @value{EDITION}, for GNU SETL Version @value{VERSION}
+@subtitle Updated @value{UPDATED}
+@author by dB
+@end titlepage
+
+
+@contents
+
+
+@ifnottex
+
+@node Top
+@top GNU SETL User Guide
+
+@ifinfo
+This info file documents the command-line interface to the GNU SETL
+system, i.e., the command (@pxref{setl}) that
+directs the preprocessing (@pxref{setlcpp}),
+compilation (@pxref{setltran}), and execution
+of GNU SETL programs.
+
+SETL is of course the world's most wonderful programming language.
+GNU SETL implements it along with some proposed extensions.
+
+This file is designed to be viewed with @w{@code{info setl-user}}.
+
+GNU SETL normally comes with HTML and PDF versions too, and current
+documents should always be at @uref{https://setl.org/setl/doc/}.
+@end ifinfo
+
+@menu
+* Invoking: setl.      How to run the @command{setl} command.
+* Invoking: setlcpp.   Running @command{setlcpp} directly.
+* Invoking: setltran.  Running @command{setltran} directly.
+* Index::              Subject index.
+@end menu
+
+@end ifnottex
+
+
+
+@node setl
+@unnumbered The @command{setl} command
+@cindex SETL virtual machine code
+
+The @command{setl} command is the primary
+interface to the GNU SETL system.  In typical use,
+it preprocesses SETL programs using @command{@rfe{setlcpp}}
+and compiles them with @command{@rfe{setltran}} into
+GNU SETL Virtual Machine code, which it then executes.
+
+Depending on the environment, your SETL program
+will be able to read from its standard input channel (stdin), write to
+its standard output and error channels (stdout and stderr), create and
+communicate with other processes, handle signals, receive timer events,
+listen on server ports, and open and use files, network connections,
+and existing file descriptors.
+
+@menu
+* examples::        Brief introductory examples.
+* details::         The @command{setl} command and arguments.
+* #! invocation::   Writing new commands in SETL.
+* envt vars::       Environment variables influencing @command{setl}.
+* signals::         Signals to which @command{setl} responds.
+* exit status::     What @command{setl} returns upon exit.
+@end menu
+
+
+@node examples
+@section Examples
+@cindex examples, @command{setl}
+
+This is the output of the command @w{@samp{setl --help}}:
+
+@example
+
+GNU SETL programming language processor
+
+Usage: setl [OPTIONS] [INPUT] [ARGS]
+
+  --[no]cpp           force [non]use of preprocessor
+  -I..., -D..., -U...  passed to setlcpp; these imply --cpp
+  --compile, -c       emit VM code on stdout, don't run
+  --translated, -t    input is VM code, not SETL source
+  --font-hints        just emit source prettyprinting hints
+  --keyword-case=any|upper|lower    ("stropping" convention) -
+                       control keyword recognition (default any)
+  --identifier-case=any|upper|lower|mixed    control recognition
+                       of user variable names (default any)
+  --maxmem=N          limit memory use (k, m, or g suffix OK)
+  --restricted, -r    restrict rights, for untrusted code
+  --allow-open=WHAT,HOW ...   restriction exemptions for open()
+  --allow-fd-open=FD,HOW ...   exemptions for open() over fd
+  --allow-mkstemp=TEMPLATE ...   exemptions for mkstemp() calls
+  --allow-filter=COMMAND ...   exemptions for filter() calls
+  --allow-system=COMMAND ...   exemptions for system() calls
+  --setlcpp=COMMAND   specify preprocessor command
+  --setltran=COMMAND  specify translator command
+  --help, -h          display this help on stdout and exit
+  --version           display version info on stdout and exit
+  --verbose, -v       make noise on stderr
+  --debug             make more noise on stderr
+  --abort-on-error    dump core for SETL-level error
+
+  -FD                 input from numeric file descriptor FD
+  |COMMAND            input from piped stdout of COMMAND
+  FILENAME            input from file FILENAME
+  STRING              get whole program directly from STRING
+  -, --               input from stdin (default)
+
+Examples:
+  setl mypgm.setl my args
+  setl 'print ("Hello, world.");'
+
+If the Texinfo documentation is installed, "info setl" may work.
+PDF and HTML docs are usually under share/doc/setl/ somewhere.
+
+See setl.org for more documentation, source code, etc.
+
+Please report bugs to David.Bacon@@nyu.edu.  Thanks for using
+SETL, the World's Most Wonderful Programming Language!
+
+@end example
+
+This is the output of the command @w{@samp{setl "print(57);"}}:
+@example
+57
+@end example
+
+And of @w{@samp{setl "print(command_line);" a "b c" 57}}:
+@example
+[a 'b c' '57']
+@end example
+
+
+@node details
+@section The @command{setl} command and arguments
+
+Here is the general form of the @command{setl} command:
+
+@example
+@command{setl} [@var{options}] [@var{input}] [@var{run args}]
+@end example
+
+The @meta{options} include:
+
+@table @option
+
+@anchor{--cpp}
+@item --[no]cpp
+@cindex @option{--cpp} option
+@cindex @option{--nocpp} option
+@cindex @code{#if}, @code{#ifdef}, @code{#ifndef}
+@cindex macro
+@cindex preprocessor
+By default, the GNU SETL Preprocessor, @command{@rfe{setlcpp}}, an
+adaptation of GNU CPP (the GNU C Preprocessor), is applied if the input
+program appears to require it.  Use @option{--cpp} or @option{--nocpp}
+to make an explicit choice.  Options @option{-I...}, @option{-D...},
+and @option{-U...}, which are meaningful only to the preprocessor,
+also imply @option{--cpp}.
+@c Technicality:  I'm not using @dots{} in those @code-like contexts,
+@c as it looks silly in some HTML renderings (3 dots crammed into
+@c one space).
+
+The effective setting of this option in the absence of an explicit
+choice depends on whether the input appears to have possible
+@command{setlcpp} directives.  Because a false positive is usually
+harmless, apart from incurring a little extra overhead for an
+unnecessary @command{setlcpp} invocation, the default is
+@option{--cpp} if there are any lines whose first token is @samp{#}.
+
+@cindex @code{#line} directive
+There are actually some exceptions to that:  a line that
+begins with @samp{#!} doesn't imply a default of @option{--cpp},
+nor does a @code{#line} directive that is in the canonical form
+@w{@samp{#line @var{digits} "@var{filename}"}}
+starting in column 1 and followed immediately by a newline.
+Each space shown is a single space.)  Such lines are instead
+transformed directly by the @command{setl} command into
+@w{@samp{# @var{digits} "@var{filename}"}}, just as
+@command{setlcpp} would do.
+
+Also, the presence of identifiers starting with a double underscore,
+such as @setl{__VERSION__}, @setl{__FILE__}, or @setl{__LINE__},
+imply @option{--cpp}, and are transformed by @command{setlcpp}
+appropriately if recognized.  Note that no SETL variable identifier
+can begin with an underscore, so such symbols can only be
+preprocessor symbols (like those introduced via @samp{#define} or
+a @option{-D...}@: option).
+
+At this time, @command{setl} has no option for spewing just the
+preprocessor output, although this can be retrieved from the
+@code{%SOURCE} section of the translator output
+(see @optref{--compile})
+or generated directly using the @command{setlcpp} command.
+
+To apply the preprocessor, @command{setl} calls
+@command{setlcpp} with options @option{-C} and @optref{-lang-setl}.
+The @option{-lang-setl} option is needed for correct processing of
+SETL string literals and comments.  The @option{-C} (capital C) option
+means retain comments:  this is used because there was once and may
+yet be again an escape convention where pseudo-code is enclosed in
+@w{@samp{/* ... */}}.  In @option{-lang-setl} mode, @option{-C}
+also happens to cause SETL comments (not just C comments) to be
+retained in the preprocessor output.
+
+@item -I...
+@itemx -D...
+@itemx -U...
+@cindex @option{-I} option
+@cindex @option{-D} option
+@cindex @option{-U} option
+@cindex @code{#include}
+@cindex @code{#define}
+@cindex @code{#undef}
+These options imply @optref{--cpp} and are passed along to
+@command{setlcpp} in the order they occur.
+
+There must be no space between the @option{-I}, @option{-D}, or
+@option{-U} and its sub-argument:  @samp{-I..}@: is good but
+@samp{-I@tie{}..}@: fails with a message like
+@samp{setlcpp: Directory name missing after -I option}.
+
+@cindex @env{SETL_INCLUDE_PATH}
+Directories listed in the
+@envref{SETL_INCLUDE_PATH} environment variable
+will be searched @emph{after} any specified via @option{-I} options
+when an @code{#include} directive is encountered.
+There are no predefined default search directories.
+
+@anchor{--compile}
+@item --compile
+@itemx -c
+@cindex @option{--compile} option
+@cindex @option{-c} option
+@cindex compile-only mode
+@cindex compiler
+@cindex translator
+@cindex SETL virtual machine code
+Runs only @command{setltran}, the GNU SETL translator (compiler).
+Produces (human-readable) GNU SETL Virtual Machine code on stdout.
+
+@item --translated
+@itemx -t
+@cindex @option{--translated} option
+@cindex @option{-t} option
+@cindex run-only mode
+@cindex compiler
+@cindex translator
+@cindex SETL virtual machine code
+Assumes that the input is GNU SETL Virtual Machine code, such as
+might have been produced by @w{@samp{setl -c}}.
+
+@anchor{setl --font-hints}
+@item --font-hints
+@cindex @option{--font-hints} option
+@cindex font hints
+@cindex hints, font
+@cindex prettyprinting hints
+Spews prettyprinting hints corresponding to the source input, and
+then exits successfully.  Implies @option{--nocpp}, though you can
+put a @option{--cpp} after the @option{--font-hints} option to override
+that and thereby get hints for the source as already preprocessed.
+
+The hints are output as 3 integers:  beginning offset, ending
+offset, and suggested font.  There is one line of these per
+token of input.  Comments count as whitespace.
+The offsets can be thought of as referring to
+the cracks between the characters, so if the first input character
+is a whole token by itself, its beginning and ending offsets
+are 0 and 1 respectively.
+
+If the font codes are taken to mean roman for 1, italic for 2,
+and bold for 3, then predefined tokens of the SETL language will
+be in bold, literals in roman, and user identifiers in italics
+(though user-defined @emph{operators}, i.e., those introduced by
+@setl{op} or @setl{operator} declarations, will be in bold).
+No font hints are given for comments, which probably look best in
+roman under this presentation scheme.
+
+The @option{--font-hints} option is passed to @command{setltran}
+(@optref{setltran --font-hints}).
+
+@allowcodebreaks true
+@cindex Texinfo
+Here is a little program called @file{texinfo.setl} which produces
+Texinfo output (see the GNU @cite{Texinfo} manual or
+@uref{https://www.gnu.org/software/texinfo/}).
+It maps 2 to @code{@@emph} and 3 to @code{@@strong}, and leaves
+everything else in the default font.  With its several single-letter
+variable names, it is perhaps not a splendid example of lucid SETL
+programming, but it has a couple of tuple formers that might amuse
+old fans of the World's Most Wonderful Programming Language:
+@allowcodebreaks false
+
+@smallexample
+pgmfile := command_line(1) ? 'texinfo.setl';
+n := #'# 1 "' + #pgmfile + #'"' + 1;  -- ugh
+p := fileno open ('setl --font-hints '+pgmfile, 'pipe-from');
+hints := [[i-n,j-n,k] : doing reada(p,i,j,k); while not eof];
+close(p);
+s := getfile pgmfile;
+m := 0;
+putchar (''+/[at_sub s(m+1..i) + decorate (s(i+1..j), k) :
+              [i,j,k] in hints step m := j; ]);
+putchar (at_sub s(m+1..));
+
+proc decorate (s, k);  -- decorate string s using font hint k
+  case k
+  when 2    => return '@@emph@{'+at_sub s+'@}';
+  when 3    => return '@@strong@{'+at_sub s+'@}';
+  otherwise => return at_sub s;
+  end case;
+end proc;
+
+op at_sub (s);
+  gsub (s, '@@', '@@@@');  -- double any existing @@ signs
+  gsub (s, '@{', '@@@{');  -- and take care of braces
+  gsub (s, '@}', '@@@}');
+  return s;
+end op;
+@end smallexample
+
+Applied to itself (the default!), the above program's output is as
+follows.  Note that this output looks sort of OK in HTML and in
+@TeX{}-based renderings (DVI, whence PDF and PostScript), but is
+virtually illegible in an @command{info} reader.  This program is
+of course a mere toy, however, and the gentle reader is referred to
+@uref{https://cs.nyu.edu/media/publications/bacon_david.pdf,,
+dB's thesis},
+Appendix A, for an example of what can be done with
+a much fussier and more comprehensive pretty-printer:
+
+@display
+@emph{pgmfile} @strong{:=} @strong{command_line}@strong{(}1@strong{)} @strong{?} 'texinfo.setl'@strong{;}
+@emph{n} @strong{:=} @strong{#}'# 1 "' @strong{+} @strong{#}@emph{pgmfile} @strong{+} @strong{#}'"' @strong{+} 1@strong{;}  -- ugh
+@emph{p} @strong{:=} @strong{fileno} @strong{open} @strong{(}'setl --font-hints '@strong{+}@emph{pgmfile}@strong{,} 'pipe-from'@strong{)}@strong{;}
+@emph{hints} @strong{:=} @strong{[}@strong{[}@emph{i}@strong{-}@emph{n}@strong{,}@emph{j}@strong{-}@emph{n}@strong{,}@emph{k}@strong{]} @strong{:} @strong{doing} @strong{reada}@strong{(}@emph{p}@strong{,}@emph{i}@strong{,}@emph{j}@strong{,}@emph{k}@strong{)}@strong{;} @strong{while} @strong{not} @strong{eof}@strong{]}@strong{;}
+@strong{close}@strong{(}@emph{p}@strong{)}@strong{;}
+@emph{s} @strong{:=} @strong{getfile} @emph{pgmfile}@strong{;}
+@emph{m} @strong{:=} 0@strong{;}
+@strong{putchar} @strong{(}''@strong{+}@strong{/}@strong{[}@strong{at_sub} @emph{s}@strong{(}@emph{m}@strong{+}1@strong{..}@emph{i}@strong{)} @strong{+} @emph{decorate} @strong{(}@emph{s}@strong{(}@emph{i}@strong{+}1@strong{..}@emph{j}@strong{)}@strong{,} @emph{k}@strong{)} @strong{:}
+              @strong{[}@emph{i}@strong{,}@emph{j}@strong{,}@emph{k}@strong{]} @strong{in} @emph{hints} @strong{step} @emph{m} @strong{:=} @emph{j}@strong{;} @strong{]}@strong{)}@strong{;}
+@strong{putchar} @strong{(}@strong{at_sub} @emph{s}@strong{(}@emph{m}@strong{+}1@strong{..}@strong{)}@strong{)}@strong{;}
+
+@strong{proc} @emph{decorate} @strong{(}@emph{s}@strong{,} @emph{k}@strong{)}@strong{;}  -- decorate string s using font hint k
+  @strong{case} @emph{k}
+  @strong{when} 2    @strong{=>} @strong{return} '@@emph@{'@strong{+}@strong{at_sub} @emph{s}@strong{+}'@}'@strong{;}
+  @strong{when} 3    @strong{=>} @strong{return} '@@strong@{'@strong{+}@strong{at_sub} @emph{s}@strong{+}'@}'@strong{;}
+  @strong{otherwise} @strong{=>} @strong{return} @strong{at_sub} @emph{s}@strong{;}
+  @strong{end} @strong{case}@strong{;}
+@strong{end} @strong{proc}@strong{;}
+
+@strong{op} @strong{at_sub} @strong{(}@emph{s}@strong{)}@strong{;}
+  @strong{gsub} @strong{(}@emph{s}@strong{,} '@@'@strong{,} '@@@@'@strong{)}@strong{;}  -- double any existing @@ signs
+  @strong{gsub} @strong{(}@emph{s}@strong{,} '@{'@strong{,} '@@@{'@strong{)}@strong{;}  -- and take care of braces
+  @strong{gsub} @strong{(}@emph{s}@strong{,} '@}'@strong{,} '@@@}'@strong{)}@strong{;}
+  @strong{return} @emph{s}@strong{;}
+@strong{end} @strong{op}@strong{;}
+@end display
+
+Note how this program deals with the unpleasant fact that even
+programs that are not passed through @command{setlcpp} get a line
+of the form @w{@samp{# 1 "@var{filename}"}} prepended on
+their way into @command{setltran}.  A slightly simpler variation on
+this program is suggested in the
+corresponding @command{setltran} option description
+(@optref{setltran --font-hints}).
+
+@anchor{setl --keyword-case}
+@anchor{setl --identifier-case}
+@item --keyword-case=upper|lower|any
+@itemx --identifier-case=upper|lower|any|mixed
+@cindex @option{--keyword-case} option
+@cindex @option{--identifier-case} option
+@cindex lettercase
+By default, the GNU SETL translator recognizes
+keywords and user identifiers case-insensitively,
+i.e., in @code{any} lettercase.  Details on this and the other
+possibilities can be found with the corresponding @command{setltran}
+option descriptions
+(@optref{setltran --keyword-case} and @optref{setltran --identifier-case}).
+
+@anchor{--maxmem option}
+@item --maxmem=@var{n}
+@cindex @option{--maxmem} option
+@cindex memory limit
+@cindex limit, memory
+@cindex SETL virtual machine
+Limits the amount of memory that the GNU SETL
+Virtual Machine allows to be allocated for data
+
+The decimal number @meta{n} may include a case-insensitive suffix
+@code{K} (1024), @code{M} (1024K), or @code{G} (1024M).
+
+The default is unlimited, up to what the host system will bear.  This
+default can be explicitly specified with @samp{--maxmem=0}.
+
+@anchor{--restricted}
+@item --restricted
+@itemx -r
+@cindex @option{--restricted} option
+@cindex @option{-r} option
+@cindex restricted mode
+@cindex security, restricted mode
+@cindex untrusted client programs, restricted mode
+@cindex client programs, untrusted, restricted mode
+@cindex SETL virtual machine
+If @option{--restricted} (or equivalently @option{-r}) is specified,
+the GNU SETL Virtual Machine disallows
+certain operations, such as file and socket operations,
+that can pose security risks.
+For specifics, @reflib{restricted, Restricted Mode}.
+
+Restricted mode is intended to let you run untrusted client
+programs.  For example, you might wish to do this to let
+your students test and submit their SETL programs directly
+on and through your Web site.
+@uref{https://setl.org/setl/setl-server.html,,
+Dave's Famous Original SETL Server} accepts programs through
+a web form and runs them in restricted mode.
+
+This mode would also be suitable for a browser plugin that supports
+SETL @dfn{markup} (SETL program text embedded in Web pages).
+
+To allow access to specific resources even in restricted mode, use as
+many @optref{--allow-...}@: options as required.
+
+@need 1618
+@anchor{--allow-...}
+@anchor{--allow-open}
+@anchor{--allow-fd-open}
+@anchor{--allow-mkstemp}
+@anchor{--allow-filter}
+@anchor{--allow-system}
+@item --allow-open=@var{what},@var{how} @dots{}
+@itemx --allow-fd-open=@var{fd},@var{how} @dots{}
+@itemx --allow-mkstemp=@var{template} @dots{}
+@itemx --allow-filter=@var{command} @dots{}
+@itemx --allow-system=@var{command} @dots{}
+@cindex @option{--allow-...}@: options
+@cindex @setl{open}, selectively allowing
+@cindex @setl{mkstemp}, selectively allowing
+@cindex @setl{filter}, selectively allowing
+@cindex @setl{system}, selectively allowing
+@cindex security, allowing selective access to resources
+@cindex untrusted client programs, access to resources
+@cindex client programs, access to resources
+These options, which may be used multiple times, drill little holes in
+the firewall erected by the @optref{--restricted} option,
+giving the SETL program access to particular resources
+specified at @command{setl} invocation time.
+
+For example, you can give your students the time of day with
+@samp{--allow-open=profhost:daytime,tcp-client}.
+
+Or, if you start their programs in an environment
+where file descriptor 4 is already open on some pipe, socket, or file
+you want them to be able to read from, then @samp{--allow-fd-open=4,r}
+would do the trick.
+
+The arg @samp{--allow-mkstemp=/tmp/homework-1XXXXXX} allows the
+SETL @libref{mkstemp} primitive to be called with the given template,
+for the safe use of temporary scratch files in restricted mode.
+
+Likewise, @samp{--allow-filter=fmt} lets the SETL program apply
+@libref{filter} to the commmand @command{fmt}, and
+@samp{--allow-system="mail prof </tmp/summary$(uid)"} lets the
+program call @libref{system} with a very particular @command{mail}
+command.
+
+Note that commands, filenames, and templates in @option{--allow-...}
+args will require appropriate quoting to deal with internal spaces and
+other special characters when a standard Bourne-type shell is used to
+invoke @command{setl}, as that latter example illustrates.
+
+Meaningful values of @meta{what}, @meta{fd}, and @meta{how} are
+those accepted by the SETL @libref{open} primitive,
+except that a @type{tuple} argument to @setl{open}
+must be represented as a pair of strings separated by a colon in
+@option{--allow-open} options.  Specify integer values as
+strings of decimal digits.
+
+There should be no space around the comma that separates @meta{what}
+or @meta{fd} from @meta{how}.
+
+Timer streams are always allowed to be opened, without the need to give
+an @option{--allow-open} option for them.
+
+The @meta{what} part of an @option{--allow-open} argument must be
+matched exactly in the SETL program's @setl{open} call (or equivalent
+auto-open), with these exceptions:  (1) the names of signal-catching,
+signal-ignoring, and signal-defaulting streams need only be equivalent
+according to the usual @setl{open} convention; and (2) when @meta{what}
+is a network (host:service) spec, the matching is case-insensitive.
+
+The case-sensitive matching for commands and filenames is the safest
+way to treat an @option{--allow-open} security exemption, even though
+@setl{open} itself may behave case-insensitively on some combinations
+of OS and filesystem.
+
+@anchor{--setlcpp}
+@item --setlcpp=@var{command}
+@cindex @option{--setlcpp} option
+@cindex preprocessor command
+This specifies a preprocessor command to be used in place of the default
+@command{setlcpp}.  The default is that if @command{setl} appears to
+have been invoked using a specific pathname (i.e., there is a
+directory separator character in @posix{argv[0]} at the C level),
+then @command{setlcpp} is sought in the same directory as
+@command{setl} was ostensibly found in.  Otherwise, given no
+directory separator character, the @env{PATH}
+environment variable is searched in the usual POSIX way for a
+directory containing an executable @command{setlcpp}.
+
+The @meta{command} in the @option{--setlcpp} option is in fact
+taken as the initial substring of a command to be passed, unquoted,
+with appended args such as @option{-D...}@: and @option{-I...}, quoted,
+to the POSIX standard (Bourne-compatible) shell.
+Thus @env{PATH} is also consulted if the specified @meta{command}
+has no directory separator character in its first token.
+
+@anchor{--setltran}
+@item --setltran=@var{command}
+@cindex @option{--setltran} option
+@cindex translator command
+This specifies a translator command to be used in place of the default
+@command{setltran}.  The default that if @command{setl} appears to
+have been invoked using a specific pathname (i.e., there is a
+directory separator character in @posix{argv[0]} at the C level),
+then @command{setltran} is sought in the same directory as
+@command{setl} was ostensibly found in.  Otherwise, given no
+directory separator character, the @env{PATH}
+environment variable is searched in the usual POSIX way for a
+directory containing an executable @command{setltran}.
+
+The @meta{command} in the @option{--setltran} option is in fact
+taken as the initial substring of a command to be passed, unquoted,
+with appended args such as @option{--verbose},
+to the POSIX standard (Bourne-compatible) shell.
+Thus @env{PATH} is also consulted if the specified @meta{command}
+has no directory separator character in its first token.
+
+@anchor{setl --help}
+@item --help
+@itemx -h
+@cindex @option{--help} option
+@cindex @option{-h} option
+@cindex help, @command{setl}
+Spews a command summary on stdout, and exits successfully.
+
+@anchor{setl --version}
+@item --version
+@cindex @option{--version} option
+@cindex version, @command{setl}
+Spews GNU SETL version information on stdout, and exits successfully.
+
+@anchor{setl --verbose}
+@item --verbose
+@itemx -v
+@cindex @option{--verbose} option
+@cindex @option{-v} option
+@cindex verbose mode
+@c @cindex garrulous
+@c @cindex prolix
+@c @cindex windy
+@c @cindex logorrheal
+@c @cindex pleonastic
+@c @cindex redundant
+@c @cindex noise
+@c @cindex nonsense
+@c @cindex tedious
+@c @cindex boring
+Spews some garbage on stderr during execution for the amusement of nerds.
+
+@anchor{setl --debug}
+@item --debug
+@cindex @option{--debug} option
+@cindex SETL virtual machine
+In a normal build of @command{setl}, the @option{--debug} option does
+nothing at run time.  But if the preprocessor symbol @code{DEBUG_TRACE}
+was asserted when @command{setl} was built, then @option{--debug}
+causes instruction-by-instruction tracing of GNU SETL Virtual Machine
+execution, on stderr.
+
+Regardless of @code{DEBUG_TRACE}, this option is passed to
+@command{setltran} (@optref{setltran --debug}).
+
+@end table
+
+A single hyphen is acceptable in place of the double hyphen in all
+the above options.  Single-letter options only take a single hyphen,
+however.  Also, single-letter options may not be @q{clustered}:  each
+option must be a separate argument, so @w{@samp{setl -c -v}} wins but
+@w{@samp{setl -cv}} loses.
+
+Possibilities for the @meta{input} argument to the
+@command{setl} command are tried in the following order:
+
+@table @option
+
+@item -@var{fd}
+@cindex reading program from file descriptor
+@cindex file descriptor, reading program from
+Program comes from the already open file descriptor
+@meta{fd}, where @meta{fd} is a decimal integer.
+
+@item @var{-}
+@cindex reading program from stdin
+@cindex stdin, reading program from
+@cindex @option{-} (read from stdin)
+Program comes from the standard input (stdin).  This is the default
+if there are no other input arguments to @command{setl}.
+
+@item |@var{command}
+@cindex reading program from command output
+@cindex command, reading program from output of
+Program comes from the standard output of @meta{command}.
+
+@item @var{filename}
+@cindex reading program from file
+@cindex file, reading program from
+Program comes from the file @meta{filename}.
+
+@item @var{string}
+@cindex reading program from string
+@cindex string, reading program from
+@cindex reading program from command-line argument
+@cindex command-line argument, reading program from
+Program comes from the argument @meta{string} itself.
+
+@end table
+
+
+@naI{hashbang}
+@node #! invocation
+@section @code{#!} invocation
+
+@cindex @code{#!} invocation
+@cindex hashbang (@code{#!})
+@cindex SETL script
+@cindex @setl{command_name}, @setl{command_line}
+
+@c @samp{#!} would be more normal here, but the context favours
+@c @code{#!} (it's prettier here):
+
+On systems that support the convention in which any script beginning
+with the characters @code{#!} (@dfn{hashbang})
+is passed to the interpreter whose absolute pathname appears right after
+the @code{#!}, the @command{setl} command may be run indirectly
+to create SETL @dfn{scripts}.
+
+Here is an example:
+
+@example
+#! /usr/bin/setl
+print (command_name, command_line);
+@end example
+
+If that script is put in @command{/tmp/prtcmd} and made executable,
+and if @command{setl} (together with @command{setlcpp} and
+@command{setltran}) is installed in @command{/usr/bin},
+then the shell command
+
+@example
+/tmp/prtcmd a2 'Hetu' 'eh you' 57
+@end example
+
+will give the output
+
+@example
+/tmp/prtcmd [a2 Hetu 'eh you' '57']
+@end example
+
+Note that the pathname of
+the script is available to the program as the string
+@libref{command_name}, and the arguments to the script
+as the tuple of strings @libref{command_line}.
+
+Another possibility is to begin the shell script
+as follows when you don't wish to specify an absolute pathname for
+the @command{setl} command but would rather have it found in the
+user's @env{PATH}, and don't need to pass any
+options to @command{setl}:
+
+@example
+#! /usr/bin/env setl
+@end example
+
+@cindex shell script, embedding SETL programs in
+@cindex @command{/bin/sh}
+
+Multi-line SETL programs can also be embedded in shell scripts.
+Example:
+
+@example
+#! /bin/sh
+setl -3 3<<'!' "$@@"
+print ("Command args:", command_line);
+print ("Please enter a number, string, set, or tuple:");
+read (v);
+print ("Thank you.  I now have", type v, "v =", v);
+!
+@end example
+
+The above script tells @command{setl} to
+read source code from POSIX file descriptor 3, which is directed
+to the in-line @dfn{here} document that ends with a bang.  The single
+quotes around the first bang indicate, in the bizarre and arcane
+language of the Bourne shell, that the SETL program text is to be
+taken literally, not subjected to parameter expansion,
+command substitution, or arithmetic expansion.
+
+So, if the above script is executed or even just @dfn{sourced} by a
+Bourne-compatible shell, it will prompt on stdout and read from stdin,
+just as an equivalent @samp{#!} SETL script would when executed, or
+as a free-standing SETL program run by the @command{setl} command
+would.  Using this technique, it is easy to embed any number of SETL
+programs in a shell script.
+
+@cindex @code{#line} directive
+Note, however, that if a program in-lined in that way has a syntax
+error or experiences an execution error, the diagnostic will refer to
+a program named @samp{-3}, and a line number relative to where the
+program begins.  A @code{#line} directive can be used to work around
+this problem.  For example, if the above script is called @command{bach},
+then the line
+
+@example
+#line 4 "bach"
+@end example
+
+could be inserted as the first line of the program to ensure that
+diagnostics refer to @command{bach} and the correct line number of
+the script.  Then if the user enters an invalid input, the diagnostic
+will point to line 6 of @command{bach}, the @setl{read} statement.
+
+@cindex @command{/bin/bash}
+That literal line number in the @code{#line} directive is obviously a
+maintenance hazard, but if you are willing to assume a working
+@command{/bin/bash}, and approve of the shell making @q{here-document}
+substitutions for sequences such as @code{$...}@: in your SETL code,
+then another way to embed it in @command{bach} is:
+
+@example
+#! /bin/bash
+# Lines of shell script ...
+setl -3 3<<! args to SETL program ...
+#line $((LINENO+2)) "bach"
+-- Lines of SETL program ...
+!
+# More lines of shell script ...
+@end example
+
+Finally, a very short SETL program can be entirely contained within
+a command-line argument; here is a functional equivalent to the
+@command{bach} scripts above:
+
+@example
+#! /bin/sh
+setl '
+#line 4 "bach"
+print ("Command args:", command_line);
+print ("Please enter a number, string, set, or tuple:");
+read (v);
+print ("Thank you.  I now have", type v, "v =", v);
+' "$@@"
+@end example
+
+Note that special care must be taken of apostrophes in a program
+embedded in this last way (or of double quotes if those are used to
+enclose it), in order to keep the shell happy.
+
+@ignore
+If the embedded program does not need to read from stdin,
+the terser shell script line
+
+@example
+setl <<'!'
+@end example
+
+can be used to herald it.
+@end ignore
+
+
+@node envt vars
+@section Environment variables
+@cindex environment variables, @command{setl} command
+
+The environment variables to which the @command{setl} command is
+sensitive are as follows.
+
+@table @env
+
+@item HOME
+@cindex @env{HOME} environment variable
+This identifies the user's home directory, if any.  It gives the
+default for the SETL @libref{chdir} parameter.
+
+@item PATH
+@cindex @env{PATH} environment variable
+@cindex executables, search path for
+@cindex search path for executables
+For commands launched by your SETL program, e.g., by
+@libref{system} or @libref{filter}, or by an @libref{open} on
+a pipe or pump stream, the @env{PATH} environment variable is used
+in locating the executable.  @env{PATH} is also used in searching for the
+@command{setlcpp} and @command{setltran} executables when @command{setl}
+itself appears to have been found in a directory listed in @env{PATH}
+(i.e., when there is no directory separator character in @posix{argv[0]}
+at the C level) and where this search is not overridden by a
+@optref{--setlcpp} or @optref{--setltran} option.
+
+@anchor{SETL_LINEBUF_STDERR}
+@item SETL_LINEBUF_STDERR
+@cindex @env{SETL_LINEBUF_STDERR} environment variable
+By default, characters on the standard output stream (@libref{stderr})
+are flushed (written out) as soon as possible; i.e., the stream is
+@dfn{unbuffered} (@reflib{Buffering, Buffering}).
+But if @env{SETL_LINEBUF_STDERR} is set (to anything,
+even the null string), then stderr is @dfn{line buffered}, meaning that
+characters may not be written out until the next newline is written to
+stderr by the SETL program.
+
+This can be convenient when a bunch of different processes all want to
+issue diagnostics to the terminal at the same time, as it greatly
+reduces the likelihood that those messages will be intermingled on a
+character-by-character basis.  In a production-level set of related
+processes, of course, it is probably better to redirect everyone's
+stderr to a common server that respects newlines and can perform
+additional functions such as keeping a log, presenting a highlighted
+real-time display, etc.
+
+@end table
+
+
+@node signals
+@section Signals
+@cindex signals, @command{setl} command
+
+For the signals that can be caught directly by the user's SETL program
+using @libref{open} on a signal stream,
+@reflib{signals, Signal streams}.
+
+
+@node exit status
+@section Exit status
+@cindex exit status, @command{setl} command
+The @command{setl} command exits with a non-zero status in the event
+of an error.  Specifically, if the invocation of @command{setlcpp}
+fails, @command{setl} returns its (error) status.  Otherwise, if
+@command{setltran} fails, @command{setl} returns that status.
+(If the failure of @command{setlcpp} or @command{setltran} is
+due to termination by a signal, the status will be 128 plus the
+signal number, in mimicry of the standard shell convention.)
+Otherwise, if @command{setl} itself encounters an unrecoverable
+error, it issues a diagnostic and returns 1.  But if a @setl{stop}
+statement is executed, @command{setl} exits with the status given
+by the @setl{stop} argument.  That status defaults to 0, just as when
+the program flows through its last statement.
+
+Note that although @setl{stop} accepts any integer small enough to fit
+into a C @code{int}, it is returned modulo 256 to the invoker of the
+@command{setl} command.
+
+If you want your program's exit status to be that of the last
+subcommand it waited for, and mimic the shell in the case of abnormal
+termination by signal, you could use this little horror:
+
+@example
+stop if status >= 0 then status else 128 + abs status end;
+@end example
+
+Otherwise, if you only care that your exit status be zero or nonzero
+according as the last subcommand succeeded or failed, or you know that
+the last subcommand was actually being managed by an enclosing shell
+(the usual case, unless you begin the subcommand with the word
+@code{exec}), or even if you just don't mind having the exit values
+associated with signal-triggered terminations a little weirdly mapped
+(the other exit codes will come through fine), you can generally get
+away with the much simpler
+
+@example
+stop status;
+@end example
+
+
+
+@node setlcpp
+@unnumbered The @command{setlcpp} command
+@cindex preprocessor
+
+The @command{setlcpp} command is a modification of @command{cpp}, the
+GNU C PreProcessor.  The main extension to GNU CPP is the provision
+of a @option{-lang-setl} option, which should normally be used when
+@command{setlcpp} is applied to SETL programs.
+
+In the GNU SETL system, @command{setlcpp} is usually run
+automatically by the @command{@rfe{setl}} command
+and seldom directly from the interactive command line.
+
+@menu
+* setlcpp examples::   Brief introductory examples.
+* setlcpp details::    The @command{setlcpp} command and arguments.
+* setlcpp envt vars::  Environment variables influencing @command{setlcpp}.
+@end menu
+
+
+@node setlcpp examples
+@section Examples
+@cindex examples, @command{setlcpp}
+
+This is the output of the command @w{@samp{setlcpp --help}}:
+
+@example
+
+GNU SETL programming language preprocessor
+
+Usage: setlcpp [OPTIONS] [INPUT [OUTPUT]]
+
+  --help, -h       display this help on stdout and exit
+  --version        display version info on stdout and exit
+  -lang-setl       SETL lexical environment; implies -$
+  CPP-OPTION       GNU CPP option
+
+If INPUT is "-" or is not specified, standard input is used.
+Otherwise, INPUT must name a readable file.  Similarly, OUTPUT
+must name a writable file, or be "-" for the default stdout.
+
+The "SETL_INCLUDE_PATH" environment variable, if -lang-setl is
+specified, extends the list of directories given by -I options.
+Directory names must be separated by a ":" character.
+
+Other environment variables are as for GNU CPP version 2.7.2.1.
+
+Note also the --[no]cpp option of the "setl" command.
+
+If the Texinfo documentation is installed, "info setlcpp" may work.
+PDF and HTML docs are usually under share/doc/setl/ somewhere.
+
+See setl.org for more documentation, source code, etc.
+
+Please report bugs to David.Bacon@@nyu.edu.
+
+@end example
+
+Now suppose the file @file{main.setl} contains
+
+@example
+-- This is a comment at the top of main.setl.
+-- Let's now incorporate inc.setl:
+#include "inc.setl"
+print (corpor, version);
+@end example
+
+and the file @file{inc.setl} contains
+
+@example
+$ For nostalgic reasons, this is also a comment.
+#define corpor "SETL, Inc."
+const version = __VERSION__;
+$ Here ends the included file.
+@end example
+
+Then the output of @w{@samp{setlcpp -C -lang-setl main.setl}} (which
+is how @command{setl} invokes @command{setlcpp}) is
+
+@example
+# 1 "main.setl"
+-- This is a comment at the top of main.setl.
+-- Let's now incorporate inc.setl:
+# 1 "inc.setl" 1
+$ For nostalgic reasons, this is also a comment.
+ 
+const version = "2.7.2.1";
+$ Here ends the included file.
+# 3 "main.setl" 2
+ 
+print ("SETL, Inc.", version);
+@end example
+
+Note that a SETL @setl{const} declaration may often serve as well as
+or better than a preprocessor @code{#define}.  A preprocessor symbol,
+however, can be particularly useful for governing conditional source
+code inclusion via @code{#if} or @code{#ifdef}.  Macros that take
+arguments have their uses too, though the user should always be aware
+of the literal expansion of arguments so as to be on guard against
+side-effects that result from multiple evaluations of an expression.
+
+
+@node setlcpp details
+@section The @command{setlcpp} command and arguments
+
+Here is the general form of the @command{setlcpp} command:
+
+@example
+@command{setlcpp} [@var{options}] [@var{input} [@var{output}]]
+@end example
+
+The @meta{options} include:
+
+@table @option
+
+@anchor{setlcpp --help}
+@item --help
+@itemx -h
+@cindex @option{--help} option
+@cindex @option{-h} option
+@cindex help, @command{setlcpp}
+Spews a command summary on stdout, and exits successfully.
+
+@anchor{setlcpp --version}
+@item --version
+@cindex @option{--version} option
+@cindex version, @command{setlcpp}
+Spews @command{setlcpp} version information on stdout, and exits
+successfully.
+
+@anchor{-lang-setl}
+@item -lang-setl
+@cindex @option{-lang-setl} option
+Assumes that the input is a SETL program, so that its lexical
+peculiarities can be accommodated.  Otherwise,
+@option{-lang-c}, which was once a standard @command{cpp} option,
+will be assumed.
+
+The @option{-lang-setl} option also makes @command{setlcpp}
+recognize the @envref{SETL_INCLUDE_PATH} environment variable.
+
+@anchor{cpp-option}
+@item @var{cpp-option}
+@cindex @command{cpp} (GNU C Preprocessor)
+@cindex GNU C Preprocessor (@command{cpp})
+Any other argument beginning with a hyphen (@samp{-}) is interpreted
+as if by the GNU C Preprocessor (@command{cpp}), except that there
+are no predefined default @dfn{include} directories such as
+@file{/usr/include}.
+
+@allowcodebreaks true
+@cindex Texinfo
+As of this writing, @command{setlcpp} is based on the version of
+@command{cpp} corresponding to GCC 2.7.2.1.  That original is bundled
+with the GNU SETL source distribution, including its Texinfo
+(@file{cpp.texi} and @file{cpp.info*}) documentation.  For most
+purposes, however, you may find that the command @w{@samp{info cpp}}
+on your system or the on-line GNU CPP manual at
+@uref{http://gcc.gnu.org/onlinedocs/}
+gives adequate if somewhat anachronistic information.
+Otherwise, to get the version-specific truth, unpack
+@file{cpp-2.7.2.1.tgz} and in the resulting subdirectory do this:
+@allowcodebreaks false
+
+@example
+info -f ./cpp.info
+@end example
+
+@end table
+
+@cindex @option{-} (stdin or stdout, @command{setlcpp})
+If @meta{input} is a hyphen (@option{-}) or is not specified,
+@command{setlcpp} reads from standard input (stdin).
+
+The @meta{output} argument, which can only be present if
+@meta{input} is present, must name a writable file or be a
+hyphen representing standard output (stdout), the default.
+
+Note that @command{setlcpp} is case-sensitive despite any
+@option{--keyword-case} or @option{--identifier-case} options that
+might have been passed to a parent @command{setl} command.
+
+@cindex exit status, @command{setlcpp} command
+Like @command{cpp}, the @command{setlcpp} command returns 0 to the
+operating system on success, non-zero on failure.
+
+
+@node setlcpp envt vars
+@section Environment variables
+@cindex environment variables, @command{setlcpp} command
+
+@table @env
+
+@anchor{SETL_INCLUDE_PATH}
+@item SETL_INCLUDE_PATH
+@cindex @env{SETL_INCLUDE_PATH}
+@cindex @env{C_INCLUDE_PATH}
+@cindex @option{-I} option
+@cindex @option{-lang-setl} option
+@cindex @option{-nostdinc} option
+If the @command{setlcpp} @optref{-lang-setl} option was given, then
+@env{SETL_INCLUDE_PATH} extends the list of directories
+named in @option{-I} options, much as @env{C_INCLUDE_PATH}
+does in the @option{-lang-c} case.  The standard @command{cpp}
+option @option{-nostdinc} will cause @env{SETL_INCLUDE_PATH} to be
+ignored, however.
+
+@end table
+
+For details on other environment variables, see the references
+cited under @ref{cpp-option, , @option{@var{cpp-option}}}.
+
+
+
+@node setltran
+@unnumbered The @command{setltran} command
+@cindex compiler
+@cindex translator
+@cindex SETL virtual machine code
+
+@c @allowcodebreaks true
+@c @cindex Liu, Zhiqing
+@c @cindex Lazy SETL Debugger
+The @command{setltran} command takes SETL programs
+and compiles them into a simple assembly-like language
+that the @command{@rfe{setl}} command can interpret as
+GNU SETL Virtual Machine code.
+@c I used to cite Zhiqing Liu's
+@c @uref{https://www.cs.nyu.edu/web/Research/Theses/liu_zhiqing.pdf,,
+@c Lazy SETL Debugger}
+@c as another interpreter, but the VM code format has changed.
+@c @allowcodebreaks false
+
+In the GNU SETL system, @command{setltran} is usually run
+automatically by the @command{@rfe{setl}} command
+and seldom directly.
+
+@menu
+* setltran examples::  Brief introductory examples.
+* setltran details::   The @command{setltran} command and arguments.
+@end menu
+
+
+@node setltran examples
+@section Examples
+@cindex examples, @command{setltran}
+
+This is the output of the command @w{@samp{setltran --help}}:
+
+@example
+
+GNU SETL programming language translator (compiler)
+
+Usage: setltran [OPTIONS] [FILENAME | - | STRING]
+
+  --help, -h      display this help on stdout and exit
+  --version       display version info on stdout and exit
+  --font-hints    emit source prettyprinting hints, period
+  --verbose, -v   otiose sucrose on stderr
+  --debug         trace parsing, etc. on stderr
+  --keyword-case=any|upper|lower   ("stropping" convention) -
+                   control SETL keyword recognition (default any)
+  --identifier-case=any|upper|lower|mixed   control recognition
+                   of user variable names (default any)
+
+The setltran command reads from standard input by default or if "-"
+is specified.  Otherwise, if FILENAME names a readable file, it reads
+from there.  Failing that, it reads directly from STRING.
+
+When the translator is invoked by a command like "setl -c ...", the
+preprocessor (setlcpp) is applied first if necessary.
+
+If the Texinfo documentation is installed, "info setltran" may work.
+PDF and HTML docs are usually under share/doc/setl/ somewhere.
+
+See setl.org for more documentation, source code, etc.
+
+Please report bugs to David.Bacon@@nyu.edu.
+
+@end example
+
+This is the output (on stdout) of the command
+@w{@samp{setltran "print(57);"}}, with tab stops every 8 columns
+(tabs separate opcodes and operands):
+
+@example
+# This is code for the GNU SETL Virtual Machine.
+%SOURCE
+print(57);
+     1  print(57);
+%CODE
+#       print(57);
+     0          mainproc        U__MAIN
+     0          call    U__unnamed_SETL_program >-
+     0          copy    <I_0    >STATUS
+     0          stop    <STATUS
+     0          end     U__MAIN
+     0          proc    U__unnamed_SETL_program >RET
+     6          scall   S_PRINT <I_57   >-
+     6          copy    <I_0    >STATUS
+     6          stop    <STATUS
+     6          end     U__unnamed_SETL_program
+%EXECUTE
+@end example
+
+@cindex SETL virtual machine code
+For more information on GNU SETL Virtual Machine code,
+@imptop{}.
+
+
+@node setltran details
+@section The @command{setltran} command and arguments
+
+Here is the general form of the @command{setltran} command:
+
+@example
+@command{setltran} [@var{options}] [@var{input}]
+@end example
+
+The options include:
+
+@table @option
+
+@anchor{setltran --help}
+@item --help
+@itemx -h
+@cindex @option{--help} option
+@cindex @option{-h} option
+@cindex help, @command{setltran}
+Spews a command summary on stdout, and exits successfully.
+
+@anchor{setltran --version}
+@item --version
+@cindex @option{--version} option
+@cindex version, @command{setltran}
+Spews @command{setltran} version information on stdout, and exits
+successfully.
+
+@anchor{setltran --font-hints}
+@item --font-hints
+@cindex @option{--font-hints} option
+@cindex font hints
+@cindex prettyprinting hints
+Spews prettyprinting hints corresponding to the source input.
+
+It is left as an exercise to the reader to simplify the
+@file{texinfo.setl} program in the description of the
+@command{setl} command's corresponding option
+(@optref{setl --font-hints}).
+Hint:  by invoking @command{setltran} as the subprocess instead of
+@command{setl}, you can eliminate the offset variable, @meta{n}.
+For extra credit, state why.
+
+@anchor{setltran --verbose}
+@item --verbose
+@itemx -v
+@cindex @option{--verbose} option
+@cindex @option{-v} option
+@cindex verbose mode
+On stderr, reports each of the major phases of processing,
+such as lexical analysis, parsing, semantic analysis, etc.
+
+@anchor{setltran --debug}
+@item --debug
+@cindex @option{--debug} option
+On stderr, traces the gory details of shift-reduce parsing
+and dumps some tables.  The author really prefers recursive descent
+parsers; @command{setltran} is an aberration.
+
+This option also causes files @file{parse.tree} and
+@file{flattened.tree} to be created in the current working directory.
+
+@anchor{setltran --keyword-case}
+@anchor{setltran --identifier-case}
+@item --keyword-case=upper|lower|any
+@itemx --identifier-case=upper|lower|any|mixed
+@cindex @option{--keyword-case} option
+@cindex @option{--identifier-case} option
+@cindex recognizing keywords, identifiers
+@cindex keyword case, recognizing
+@cindex identifier case, recognizing
+@cindex case, keyword and identifier
+@cindex lettercase
+@cindex @option{upper} case option
+@cindex @option{lower} case option
+@cindex @option{any} case option
+@cindex @option{mixed} case option
+@c @cindex point
+@c @cindex res
+@c @cindex tag
+@cindex stropping convention
+@c @cindex ancient
+@c @cindex venerable
+@cindex Algol 68
+By default, @command{setltran} recognizes
+keywords and user-introduced identifiers case-insensitively,
+i.e., in @code{any} lettercase.
+
+However, it can be useful to restrict the recognition for stylistic or
+maintenance reasons.
+
+For example, since new keywords sometimes enter the language, and
+@q{customized} implementations can add many more, one might adopt a
+convention of @code{--keyword-case=upper} to ensure that only uppercase
+identifiers are recognized as keywords, no matter what new keywords
+might later be introduced.
+
+That happens to correspond to the ancient and venerable Algol 68
+@dfn{upper} stropping convention.  @dfn{Point} stropping, incidentally,
+was quite dreadful:  keywords had to be denoted by leading dots.
+Fortunately for Algol 68 programmers,
+there was also @dfn{res} (standing for @dfn{reserved word}) stropping,
+which imposed no restriction on the lettercase of keywords.
+That corresponds to the GNU SETL default.
+
+A combination of @code{--keyword-case=lower} and
+@code{--identifier-case=mixed}
+gives a case-sensitive convention resembling that of C/C++ and Java.
+
+The @command{setl} command passes these lettercase options through
+to @command{setltran}.
+
+@end table
+
+@cindex @option{-} (read from stdin)
+The @command{setltran} command takes up to one @meta{input}
+argument in addition to any options specified.  It must be the name of
+a readable file, or a single hyphen (@option{-}) meaning standard input
+(the default), or a string containing an entire SETL program.
+
+@cindex exit status, @command{setltran} command
+Finally, @command{setltran} exits with a code of 0 on success, or a
+higher number on failure.
+
+@ignore
+For now, I'm not going to document the fact that you can feed
+multiple @code{%END}-separated SETL programs through in a batch,
+as the feature seems to be of such dubious value.
+
+Likewise, in the @command{setl} description, I'm leaving out for now
+any mention of the fact that multiple @code{%EXECUTE} lines can be
+used to execute the same program repeatedly without recompiling it,
+and the fact that a subsequent @code{%SOURCE} or @code{%CODE} line
+resets that, i.e., clears the executable code from memory.
+@end ignore
+
+
+
+@node Index
+@unnumbered Index
+
+@printindex cp
+
+@bye
+
+@c setl-user.texi ends here

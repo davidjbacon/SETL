@@ -1,0 +1,27 @@
+-- $Id: megahack.setl,v 1.5 2022/12/11 17:09:27 setlorg Exp $
+
+-- Process pre.tuples on stdin to produce routine.tuples on stdout, by
+-- splitting each formal into type and name (id).  If no id was given,
+-- make one up.
+
+alf := '_abcdefghijklmnopqrstuvwxyz';
+nonid := {'*', 'int', 'char', 'short', 'long', 'unsigned'};
+LOOP DOING READ(t); WHILE NOT EOF DO
+  LOOP FOR i IN [2..#t] DO
+    [formal] := t(i);
+    u := SPLIT(formal,' ');
+    IF #u <= 1 OR u(#u) IN nonid THEN
+      typ := formal;
+      id := alf(i);  -- make up a single-letter name
+    ELSE
+      [typ,id] := type_and_id(u);
+    END IF;
+    t(i) := [typ,id];
+  END LOOP;
+  IF #t > 1 AND t(#t)(1) IN {'void','Void','VOID'} THEN
+    t := t(1..#t-1);
+  END IF;
+  PRINT(t);
+END LOOP;
+
+#include "tokens.setl"

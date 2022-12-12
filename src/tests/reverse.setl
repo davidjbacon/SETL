@@ -1,0 +1,16 @@
+		PROGRAM reverse_lines;
+
+$ First practical application of the C-coded SETL compiler!
+
+t := [];
+LOOP DO
+  GETA('',s);
+  IF EOF THEN QUIT LOOP; END;
+  t +:= [s];
+END LOOP;
+
+(FOR i IN [#t,#t-1..1])
+   PRINT(t(i));
+END FOR;
+
+	      END PROGRAM reverse_lines;

@@ -1,0 +1,516 @@
+--  Auxiliary support for the GNU SETL GLUT/Mesa interface  --
+
+--  $Id: auxi.setl,v 1.7 2022/12/11 17:09:27 setlorg Exp $
+
+
+--  Although this is a valid SETL package spec and body in its own
+--  right, it is not actually intended to be used directly.  Instead,
+--  its contents are incorporated into custom.setl by gen.setl.
+
+
+package Mesa_aux;
+
+--  Public data declarations
+
+--  The following GLUTA_..._EVENT consts are generated from the
+--  gluta...Func prototypes (signatures, specs) by glutaconst-gen.setl,
+--  which at the time of this writing was defined as:
+--
+--  n := 0;
+--  while (s := getline stdin) /= om loop
+--    s('proc ') := '';
+--    s('\\(.*$') := '';
+--    c := s;
+--    c('Func') := 'Event';
+--    c := +/[if c('[A-Z]') /= om then '_'+c else c end : c in c];
+--    c := to_upper c;
+--    n +:= 1;
+--    print(rpad('const '+c,35)+' = '+str n+';');
+--  end loop;
+--  n +:= 1;
+--  print(rpad('const GLUTA_MENU_SELECTION_EVENT',35)+' = '+str n+';');
+--  
+--  Note that 0 is "reserved" as a way of cancelling interest in
+--  events of a particular type:
+
+const GLUTA_IDLE_EVENT              = 1;
+const GLUTA_DISPLAY_EVENT           = 2;
+const GLUTA_OVERLAY_DISPLAY_EVENT   = 3;
+const GLUTA_RESHAPE_EVENT           = 4;
+const GLUTA_KEYBOARD_EVENT          = 5;
+const GLUTA_MOUSE_EVENT             = 6;
+const GLUTA_MOTION_EVENT            = 7;
+const GLUTA_PASSIVE_MOTION_EVENT    = 8;
+const GLUTA_VISIBILITY_EVENT        = 9;
+const GLUTA_ENTRY_EVENT             = 10;
+const GLUTA_SPECIAL_EVENT           = 11;
+const GLUTA_SPACEBALL_MOTION_EVENT  = 12;
+const GLUTA_SPACEBALL_ROTATE_EVENT  = 13;
+const GLUTA_SPACEBALL_BUTTON_EVENT  = 14;
+const GLUTA_BUTTON_BOX_EVENT        = 15;
+const GLUTA_DIALS_EVENT             = 16;
+const GLUTA_TABLET_MOTION_EVENT     = 17;
+const GLUTA_TABLET_BUTTON_EVENT     = 18;
+const GLUTA_MENU_STATUS_EVENT       = 19;
+const GLUTA_TIMER_EVENT             = 20;
+const GLUTA_FILE_INPUT_EVENT        = 21;
+const GLUTA_FILE_OUTPUT_EVENT       = 22;
+const GLUTA_FILE_EXCEPTION_EVENT    = 23;
+const GLUTA_CLOSE_EVENT             = 24;
+const GLUTA_MENU_SELECTION_EVENT    = 25;
+
+
+--  Public routine declarations
+
+proc glutaInit;
+proc glutaGetOneEvent();
+proc glutaDoOneEvent();
+proc glutaDoAllEvents;
+proc glutaMainLoop;
+proc glutaDispatch(event);
+
+proc glutaIdleFunc(p);
+proc glutaDisplayFunc(p);
+proc glutaOverlayDisplayFunc(p);
+proc glutaReshapeFunc(p);
+proc glutaKeyboardFunc(p);
+proc glutaMouseFunc(p);
+proc glutaMotionFunc(p);
+proc glutaPassiveMotionFunc(p);
+proc glutaVisibilityFunc(p);
+proc glutaEntryFunc(p);
+proc glutaSpecialFunc(p);
+proc glutaSpaceballMotionFunc(p);
+proc glutaSpaceballRotateFunc(p);
+proc glutaSpaceballButtonFunc(p);
+proc glutaButtonBoxFunc(p);
+proc glutaDialsFunc(p);
+proc glutaTabletMotionFunc(p);
+proc glutaTabletButtonFunc(p);
+proc glutaMenuStatusFunc(p);
+proc glutaTimerFunc(ms,p,id);
+proc glutaFileInputFunc(fd,p);
+proc glutaFileOutputFunc(fd,p);
+proc glutaFileExceptionFunc(fd,p);
+proc glutaCloseFunc(p);
+
+proc glutaCreateMenu(p);
+proc glutaDestroyMenu(menu);
+
+proc glutaBitmap8By13();
+proc glutaBitmap9By15();
+proc glutaBitmapHelvetica10();
+proc glutaBitmapHelvetica12();
+proc glutaBitmapHelvetica18();
+proc glutaBitmapTimesRoman10();
+proc glutaBitmapTimesRoman24();
+proc glutaStrokeMonoRoman();
+proc glutaStrokeRoman();
+
+end Mesa_aux;
+
+
+
+package body Mesa_aux;
+
+--  Private data declarations
+
+var dispatch_map := {};
+var menu_map := {};
+
+
+--  Routine definitions
+
+proc glutaInit;
+  glutSETLInit;
+end glutaInit;
+
+proc glutaGetOneEvent();
+  return glutSETLGetOneEvent();
+end glutaGetOneEvent;
+
+proc glutaDoOneEvent();
+$ return glutaDispatch(glutaGetOneEvent());
+  if (event := glutaGetOneEvent()) /= om then
+    -- Most callbacks will return om, but glutaDispatch() and hence
+    -- glutaDoOneEvent() allow any value to be returned:
+    return glutaDispatch(event);
+  end if;
+  -- No event currently queued.  Note that this case is
+  -- indistinguishable from a callback that returns om, or an event
+  -- whose callback was freshly removed from the dispatch map.
+  return om;
+end glutaDoOneEvent;
+
+proc glutaDoAllEvents;
+  while (event := glutaGetOneEvent()) /= om loop
+    glutaDispatch(event);  -- discard callback result
+  end loop;
+end glutaDoAllEvents;
+
+proc glutaMainLoop;
+  loop do
+$   glutaDoOneEvent;  -- throwing away the callback result
+    glutaDoAllEvents;  -- process all queued events
+  end loop;
+end glutaMainLoop;
+
+proc glutaDispatch(event);
+  event_type fromb event;
+  p := dispatch_map(event_type);
+  if p = om then return om; end if;  -- freshly removed
+  case event_type of
+  (GLUTA_IDLE_EVENT):              return call(p);
+  (GLUTA_DISPLAY_EVENT):           return call(p);
+  (GLUTA_OVERLAY_DISPLAY_EVENT):   return call(p);
+  (GLUTA_RESHAPE_EVENT):
+         [width,height] := event;  return call(p,width,height);
+  (GLUTA_KEYBOARD_EVENT):
+              [key,x,y] := event;  return call(p,key,x,y);
+  (GLUTA_MOUSE_EVENT):
+     [button,state,x,y] := event;  return call(p,button,state,x,y);
+  (GLUTA_MOTION_EVENT):
+                  [x,y] := event;  return call(p,x,y);
+  (GLUTA_PASSIVE_MOTION_EVENT):
+                  [x,y] := event;  return call(p,x,y);
+  (GLUTA_VISIBILITY_EVENT):
+                [state] := event;  return call(p,state);
+  (GLUTA_ENTRY_EVENT):
+                [state] := event;  return call(p,state);
+  (GLUTA_SPECIAL_EVENT):
+              [key,x,y] := event;  return call(p,key,x,y);
+  (GLUTA_SPACEBALL_MOTION_EVENT):
+                [x,y,z] := event;  return call(p,x,y,z);
+  (GLUTA_SPACEBALL_ROTATE_EVENT):
+                [x,y,z] := event;  return call(p,x,y,z);
+  (GLUTA_SPACEBALL_BUTTON_EVENT):
+         [button,state] := event;  return call(p,button,state);
+  (GLUTA_BUTTON_BOX_EVENT):
+         [button,state] := event;  return call(p,button,state);
+  (GLUTA_DIALS_EVENT):
+           [dial,value] := event;  return call(p,dial,value);
+  (GLUTA_TABLET_MOTION_EVENT):
+                  [x,y] := event;  return call(p,x,y);
+  (GLUTA_TABLET_BUTTON_EVENT):
+     [button,state,x,y] := event;  return call(p,button,state,x,y);
+  (GLUTA_MENU_STATUS_EVENT):
+            [state,x,y] := event;  return call(p,state,x,y);
+  (GLUTA_TIMER_EVENT):
+                   [id] := event;  return call(p,id);
+  (GLUTA_FILE_INPUT_EVENT):
+                   [fd] := event;  return call(p,fd);
+  (GLUTA_FILE_OUTPUT_EVENT):
+                   [fd] := event;  return call(p,fd);
+  (GLUTA_FILE_EXCEPTION_EVENT):
+                   [fd] := event;  return call(p,fd);
+  (GLUTA_CLOSE_EVENT):             return call(p);
+  (GLUTA_MENU_SELECTION_EVENT):
+           [menu,value] := event;  p := menu_map(menu);
+                                   if p = om then return om; end if;
+                                   return call(p,value);
+  else assert false;  -- no such event type
+  end case;
+end glutaDispatch;
+
+--  These gluta...Func bodies are generated from their specs by
+--  passing the gluta...Func specs to glutafunc-gen.setl, which at
+--  the time of this writing was defined as:
+--
+--  while (s := getline stdin) /= om loop
+--    print;
+--    print(s);
+--    s('proc ') := '';
+--    p := s('\\(.*\\)');
+--    s('\\(.*$') := '';
+--    c := s;
+--    c('Func') := 'Event';
+--    c := +/[if c('[A-Z]') /= om then '_'+c else c end : c in c];
+--    c := to_upper c;
+--    f := s;
+--    f('gluta') := 'glutSETL';
+--    print('  dispatch_map('+c+') := p;');
+--    print('  if p = om then');
+--    q := p;
+--    q('p') := '0';
+--    print('    '+f+q+';');
+--    print('  else assert is_routine p;  -- arg must be OM or ROUTINE');
+--    r := p;
+--    r('p') := c;
+--    print('    '+f+r+';');
+--    print('  end if;');
+--    print('end '+s+';');
+--  end loop;
+
+proc glutaIdleFunc(p);
+  dispatch_map(GLUTA_IDLE_EVENT) := p;
+  if p = om then
+    glutSETLIdleFunc(0);
+  else assert is_routine p;  -- arg must be OM or ROUTINE
+    glutSETLIdleFunc(GLUTA_IDLE_EVENT);
+  end if;
+end glutaIdleFunc;
+
+proc glutaDisplayFunc(p);
+  dispatch_map(GLUTA_DISPLAY_EVENT) := p;
+  if p = om then
+    glutSETLDisplayFunc(0);
+  else assert is_routine p;  -- arg must be OM or ROUTINE
+    glutSETLDisplayFunc(GLUTA_DISPLAY_EVENT);
+  end if;
+end glutaDisplayFunc;
+
+proc glutaOverlayDisplayFunc(p);
+  dispatch_map(GLUTA_OVERLAY_DISPLAY_EVENT) := p;
+  if p = om then
+    glutSETLOverlayDisplayFunc(0);
+  else assert is_routine p;  -- arg must be OM or ROUTINE
+    glutSETLOverlayDisplayFunc(GLUTA_OVERLAY_DISPLAY_EVENT);
+  end if;
+end glutaOverlayDisplayFunc;
+
+proc glutaReshapeFunc(p);
+  dispatch_map(GLUTA_RESHAPE_EVENT) := p;
+  if p = om then
+    glutSETLReshapeFunc(0);
+  else assert is_routine p;  -- arg must be OM or ROUTINE
+    glutSETLReshapeFunc(GLUTA_RESHAPE_EVENT);
+  end if;
+end glutaReshapeFunc;
+
+proc glutaKeyboardFunc(p);
+  dispatch_map(GLUTA_KEYBOARD_EVENT) := p;
+  if p = om then
+    glutSETLKeyboardFunc(0);
+  else assert is_routine p;  -- arg must be OM or ROUTINE
+    glutSETLKeyboardFunc(GLUTA_KEYBOARD_EVENT);
+  end if;
+end glutaKeyboardFunc;
+
+proc glutaMouseFunc(p);
+  dispatch_map(GLUTA_MOUSE_EVENT) := p;
+  if p = om then
+    glutSETLMouseFunc(0);
+  else assert is_routine p;  -- arg must be OM or ROUTINE
+    glutSETLMouseFunc(GLUTA_MOUSE_EVENT);
+  end if;
+end glutaMouseFunc;
+
+proc glutaMotionFunc(p);
+  dispatch_map(GLUTA_MOTION_EVENT) := p;
+  if p = om then
+    glutSETLMotionFunc(0);
+  else assert is_routine p;  -- arg must be OM or ROUTINE
+    glutSETLMotionFunc(GLUTA_MOTION_EVENT);
+  end if;
+end glutaMotionFunc;
+
+proc glutaPassiveMotionFunc(p);
+  dispatch_map(GLUTA_PASSIVE_MOTION_EVENT) := p;
+  if p = om then
+    glutSETLPassiveMotionFunc(0);
+  else assert is_routine p;  -- arg must be OM or ROUTINE
+    glutSETLPassiveMotionFunc(GLUTA_PASSIVE_MOTION_EVENT);
+  end if;
+end glutaPassiveMotionFunc;
+
+proc glutaVisibilityFunc(p);
+  dispatch_map(GLUTA_VISIBILITY_EVENT) := p;
+  if p = om then
+    glutSETLVisibilityFunc(0);
+  else assert is_routine p;  -- arg must be OM or ROUTINE
+    glutSETLVisibilityFunc(GLUTA_VISIBILITY_EVENT);
+  end if;
+end glutaVisibilityFunc;
+
+proc glutaEntryFunc(p);
+  dispatch_map(GLUTA_ENTRY_EVENT) := p;
+  if p = om then
+    glutSETLEntryFunc(0);
+  else assert is_routine p;  -- arg must be OM or ROUTINE
+    glutSETLEntryFunc(GLUTA_ENTRY_EVENT);
+  end if;
+end glutaEntryFunc;
+
+proc glutaSpecialFunc(p);
+  dispatch_map(GLUTA_SPECIAL_EVENT) := p;
+  if p = om then
+    glutSETLSpecialFunc(0);
+  else assert is_routine p;  -- arg must be OM or ROUTINE
+    glutSETLSpecialFunc(GLUTA_SPECIAL_EVENT);
+  end if;
+end glutaSpecialFunc;
+
+proc glutaSpaceballMotionFunc(p);
+  dispatch_map(GLUTA_SPACEBALL_MOTION_EVENT) := p;
+  if p = om then
+    glutSETLSpaceballMotionFunc(0);
+  else assert is_routine p;  -- arg must be OM or ROUTINE
+    glutSETLSpaceballMotionFunc(GLUTA_SPACEBALL_MOTION_EVENT);
+  end if;
+end glutaSpaceballMotionFunc;
+
+proc glutaSpaceballRotateFunc(p);
+  dispatch_map(GLUTA_SPACEBALL_ROTATE_EVENT) := p;
+  if p = om then
+    glutSETLSpaceballRotateFunc(0);
+  else assert is_routine p;  -- arg must be OM or ROUTINE
+    glutSETLSpaceballRotateFunc(GLUTA_SPACEBALL_ROTATE_EVENT);
+  end if;
+end glutaSpaceballRotateFunc;
+
+proc glutaSpaceballButtonFunc(p);
+  dispatch_map(GLUTA_SPACEBALL_BUTTON_EVENT) := p;
+  if p = om then
+    glutSETLSpaceballButtonFunc(0);
+  else assert is_routine p;  -- arg must be OM or ROUTINE
+    glutSETLSpaceballButtonFunc(GLUTA_SPACEBALL_BUTTON_EVENT);
+  end if;
+end glutaSpaceballButtonFunc;
+
+proc glutaButtonBoxFunc(p);
+  dispatch_map(GLUTA_BUTTON_BOX_EVENT) := p;
+  if p = om then
+    glutSETLButtonBoxFunc(0);
+  else assert is_routine p;  -- arg must be OM or ROUTINE
+    glutSETLButtonBoxFunc(GLUTA_BUTTON_BOX_EVENT);
+  end if;
+end glutaButtonBoxFunc;
+
+proc glutaDialsFunc(p);
+  dispatch_map(GLUTA_DIALS_EVENT) := p;
+  if p = om then
+    glutSETLDialsFunc(0);
+  else assert is_routine p;  -- arg must be OM or ROUTINE
+    glutSETLDialsFunc(GLUTA_DIALS_EVENT);
+  end if;
+end glutaDialsFunc;
+
+proc glutaTabletMotionFunc(p);
+  dispatch_map(GLUTA_TABLET_MOTION_EVENT) := p;
+  if p = om then
+    glutSETLTabletMotionFunc(0);
+  else assert is_routine p;  -- arg must be OM or ROUTINE
+    glutSETLTabletMotionFunc(GLUTA_TABLET_MOTION_EVENT);
+  end if;
+end glutaTabletMotionFunc;
+
+proc glutaTabletButtonFunc(p);
+  dispatch_map(GLUTA_TABLET_BUTTON_EVENT) := p;
+  if p = om then
+    glutSETLTabletButtonFunc(0);
+  else assert is_routine p;  -- arg must be OM or ROUTINE
+    glutSETLTabletButtonFunc(GLUTA_TABLET_BUTTON_EVENT);
+  end if;
+end glutaTabletButtonFunc;
+
+proc glutaMenuStatusFunc(p);
+  dispatch_map(GLUTA_MENU_STATUS_EVENT) := p;
+  if p = om then
+    glutSETLMenuStatusFunc(0);
+  else assert is_routine p;  -- arg must be OM or ROUTINE
+    glutSETLMenuStatusFunc(GLUTA_MENU_STATUS_EVENT);
+  end if;
+end glutaMenuStatusFunc;
+
+proc glutaTimerFunc(ms,p,id);
+  dispatch_map(GLUTA_TIMER_EVENT) := p;
+  if p = om then
+    glutSETLTimerFunc(ms,0,id);
+  else assert is_routine p;  -- arg must be OM or ROUTINE
+    glutSETLTimerFunc(ms,GLUTA_TIMER_EVENT,id);
+  end if;
+end glutaTimerFunc;
+
+proc glutaFileInputFunc(fd,p);
+  dispatch_map(GLUTA_FILE_INPUT_EVENT) := p;
+  if p = om then
+    glutSETLFileInputFunc(fd,0);
+  else assert is_routine p;  -- arg must be OM or ROUTINE
+    glutSETLFileInputFunc(fd,GLUTA_FILE_INPUT_EVENT);
+  end if;
+end glutaFileInputFunc;
+
+proc glutaFileOutputFunc(fd,p);
+  dispatch_map(GLUTA_FILE_OUTPUT_EVENT) := p;
+  if p = om then
+    glutSETLFileOutputFunc(fd,0);
+  else assert is_routine p;  -- arg must be OM or ROUTINE
+    glutSETLFileOutputFunc(fd,GLUTA_FILE_OUTPUT_EVENT);
+  end if;
+end glutaFileOutputFunc;
+
+proc glutaFileExceptionFunc(fd,p);
+  dispatch_map(GLUTA_FILE_EXCEPTION_EVENT) := p;
+  if p = om then
+    glutSETLFileExceptionFunc(fd,0);
+  else assert is_routine p;  -- arg must be OM or ROUTINE
+    glutSETLFileExceptionFunc(fd,GLUTA_FILE_EXCEPTION_EVENT);
+  end if;
+end glutaFileExceptionFunc;
+
+proc glutaCloseFunc(p);
+  dispatch_map(GLUTA_CLOSE_EVENT) := p;
+  if p = om then
+    glutSETLCloseFunc(0);
+  else assert is_routine p;  -- arg must be OM or ROUTINE
+    glutSETLCloseFunc(GLUTA_CLOSE_EVENT);
+  end if;
+end glutaCloseFunc;
+
+proc place_holder;
+  printa (stderr, "Hey, you're not supposed to call me!");
+end proc;
+
+proc glutaCreateMenu(p);
+  assert is_routine p;
+  dispatch_map(GLUTA_MENU_SELECTION_EVENT) := routine place_holder;
+  menu := glutSETLCreateMenu(GLUTA_MENU_SELECTION_EVENT);
+  menu_map(menu) := p;  -- where the real action is
+  return menu;
+end glutaCreateMenu;
+
+proc glutaDestroyMenu(menu);
+  glutSETLDestroyMenu(menu);
+  menu_map(menu) := om;
+  if #menu_map = 0 then
+    dispatch_map(GLUTA_MENU_SELECTION_EVENT) := om;
+  end if;
+end glutaDestroyMenu;
+
+proc glutaBitmap8By13();
+  return glutSETLBitmap8By13();
+end glutaBitmap8By13;
+
+proc glutaBitmap9By15();
+  return glutSETLBitmap9By15();
+end glutaBitmap9By15;
+
+proc glutaBitmapHelvetica10();
+  return glutSETLBitmapHelvetica10();
+end glutaBitmapHelvetica10;
+
+proc glutaBitmapHelvetica12();
+  return glutSETLBitmapHelvetica12();
+end glutaBitmapHelvetica12;
+
+proc glutaBitmapHelvetica18();
+  return glutSETLBitmapHelvetica18();
+end glutaBitmapHelvetica18;
+
+proc glutaBitmapTimesRoman10();
+  return glutSETLBitmapTimesRoman10();
+end glutaBitmapTimesRoman10;
+
+proc glutaBitmapTimesRoman24();
+  return glutSETLBitmapTimesRoman24();
+end glutaBitmapTimesRoman24;
+
+proc glutaStrokeMonoRoman();
+  return glutSETLStrokeMonoRoman();
+end glutaStrokeMonoRoman;
+
+proc glutaStrokeRoman();
+  return glutSETLStrokeRoman();
+end glutaStrokeRoman;
+
+end Mesa_aux;

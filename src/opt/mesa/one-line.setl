@@ -1,0 +1,42 @@
+-- $Id: one-line.setl,v 1.4 2022/12/11 17:09:27 setlorg Exp $
+
+-- Keep declarations on one line by making sure parentheses are
+-- balanced before emitting a newline.  This isn't very general,
+-- but does handle the function decls in the GLUT/Mesa interface.
+
+s := '';  -- buffer
+p := 0;  -- parenthesis level
+
+while (c := getchar()) /= om loop
+  case c of
+  ('('):
+    s +:= c;
+    p +:= 1;
+  (')'):
+    s +:= c;
+    p -:= 1;
+    if p < 0 then
+      printa (stderr, 'too many right parentheses');
+      stop 1;
+    end if;
+  ('\n'):
+    if p = 0 then
+      print (s);
+      s := '';
+    else
+      s +:= ' ';
+    end if;
+  else
+    s +:= c;
+  end case;
+end loop;
+
+if p /= 0 then
+  printa (stderr, 'too many left parentheses');
+  stop 2;
+end if;
+
+if #s /= 0 then
+  printa (stderr, 'leftover text: ', pretty s);
+  stop 3;
+end if;

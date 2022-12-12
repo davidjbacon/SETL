@@ -1,0 +1,184 @@
+a := [1,2,3];
+b := [4,5,6];
+PRINT(a VECADD b);
+m := rotmat(NORM [1,1,1], ATAN 1);
+PRINT(m, m MATVEC a);
+n := [[0,0,0],[1,1,0]] DOCK [[0,0,0],[-1,1,0]];
+PRINT(n);
+
+--- The following is nominally ~bacon/matvec.setl:
+
+--  A matrix is a tuple of tuples (rows).
+
+OP MATMUL(a,b);
+  VAR ai;
+  RETURN [ai VECMAT b: ai IN a];
+END OP MATMUL;
+
+OP MATVEC(a,b);
+  VAR ai;
+  RETURN [ai DOT b: ai IN a];
+END OP MATVEC;
+
+OP VECMAT(a,b);
+  RETURN (TRANSPOSE b) MATVEC a;
+END OP VECMAT;
+
+OP DOT(a,b);
+  VAR i,ai;
+  ASSERT #a = #b;
+  RETURN +/[ai*b(i): ai=a(i)];
+END OP DOT;
+
+OP CROSS(a,b);
+  ASSERT #a = 3;
+  ASSERT #b = 3;
+  RETURN [a(2)*b(3) - a(3)*b(2),
+	  a(3)*b(1) - a(1)*b(3),
+	  a(1)*b(2) - a(2)*b(1)];
+END OP CROSS;
+
+OP MATADD(a,b);
+  VAR i,ai;
+  ASSERT #a = #b;
+  RETURN [ai VECADD b(i): ai=a(i)];
+END OP MATADD;
+
+OP MATSUB(a,b);
+  VAR i,ai;
+  ASSERT #a = #b;
+  RETURN [ai VECSUB b(i): ai=a(i)];
+END OP MATSUB;
+
+OP VECADD(a,b);
+  VAR i,ai;
+  ASSERT #a = #b;
+  RETURN [ai+b(i): ai=a(i)];
+END OP VECADD;
+
+OP VECSUB(a,b);
+  VAR i,ai;
+  ASSERT #a = #b;
+  RETURN [ai-b(i): ai=a(i)];
+END OP VECSUB;
+
+OP MATSCL(a,b);
+  VAR r;
+  RETURN IF IS_TUPLE a THEN [r VECSCL b: r IN a]
+		       ELSE [a VECSCL r: r IN b]
+		       END;
+END OP MATSCL;
+
+OP VECSCL(a,b);
+  VAR r;
+  RETURN IF IS_TUPLE a THEN [r*b: r IN a]
+		       ELSE [a*r: r IN b]
+		       END;
+END OP VECSCL;
+
+OP LENGTH(a);
+  VAR r;
+  RETURN SQRT +/[r*r: r IN a];
+END OP LENGTH;
+
+OP NORM(a);
+  ASSERT LENGTH a > 0;
+  RETURN a VECSCL (1.0/LENGTH a);
+END OP NORM;
+
+OP DIST(a,b);
+  RETURN LENGTH (a VECSUB b);
+END OP DIST;
+
+OP PERP(a);	$ arbitrary perpendicular (normalized)
+  VAR p,q;
+  ASSERT #a = 3;
+  p := a CROSS [1,0,0];
+  q := a CROSS [0,1,0];
+  RETURN NORM IF LENGTH p > LENGTH q THEN p ELSE q END;
+END OP PERP;
+
+OP TRANSPOSE(a);
+  VAR b,i,j,m,n,ai,aij,bi;
+  m := #a;	$ number of rows in a
+  n := #a(1);	$ number of cols in a
+  ASSERT FORALL ai IN a | #ai = n;
+  b := [[]: i IN [1..n]];	$ b has n rows
+  LOOP FOR ai=a(i) DO
+    LOOP FOR aij=ai(j) DO
+      b(j) WITH:= aij;
+    END LOOP;
+  END LOOP;
+  ASSERT #b = n;
+  ASSERT FORALL bi IN b | #bi = m;
+  RETURN b;
+END OP TRANSPOSE;
+
+$ Adapted from Colin Broughton's Algol 68 prelude...
+
+PROC rotmat(d,theta);
+  VAR c,cc;
+  CONST identity = [[1,0,0],
+	            [0,1,0],
+	            [0,0,1]];
+  ASSERT #d = 3;
+  c := [[   0 ,-d(3), d(2)],
+	[ d(3),   0 ,-d(1)],
+	[-d(2), d(1),   0 ]];
+  cc := c MATMUL c;
+  RETURN (cc MATADD identity ) MATSUB
+	 (cc MATSCL COS theta) MATADD
+	 (c  MATSCL SIN theta);
+END PROC rotmat;
+
+OP DOCK2(temp1,temp2);
+  VAR bond1,bond2,cos1,axis1,sin1;
+  ASSERT #temp1 = 2;
+  ASSERT #temp2 = 2;
+  bond1 := NORM (temp1(2) VECSUB temp1(1));
+  bond2 := NORM (temp2(2) VECSUB temp2(1));
+  cos1 := bond1 DOT bond2;
+  axis1 := bond1 CROSS bond2;
+  sin1 := LENGTH axis1;
+  IF sin1 = 0 THEN axis1 := [1,0,0]; END IF;
+  RETURN rotmat(NORM axis1, sin1 ATAN2 cos1);
+END OP DOCK2;
+
+OP DOCK3(temp1,temp2);
+  VAR bond1,bond2,cos1,cos2,axis1,axis2,sin1,sin2,m1,m2,vbond1,vbond2;
+  VAR bond3,bond4;
+  ASSERT #temp1 = 3;
+  ASSERT #temp2 = 3;
+  bond1 := temp1(2) VECSUB temp1(1);
+  bond2 := temp2(2) VECSUB temp2(1);
+  cos1 := (NORM bond1) DOT (NORM bond2);
+  axis1 := (NORM bond1) CROSS (NORM bond2);
+  sin1 := LENGTH axis1;
+  IF sin1 = 0 THEN axis1 := [1,0,0]; END IF;
+  m1 := rotmat(NORM axis1, sin1 ATAN2 cos1);
+  bond3 := temp1(3) VECSUB temp1(2);
+  bond4 := temp2(3) VECSUB temp2(2);
+  vbond1 := (NORM bond2) CROSS (NORM (m1 MATVEC bond3));
+  vbond2 := (NORM bond2) CROSS (NORM bond4);
+  cos2 := (NORM vbond1) DOT (NORM vbond2);
+  axis2 := (NORM vbond1) CROSS (NORM vbond2);
+  sin2 := LENGTH axis2;
+  IF sin2 = 0 THEN axis2 := [1,0,0]; END IF;
+  m2 := rotmat(NORM axis2, sin2 ATAN2 cos2);
+  RETURN m2 MATMUL m1;
+END OP DOCK3;
+
+$ The resulting matvec docks temp1 -> temp2 using up to the
+$ first 3 points as a guide
+$ (This is a bit different from the Algol version)
+OP DOCK(temp1,temp2);	$ What's OP DOCK?
+  CONST n = #temp1 MIN #temp2;
+  CONST m = IF	   n = 2 THEN temp1(1..2) DOCK2 temp2(1..2)
+	    ELSEIF n > 2 THEN temp1(1..3) DOCK3 temp2(1..3)
+	    ELSE	      [[1,0,0],[0,1,0],[0,0,1]]
+	    END;
+  CONST k = n MIN 3;
+  VAR i;
+  CONST t = VECADD/[temp2(i) VECSUB (m MATVEC temp1(i)): i IN [1..k]];
+  RETURN [m, t VECSCL (1.0/k)];
+END OP DOCK;

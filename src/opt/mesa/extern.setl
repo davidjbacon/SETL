@@ -1,0 +1,25 @@
+-- $Id: extern.setl,v 1.4 2022/12/11 17:09:27 setlorg Exp $
+--
+-- Grab all "extern" function declarations.
+--
+-- This includes lines starting with 'extern' or
+-- '__attribute__((visibility("default")))', and also those with a
+-- blank in column 1, an alphabetic token starting in column 2, and a
+-- third token beginning with 'glut'.
+--
+-- To qualify, such a declaration must be on a line ending in ');' and
+-- (to eliminate some declarations from <inttypes.h> we don't want)
+-- must not contain the substring 'intmax_t'.
+
+white := '[ \f\n\r\t\v]+';  -- 1 or more whitespace chars
+
+while (line := getline stdin) /= om loop
+  if line('intmax_t') = om then
+    if (sub(line,'^(extern|__attribute__\\(\\(visibility\\("default"\\)\\)\\))'+white) /= om or
+        sub(line,'^ ([a-zA-Z]+ glut)','\\1') /= om) and
+       line('\\);') /= om then
+      gsub(line,' +',' ');
+      print(line);
+    end if;
+  end if;
+end loop;

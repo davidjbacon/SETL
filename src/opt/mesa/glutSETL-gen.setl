@@ -1,0 +1,33 @@
+-- $Id: glutSETL-gen.setl,v 1.2 2022/12/11 17:09:27 setlorg Exp $
+
+while (s := getline stdin) /= om loop
+  s('proc gluta') := '';
+  s('Func') := '';
+  p := s('\\(.*\\)');
+  s('\\(.*$') := '';
+  t := s;
+  t(1) := to_lower t(1);
+  print;
+  print('static int '+t+'EventType = 0;');
+  print;
+  print('static void '+t+'Handler(<<void, or expected parms>>) {');
+  print('  recordEvent(<<how many parms follow>>, '+t+'EventType <<, parms...>>);');
+  print('}');
+  print;
+  a := split(p(2..#p-1),',');
+  a := [if a = 'p' then 'eventType' else a end : a in a];
+  r := +/['int '+r+', ' : r in a];
+  r(#r-1..) := '';
+  print('void glutSETL'+s+'Func('+r+') {');
+  print('  '+t+'EventType = eventType;');
+  print('  if (eventType == 0) {');
+  b := [if b = 'eventType' then 'NULL' else b end : b in a];
+  r := +/[r+', ' : r in b];
+  r(#r-1..) := '';
+  print('    glut'+s+'Func('+r+');');
+  print('  } else {');
+  r('NULL') := t+'Handler';
+  print('    glut'+s+'Func('+r+');');
+  print('  }');
+  print('}');
+end loop;

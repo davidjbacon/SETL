@@ -1,0 +1,19 @@
+-- $Id: ttt.setl,v 1.5 2022/12/11 17:09:27 setlorg Exp $
+
+-- Process typedefs on stdin (for other than struct, union, enum, and
+-- function pointer types) to produce typedef.tuples on stdout.
+
+LOOP DOING GET(s); WHILE NOT EOF DO
+  s := canonicalize(s);
+  s('( ;)*$') := '';
+  t := SPLIT(s,' ');
+  IF t(1) = 'typedef' AND
+     t(2) NOTIN {'struct','union','enum'} AND
+     s(' \\( \\* ') = OM THEN
+    t := t(2..);
+    [typ,id] := type_and_id(t);
+    PRINT([['typedef',id], typ]);
+  END IF;
+END LOOP;
+
+#include "tokens.setl"

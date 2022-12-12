@@ -1,0 +1,20 @@
+s := {1..1000};
+t := [];
+LOOP WHILE #s > 0 DO
+  e FROM s;
+  t WITH:= e;
+END LOOP;
+u := v := {};
+LOOP WHILE #t > 0 DO
+  e FROMB t;
+  u WITH:= e;
+  e FROME t;
+  v WITH:= e;
+END LOOP;
+-- These commented-out assertions presume sorted sets (so you
+-- should be able to restore them safely if you are using GNU SETL
+-- and don't care about portability):
+--ASSERT u = {1..500};
+--ASSERT v = {501..1000};
+ASSERT u+v = {1..1000};
+ASSERT u*v = {};

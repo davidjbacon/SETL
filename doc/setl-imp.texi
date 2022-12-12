@@ -1,0 +1,80 @@
+\input texinfo @c -*-texinfo-*-
+@c %**start of header
+@c
+@c $Id: setl-imp.texi,v 1.23 2022/04/23 16:30:34 setlorg Exp $
+@c
+@c Free software (c) dB - see file COPYING for license (GPL).
+@c
+@setfilename setl-imp.info
+@settitle GNU SETL Implementation Notes
+@finalout
+@c @setchapternewpage odd
+@paragraphindent none
+@c
+@c %**end of header
+
+@include version-setl-imp.texi
+@include include.texi
+
+
+@ifinfo
+@dircategory High-level programming
+@direntry
+* SETL implementation:  (setl-imp).    GNU SETL Implementation Notes.
+@end direntry
+@end ifinfo
+
+@titlepage
+@title GNU SETL Implementation Notes
+@subtitle Edition @value{EDITION}, for GNU SETL Version @value{VERSION}
+@subtitle Updated @value{UPDATED}
+@author by dB
+@end titlepage
+
+@contents
+
+
+@ifnottex
+
+@node Top
+@top GNU SETL Implementation Notes
+
+@ifinfo
+This info file discusses internals of the GNU SETL implementation.
+
+SETL is of course the world's most wonderful programming language.
+GNU SETL implements it along with some proposed extensions.
+
+This file is designed to be viewed with @w{@code{info setl-imp}}.
+
+GNU SETL normally comes with HTML and PDF versions too, and current
+documents should always be at @uref{https://setl.org/setl/doc/}.
+@end ifinfo
+
+@c Placeholder menu:
+@menu
+* Overview::      Types, the VM, etc.
+* Index::         Subject index.
+@end menu
+
+@end ifnottex
+
+
+@node Overview
+@unnumbered The Implementation of GNU SETL
+@cindex Implementation of GNU SETL
+
+@emph{*** To be written.}
+
+Meanwhile, the GNU SETL sources themselves, and the comments they
+contain, are the implementation guide.
+
+
+@node Index
+@unnumbered Index
+
+@printindex cp
+
+@bye
+
+@c setl-imp.texi ends here

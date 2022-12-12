@@ -1,0 +1,54 @@
+$Id: README,v 1.28 2022/12/11 20:59:05 setlorg Exp $
+
+Free software (c) dB - see file COPYING for license (GPL).
+
+
+Aboot GNU SETL
+--------------
+
+GNU SETL is an implementation of the SETL language, with some extensions.
+
+To build and install it, see INSTALL.  Or just skip straight to "make".
+
+The top-level folder containing this README is not itself guaranteed to
+follow GNU conventions fully, but is intended mainly to drive the src/
+and doc/ subdirs, which do.
+
+
+Further Reading
+---------------
+
+The GNU SETL home page is under http://setl.org/.
+
+After local installation of GNU SETL on your system, the commands
+"setl --help", "man setl", and "info setl" should be informative in
+varying degrees, and .html and .pdf documents should appear in a
+folder such as /usr/local/share/doc/setl/.  Briefly, the .info,
+.html, and .pdf documents (all of which are generated from a common
+Texinfo source) comprise the following:
+
+ - GNU SETL OM - a good place to start
+
+ - Tutorial - a gentle introduction to the SETL language [stub]
+
+ - User Guide - full command and environment variable details
+
+ - Language Reference - a detailed specification of SETL and GNU SETL [stub]
+
+ - Library Reference - details of all the built-in functions and operators
+
+ - Implementation Notes - on occult interfaces and rules [stub]
+
+ - Extension Guide - customizing GNU SETL with new intrinsic functions [stub]
+
+ - Maintenance Manual - notes on the build/distribution system [stub]
+
+
+Helping and Getting Help
+------------------------
+
+The database of known bugs is in a tiny little file called BUGS.
+
+Please help it grow by telling dB <David.Bacon@nyu.edu> about all
+defects you find.  Also welcome are patches, questions, suggestions,
+money, postcards, flowers, refreshments, etc.  Thanks!

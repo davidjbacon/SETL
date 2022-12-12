@@ -1,0 +1,8 @@
+$ See if can write SPLIT elegantly with a tuple former
+
+s := '   now        is the thyme';
+print(split_(s,' '));
+
+proc split_(s,b);
+  return [break(s,b): doing span(s,b); while s/=''];
+end proc split_;

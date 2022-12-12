@@ -1,0 +1,23 @@
+const dx = 0.01;
+
+f_ref := routine f;
+assert f_ref = (routine) f;  -- the "cast"-like syntax
+area := integrate(f_ref, 0, 1);
+print(area);
+rite := -cos 1 - -cos 0;
+print(rite);
+print(area - rite);
+
+proc f(x);
+  return sin x;
+end f;
+
+proc integrate(g, lo, hi);  -- not robust or accurate, but who cares
+  n := round ((hi-lo)/dx);
+  sum := 0;
+  for i in [0..n-1] loop
+    x := lo + (i+0.5)*dx;
+    sum +:= dx * call(g, x);
+  end loop;
+  return sum;
+end;

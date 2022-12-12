@@ -1,0 +1,38 @@
+-- $Id: tokens.setl,v 1.4 2022/12/11 17:09:27 setlorg Exp $
+
+-- Take a string assumed to contain a syntactically valid C type
+-- expression, tokenize it, and yield a string where tokens are
+-- separated by precisely one space.  The tokenization rule here
+-- is not general, but should suffice for type expressions.
+PROC canonicalize (typexpr);
+  GSUB (typexpr, '[][)(}{><,;*]', ' & ');
+  typexpr := ' ' + typexpr + ' ';
+  GSUB (typexpr, '[ \f\n\r\t\v]+', ' ');
+  RETURN typexpr(2..#typexpr-1);
+END canonicalize;
+
+PROC blank_separated(t);  -- the "canonical form" for typexprs
+  RETURN JOIN(t,' ');
+END blank_separated;
+
+PROC namelike(s);
+  RETURN s('^[_A-Za-z][_A-Za-z0-9]*$') = s;
+END namelike;
+
+-- Extract the type expression and id from a C typedef or formal arg.
+-- Not fully general, but good enough for its known callers.
+PROC type_and_id(t);
+  ASSERT IS_TUPLE t;
+  IF #(m := [i : tok=t(i) | tok='*' AND namelike(t(i+1)) AND t(i+2)=')']) /= 0 THEN
+    k := m(#m) + 1;  -- id just after last * before ) in t
+  ELSEIF #(m := [i : tok=t(i) | tok='*' AND namelike(t(i+1))]) /= 0 THEN
+    k := m(#m) + 1;  -- id just after last * in t
+  ELSEIF #(m := [i : tok=t(i) | tok='[' AND namelike(t(i-1))]) /= 0 THEN
+    k := m(1) - 1;  -- id just before first [ in t
+  ELSE
+    k := #t;  -- id taken to be last token in t
+  END IF;
+  typ := blank_separated(t(1..k-1)+t(k+1..));
+  id := t(k);
+  RETURN [typ,id];
+END type_and_id;

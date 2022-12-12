@@ -1,0 +1,7 @@
+		  program smap_test;
+
+f := { [1,2], [2,3], [4,5] };
+print (f);
+(for y=f(x)) print (x,y); end for;
+
+		end program smap_test;

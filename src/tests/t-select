@@ -1,0 +1,2 @@
+#! /bin/sh
+SETL_LINEBUF_STDERR=1 "$srcdir/simple-test" select

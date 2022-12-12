@@ -1,0 +1,6 @@
+-- SETL source for the subprogram invoked by tty-pump.setl
+system ('tty >&2');  -- print name of stdin's pty on stderr
+while (line := getline stdin) /= om loop
+  print (hex line);
+end loop;
+printa (stderr, 'child exiting');

@@ -1,0 +1,8 @@
+PROGRAM test;
+  LOOP DO
+    GET(line1,line2);
+    IF EOF THEN QUIT; END IF;
+    PRINT(line1);
+    PRINT(line2);
+  END LOOP;
+END PROGRAM;

@@ -1,0 +1,17 @@
+-- Test the passing of file descriptors from a subprocess to a parent.
+--
+-- We run the parent ("main") program, passing it 3 filenames.
+--
+-- The SETL_LINEBUF_STDERR=1 envt var setting only matters if lines of
+-- debug output are sent to stderr by both the parent and child, and
+-- you don't want the characters in those lines to be intermingled.
+--
+-- This program itself could just as easily (and a little more
+-- concisely) have been a shell script, except that we want it to be a
+-- SETL program for the particular test environment we are using.
+
+-- Defaults for envt vars srcdir and top_srcdir:
+setenv ('srcdir', getenv 'srcdir' ? '.');
+setenv ('top_srcdir', getenv 'top_srcdir' ? '..');
+
+system ('SETL_LINEBUF_STDERR=1 "$top_srcdir"/run-setl "$srcdir"/fd-pass-main.setl "$srcdir"/fd-pass.setl "$srcdir"/fd-pass-main.setl "$srcdir"/fd-pass-pump.setl');

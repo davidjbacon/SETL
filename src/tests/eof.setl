@@ -1,0 +1,37 @@
+setenv('LC_COLLATE','C');  -- for consistent ls sort order
+chdir(getenv 'srcdir');
+loop doing
+  printa('stderr','Please enter filename or command:');
+  GET(s);
+while not eof do
+  printa('stderr','s =',s);
+  if #s > 0 then
+    if s(1) = '|' then
+      s := s(2..);
+      open(s,'pipe-in');
+      x := 'Command';
+    elseif s = '.' then
+      quit loop doing printa;
+    else
+      open(s,'text-in');
+      x := 'File';
+    end if;
+    printa('stderr','Thank you.  '+x+' from which to read is "'+s+'".');
+    printa('stderr','Please enter line number at which copying should start:');
+    read(n);
+    printa('stderr','Thank you.  Copying will start from line',n);
+    if eof then quit loop doing printa; end if;
+    loop for i in [1..n-1] do
+      GETA(s,t);
+    end loop for i;
+    k := 0;
+    loop doing GETA(s,t); while not eof do
+      print(t); k +:= 1;
+    end loop doing GETA;
+    close(s);
+    flush(stdout);
+    printa('stderr','<',k,'lines copied, starting with line',n,'>');
+  else
+    printa('stderr','Null input.  Use ctrl-D or "." to exit prompting loop.');
+  end if;
+end loop doing printa;

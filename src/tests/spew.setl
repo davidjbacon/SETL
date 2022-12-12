@@ -1,0 +1,1 @@
+PUTC('/tmp/spewage',+/[CHAR(i): i IN [0..255]]);

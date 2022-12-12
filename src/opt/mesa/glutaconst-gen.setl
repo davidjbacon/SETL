@@ -1,0 +1,15 @@
+-- $Id: glutaconst-gen.setl,v 1.2 2022/12/11 17:09:27 setlorg Exp $
+
+n := 0;
+while (s := getline stdin) /= om loop
+  s('proc ') := '';
+  s('\\(.*$') := '';
+  c := s;
+  c('Func') := 'Event';
+  c := +/[if c('[A-Z]') /= om then '_'+c else c end : c in c];
+  c := to_upper c;
+  n +:= 1;
+  print(rpad('const '+c,35)+' = '+str n+';');
+end loop;
+n +:= 1;
+print(rpad('const GLUTA_MENU_SELECTION_EVENT',35)+' = '+str n+';');

@@ -1,0 +1,30 @@
+-- $Id: sniff-params.setl,v 1.5 2022/12/11 17:09:27 setlorg Exp $
+
+-- Input is from (e.g.) "grep -1 '<I>params</I> returns' ~/glGet.html"
+--
+-- This was used to help create the initial contents of a biggish
+-- switch statement in auxi.c from some HTML documentation.
+-- Pretty much obsolete scaffolding now.
+
+lines := split(getfile stdin,'\n');
+
+m := {};
+m.a := '1';
+m.one := '1';
+m.two := '2';
+m.three := '3';
+m.four := '4';
+m.sixteen := '16';
+
+for line=lines(i) loop
+  if '<I>params</I>' in line then
+    p := lines(i-1);
+    t := split(line);
+    if exists w=t(j) | w = 'returns' then
+      p('^<DT><B>') := '';
+      p('</B><DD>$') := '';
+      h := m(t(j+1));
+      print(rpad('  case '+p+':',42)+' r = '+h+'; break;');
+    end if;
+  end if;
+end loop;

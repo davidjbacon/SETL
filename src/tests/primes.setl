@@ -1,0 +1,9 @@
+PROGRAM primes;
+  PRINTA (STDERR, 'Please enter n, the ceiling on prime numbers:');
+  READ (x);
+  n := FLOOR x;
+  s := {2..n} - {i*j : i IN {2..FLOOR SQRT n}, j IN {i..n DIV 2}};
+  t := {p IN {2..n} | FORALL i IN {2..FLOOR SQRT p} | p MOD i /= 0};
+  ASSERT s = t;
+  PRINT (t);
+END PROGRAM primes;

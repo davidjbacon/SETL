@@ -1,0 +1,1 @@
+PRINT('Now allowing programs without PROGRAM and END around them!');

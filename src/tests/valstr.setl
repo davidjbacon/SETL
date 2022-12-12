@@ -1,0 +1,39 @@
+printa(stderr,'valstr begins; strange values follow...');
+--- TODO:  This program should figure out, in terms of low-order bits,
+--- the statistics on how different the VAL'd or UNSTR'd value looks
+--- from the original value, at least the average (which is actually
+--- not all that meaningful for the non-uniform distribution used
+--- here) and especially the worst case.  Rather than in terms of
+--- low-order bits, it might be better to give the highest ratio and
+--- the lowest (and perhaps even skip the "average too-high" and
+--- "average too-low").
+for i in [1..900] loop
+  a := [];
+  for x in [i, flog (i+10)] loop
+    b := [x, 1/x, x**10, 1/x**10, 10**x, 1/10**x, x**x, x/10**x,
+          flog x, flog (1/x), flog (x**10), flog (1/x**10)];
+    if x <= 308 then
+      b +:= [flog (10**x), flog (1/10**x)];
+    end if;
+    a +:= b;
+  end loop;
+  for v in a loop
+    sv := str v;
+    vsv := val sv;
+    if str vsv /= sv then
+      printa(stderr, type v, v, '(v)', 'vs.', type vsv, vsv, '(val str v)');
+    end if;
+    usv := unstr sv;
+    if str usv /= sv then
+      printa(stderr, type v, v, '(v)', 'vs.', type usv, usv, '(unstr str v)');
+    end if;
+  end loop;
+end loop;
+printa(stderr,'valstr ends.');
+print(a);
+
+op flog(v);
+  if v <= 0 then return 1 / random 1.0;
+  else return log v;
+  end if;
+end flog;

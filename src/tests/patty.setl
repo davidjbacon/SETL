@@ -1,0 +1,167 @@
+           PROGRAM patricia;
+
+$ Each node is a set of keys partitioned into two subsets
+$ according as the S'th bit is 0 or 1.
+$ It will be represented as the pair (K,S).
+$ The tree is a set of such nodes.
+$ The relations among the nodes are defined by the
+$ subset relations:  M is a left son of N if K(M) = L(N).
+$ (*) The representation for 0 or 1 keys in this
+$ implementation is quite silly and inconvenient, but
+$ I had to have something.
+
+CONST univ = {
+ '11100011100010001000100110100010',   $ This
+ '1000100110100010',                    $ is
+ '101000111000100010000101',             $ the
+ '1000100010010110101001001010001010000101',   $ house
+ '10100011100010001000000110100011',   $ that
+ '11010001100000011000001110010010',   $ Jack
+ '100000101010010010001001100100111010001101001011'};   $ built.
+
+INIT tree := {};
+LOOP FOR u IN univ DO insert(u); END LOOP;
+LOOP FOR u IN univ DO print(search(u)); END LOOP;
+print(search('10100011'));
+print(search('10'));
+print(search('1'));
+print(search('0'));
+insert('0');
+print(search('0'));
+print(tree);
+LOOP FOR u IN univ DO remove(u); END LOOP;
+print(tree);
+
+PROC search(key);
+  IF #tree = 0 THEN RETURN {}; END IF;
+  p := root();  $ sort of
+  t := p(1);
+  IF #t = 1 THEN RETURN t; END IF;
+  IF #key = 0 THEN RETURN t; END IF;
+  LOOP DO
+    ASSERT (#t > 1);
+    ASSERT (p(2) > 0);
+    IF p(2) > #key THEN QUIT LOOP; END IF;
+    IF key(p(2)) = '0' THEN t := left(p);
+                       ELSE t := rite(p);
+    END IF;
+    IF t IN DOMAIN tree THEN
+      ASSERT #t > 1;   $ useless, but just to remind me
+      p := node(t);
+    ELSE
+      ASSERT #t = 1;
+      QUIT LOOP;
+    END IF;
+  END LOOP;
+  RETURN t;
+END PROC;
+
+PROC insert(key);
+  IF #tree = 0 THEN
+    tree := {[{key},0]};
+    RETURN;
+  END IF;
+  t := search(key);
+  k := ARB t;
+  l := MIN/{i IN {1..(#k MIN #key)} | k(i) /= key(i)} - 1;
+  ASSERT FORALL h IN t |
+   l = MIN/{i IN {1..(#h MIN #key)} | h(i) /= key(i)} - 1;
+  IF EXISTS t IN DOMAIN tree | #t = 1 THEN
+    ASSERT FORALL t IN DOMAIN tree | #t = 1;
+    ASSERT #tree = 1;  $ (*) you see what I mean
+    tree := {[{k,key},l+1]};
+    RETURN;
+  END IF;
+  t := search(key(1..l));
+  ASSERT #t >= 1;
+  stuff(t,key);
+  tree(t+{key}) := l+1;
+END PROC;
+
+PROC stuff(t,key);  $ insert key in all nodes up to root
+  IF EXISTS q IN tree | left(q) = t OR rite(q) = t THEN
+    stuff(q(1),key);
+    s := tree(q(1));
+    tree(q(1)) := OM;
+    tree(q(1)+{key}) := s;
+  ELSE
+    ASSERT (node(t) = root());
+  END IF;
+END PROC;
+
+PROC remove(key);
+  ASSERT #tree > 0;
+  IF #tree = 1 THEN  $ this niggly spam is just for degenerates
+    q := ARB tree;
+    d := q(1);
+    IF #d = 1 THEN
+      tree := {};
+      RETURN;
+    ELSEIF #d = 2 THEN
+      ASSERT key IN d;
+      d -:= {key};
+      tree := {[d,0]};
+      RETURN;
+    END IF;
+  END IF;
+  t := search(key);
+  ASSERT #t = 1;
+  ASSERT EXISTS q IN tree | left(q) = t OR rite(q) = t;
+  tree(q(1)) := OM;
+  $ At this point, we could just get rid of all occurrences
+  $ of t in the tree at once, but I am going to
+  $ step carefully up to the root at the risk of some
+  $ harmless overspecification, partly for the sake of a few
+  $ extra (probably useless) assertions.
+  $ Here is what the code might look like otherwise (untested):
+  $ LOOP FOR q IN tree DO
+  $   d := q(1);
+  $   IF t SUBSET d THEN
+  $     ASSERT t SUBSET left(q) OR t SUBSET rite(q);
+  $     ASSERT t /= left(q);
+  $     ASSERT t /= rite(q);
+  $     s := tree(d);
+  $     tree(d) := OM;
+  $     d -:= t;
+  $     tree(d) := s;
+  $   END IF;
+  $ END LOOP;
+  suck(t,q);
+END PROC;
+
+PROC suck(t,q);  $ delete t from nodes above q
+  ASSERT #t = 1;
+  d := q(1);
+  IF EXISTS r IN tree | left(r) = d OR rite(r) = d THEN
+    e := r(1);
+    ASSERT t SUBSET e;
+    ASSERT t SUBSET left(r) OR t SUBSET rite(r);
+    ASSERT t /= left(r);
+    ASSERT t /= rite(r);
+    s := tree(e);
+    tree(e) := OM;
+    e -:= t;
+    tree(e) := s;
+    suck(t,r);
+  ELSE
+    ASSERT d = (root())(1)+t;  $ root was already updated
+  END IF;
+END PROC;
+
+PROC left(x); RETURN {key IN x(1) | key(x(2)) = '0'}; END PROC;
+PROC rite(x); RETURN {key IN x(1) | key(x(2)) = '1'}; END PROC;
+
+PROC node(keys); RETURN [keys, tree(keys)]; END PROC;
+
+PROC root();
+  f := {[#p(1),p] : p IN tree};
+  n := 0 MAX/(DOMAIN f);
+  p := f{n};
+  ASSERT (#p = 1);
+  p := ARB p;
+  t := p(1);
+  IF #t = 1 THEN ASSERT n = 1; END IF;
+  RETURN p;
+END PROC;
+
+                END PROGRAM;

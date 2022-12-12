@@ -1,0 +1,20 @@
+-- by Zhiqing --
+
+program primes100;
+
+N := 100;
+primes := [2];
+candidates := {3,5..N};
+
+for num in [3,5..N]|num in candidates loop
+    primes with := num;
+    candidates less := num;
+    for multiple in [num*num,(num+2)*num..N] loop
+        candidates less := multiple;
+    end loop;
+end loop;
+
+print ('Primes in the range 1 to',N,':');
+print (primes);
+
+end primes100;

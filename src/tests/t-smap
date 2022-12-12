@@ -1,0 +1,2 @@
+#! /bin/sh
+"$srcdir/simple-test" smap "$srcdir/diff-read"

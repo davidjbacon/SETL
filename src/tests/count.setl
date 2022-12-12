@@ -1,0 +1,5 @@
+CONST n = 1000000;
+i := 0;
+(WHILE i < n) i +:= 1; END;
+PRINT(i);
+PRINTA(2,'10**'+LOG n/LOG 10+' iterations in ',TIME,'ms.');

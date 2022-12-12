@@ -1,0 +1,1665 @@
+<!DOCTYPE html>
+<html>
+<!-- Created by GNU Texinfo 7.0, https://www.gnu.org/software/texinfo/ -->
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<title>GNU SETL User Guide</title>
+
+<meta name="description" content="GNU SETL User Guide">
+<meta name="keywords" content="GNU SETL User Guide">
+<meta name="resource-type" content="document">
+<meta name="distribution" content="global">
+<meta name="Generator" content="makeinfo">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+
+<link href="#Top" rel="start" title="Top">
+<link href="#Index" rel="index" title="Index">
+<link href="#SEC_Contents" rel="contents" title="Table of Contents">
+<link href="#setl" rel="next" title="setl">
+<style type="text/css">
+<!--
+a.copiable-link {visibility: hidden; text-decoration: none; line-height: 0em}
+a.summary-letter-printindex {text-decoration: none}
+div.display {margin-left: 3.2em}
+div.example {margin-left: 3.2em}
+pre.display-preformatted {font-family: inherit}
+span.r {font-family: initial; font-weight: normal; font-style: normal}
+span.w-nolinebreak-text {white-space: nowrap}
+span:hover a.copiable-link {visibility: visible}
+td.printindex-index-entry {vertical-align: top}
+td.printindex-index-section {vertical-align: top}
+th.entries-header-printindex {text-align:left}
+th.sections-header-printindex {text-align:left}
+ul.toc-numbered-mark {list-style: none}
+-->
+</style>
+
+
+</head>
+
+<body lang="en">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<a class="anchor" id="dir"></a><p><a class="uref" href="index.html">Up to GNU SETL doc top</a>
+</p>
+
+
+
+
+
+
+
+<div class="top-level-extent" id="Top">
+<h1 class="top" id="GNU-SETL-User-Guide">GNU SETL User Guide</h1>
+
+
+
+
+
+
+<div class="element-contents" id="SEC_Contents">
+<h2 class="contents-heading">Table of Contents</h2>
+
+<div class="contents">
+
+<ul class="toc-numbered-mark">
+  <li><a id="toc-The-setl-command" href="#setl">The <code class="command">setl</code> command</a>
+  <ul class="toc-numbered-mark">
+    <li><a id="toc-Examples" href="#examples">Examples</a></li>
+    <li><a id="toc-The-setl-command-and-arguments" href="#details">The <code class="command">setl</code> command and arguments</a></li>
+    <li><a id="toc-_0023_0021-invocation-1" href="#g_t_0023_0021-invocation"><code class="code">#!</code> invocation</a></li>
+    <li><a id="toc-Environment-variables" href="#envt-vars">Environment variables</a></li>
+    <li><a id="toc-Signals" href="#signals">Signals</a></li>
+    <li><a id="toc-Exit-status" href="#exit-status">Exit status</a></li>
+  </ul></li>
+  <li><a id="toc-The-setlcpp-command" href="#setlcpp">The <code class="command">setlcpp</code> command</a>
+  <ul class="toc-numbered-mark">
+    <li><a id="toc-Examples-1" href="#setlcpp-examples">Examples</a></li>
+    <li><a id="toc-The-setlcpp-command-and-arguments" href="#setlcpp-details">The <code class="command">setlcpp</code> command and arguments</a></li>
+    <li><a id="toc-Environment-variables-1" href="#setlcpp-envt-vars">Environment variables</a></li>
+  </ul></li>
+  <li><a id="toc-The-setltran-command" href="#setltran">The <code class="command">setltran</code> command</a>
+  <ul class="toc-numbered-mark">
+    <li><a id="toc-Examples-2" href="#setltran-examples">Examples</a></li>
+    <li><a id="toc-The-setltran-command-and-arguments" href="#setltran-details">The <code class="command">setltran</code> command and arguments</a></li>
+  </ul></li>
+  <li><a id="toc-Index-1" href="#Index" rel="index">Index</a></li>
+</ul>
+</div>
+</div>
+<hr>
+<div class="unnumbered-level-extent" id="setl">
+<h2 class="unnumbered" id="The-setl-command">The <code class="command">setl</code> command</h2>
+<a class="index-entry-id" id="index-SETL-virtual-machine-code"></a>
+
+<p>The <code class="command">setl</code> command is the primary
+interface to the GNU SETL system.  In typical use,
+it preprocesses SETL programs using <code class="command"><a class="ref" href="#setlcpp">setlcpp</a></code>
+and compiles them with <code class="command"><a class="ref" href="#setltran">setltran</a></code> into
+GNU SETL Virtual Machine code, which it then executes.
+</p>
+<p>Depending on the environment, your SETL program
+will be able to read from its standard input channel (stdin), write to
+its standard output and error channels (stdout and stderr), create and
+communicate with other processes, handle signals, receive timer events,
+listen on server ports, and open and use files, network connections,
+and existing file descriptors.
+</p>
+
+
+<hr>
+<div class="section-level-extent" id="examples">
+<h3 class="section" id="Examples">Examples</h3>
+<a class="index-entry-id" id="index-examples_002c-setl"></a>
+
+<p>This is the output of the command &lsquo;<samp class="samp">setl&nbsp;<span class="w-nolinebreak-text">--help</span></samp>&rsquo;<!-- /@w -->:
+</p>
+<div class="example">
+<pre class="example-preformatted">
+
+GNU SETL programming language processor
+
+Usage: setl [OPTIONS] [INPUT] [ARGS]
+
+  --[no]cpp           force [non]use of preprocessor
+  -I..., -D..., -U...  passed to setlcpp; these imply --cpp
+  --compile, -c       emit VM code on stdout, don't run
+  --translated, -t    input is VM code, not SETL source
+  --font-hints        just emit source prettyprinting hints
+  --keyword-case=any|upper|lower    (&quot;stropping&quot; convention) -
+                       control keyword recognition (default any)
+  --identifier-case=any|upper|lower|mixed    control recognition
+                       of user variable names (default any)
+  --maxmem=N          limit memory use (k, m, or g suffix OK)
+  --restricted, -r    restrict rights, for untrusted code
+  --allow-open=WHAT,HOW ...   restriction exemptions for open()
+  --allow-fd-open=FD,HOW ...   exemptions for open() over fd
+  --allow-mkstemp=TEMPLATE ...   exemptions for mkstemp() calls
+  --allow-filter=COMMAND ...   exemptions for filter() calls
+  --allow-system=COMMAND ...   exemptions for system() calls
+  --setlcpp=COMMAND   specify preprocessor command
+  --setltran=COMMAND  specify translator command
+  --help, -h          display this help on stdout and exit
+  --version           display version info on stdout and exit
+  --verbose, -v       make noise on stderr
+  --debug             make more noise on stderr
+  --abort-on-error    dump core for SETL-level error
+
+  -FD                 input from numeric file descriptor FD
+  |COMMAND            input from piped stdout of COMMAND
+  FILENAME            input from file FILENAME
+  STRING              get whole program directly from STRING
+  -, --               input from stdin (default)
+
+Examples:
+  setl mypgm.setl my args
+  setl 'print (&quot;Hello, world.&quot;);'
+
+If the Texinfo documentation is installed, &quot;info setl&quot; may work.
+PDF and HTML docs are usually under share/doc/setl/ somewhere.
+
+See setl.org for more documentation, source code, etc.
+
+Please report bugs to David.Bacon@nyu.edu.  Thanks for using
+SETL, the World's Most Wonderful Programming Language!
+
+</pre></div>
+
+<p>This is the output of the command &lsquo;<samp class="samp">setl&nbsp;&quot;print(57);&quot;</samp>&rsquo;<!-- /@w -->:
+</p><div class="example">
+<pre class="example-preformatted">57
+</pre></div>
+
+<p>And of &lsquo;<samp class="samp">setl&nbsp;<span class="w-nolinebreak-text">&quot;print(command_line);&quot;</span>&nbsp;a&nbsp;&quot;b&nbsp;c&quot;&nbsp;57</samp>&rsquo;<!-- /@w -->:
+</p><div class="example">
+<pre class="example-preformatted">[a 'b c' '57']
+</pre></div>
+
+
+<hr>
+</div>
+<div class="section-level-extent" id="details">
+<h3 class="section" id="The-setl-command-and-arguments">The <code class="command">setl</code> command and arguments</h3>
+
+<p>Here is the general form of the <code class="command">setl</code> command:
+</p>
+<div class="example">
+<pre class="example-preformatted"><code class="command">setl</code> [<var class="var">options</var>] [<var class="var">input</var>] [<var class="var">run args</var>]
+</pre></div>
+
+<p>The <code class="code"><var class="var">options</var></code> include:
+</p>
+<dl class="table">
+<dd>
+<a class="anchor" id="g_t_002d_002dcpp"></a></dd>
+<dt id='index-_002d_002dcpp-option'><span><samp class="option">--[no]cpp</samp><a class="copiable-link" href='#index-_002d_002dcpp-option'> &para;</a></span></dt>
+<dd><a class="index-entry-id" id="index-_002d_002dnocpp-option"></a>
+<a class="index-entry-id" id="index-_0023if_002c-_0023ifdef_002c-_0023ifndef"></a>
+<a class="index-entry-id" id="index-macro"></a>
+<a class="index-entry-id" id="index-preprocessor"></a>
+<p>By default, the GNU SETL Preprocessor, <code class="command"><a class="ref" href="#setlcpp">setlcpp</a></code>, an
+adaptation of GNU CPP (the GNU C Preprocessor), is applied if the input
+program appears to require it.  Use <samp class="option">--cpp</samp> or <samp class="option">--nocpp</samp>
+to make an explicit choice.  Options <samp class="option">-I...</samp>, <samp class="option">-D...</samp>,
+and <samp class="option">-U...</samp>, which are meaningful only to the preprocessor,
+also imply <samp class="option">--cpp</samp>.
+</p>
+<p>The effective setting of this option in the absence of an explicit
+choice depends on whether the input appears to have possible
+<code class="command">setlcpp</code> directives.  Because a false positive is usually
+harmless, apart from incurring a little extra overhead for an
+unnecessary <code class="command">setlcpp</code> invocation, the default is
+<samp class="option">--cpp</samp> if there are any lines whose first token is &lsquo;<samp class="samp">#</samp>&rsquo;.
+</p>
+<a class="index-entry-id" id="index-_0023line-directive"></a>
+<p>There are actually some exceptions to that:  a line that
+begins with &lsquo;<samp class="samp">#!</samp>&rsquo; doesn&rsquo;t imply a default of <samp class="option">--cpp</samp>,
+nor does a <code class="code">#line</code> directive that is in the canonical form
+&lsquo;<samp class="samp">#line&nbsp;<var class="var">digits</var>&nbsp;&quot;<var class="var">filename</var>&quot;</samp>&rsquo;<!-- /@w -->
+starting in column 1 and followed immediately by a newline.
+Each space shown is a single space.)  Such lines are instead
+transformed directly by the <code class="command">setl</code> command into
+&lsquo;<samp class="samp">#&nbsp;<var class="var">digits</var>&nbsp;&quot;<var class="var">filename</var>&quot;</samp>&rsquo;<!-- /@w -->, just as
+<code class="command">setlcpp</code> would do.
+</p>
+<p>Also, the presence of identifiers starting with a double underscore,
+such as <code class="code">__VERSION__</code>, <code class="code">__FILE__</code>, or <code class="code">__LINE__</code>,
+imply <samp class="option">--cpp</samp>, and are transformed by <code class="command">setlcpp</code>
+appropriately if recognized.  Note that no SETL variable identifier
+can begin with an underscore, so such symbols can only be
+preprocessor symbols (like those introduced via &lsquo;<samp class="samp">#define</samp>&rsquo; or
+a <samp class="option">-D...</samp> option).
+</p>
+<p>At this time, <code class="command">setl</code> has no option for spewing just the
+preprocessor output, although this can be retrieved from the
+<code class="code">%SOURCE</code> section of the translator output
+(see <a class="ref" href="#g_t_002d_002dcompile"><samp class="option">--compile</samp></a>)
+or generated directly using the <code class="command">setlcpp</code> command.
+</p>
+<p>To apply the preprocessor, <code class="command">setl</code> calls
+<code class="command">setlcpp</code> with options <samp class="option">-C</samp> and <a class="ref" href="#g_t_002dlang_002dsetl"><samp class="option">-lang-setl</samp></a>.
+The <samp class="option">-lang-setl</samp> option is needed for correct processing of
+SETL string literals and comments.  The <samp class="option">-C</samp> (capital C) option
+means retain comments:  this is used because there was once and may
+yet be again an escape convention where pseudo-code is enclosed in
+&lsquo;<samp class="samp">/*&nbsp;...&nbsp;*/</samp>&rsquo;<!-- /@w -->.  In <samp class="option">-lang-setl</samp> mode, <samp class="option">-C</samp>
+also happens to cause SETL comments (not just C comments) to be
+retained in the preprocessor output.
+</p>
+</dd>
+<dt id='index-_002dI-option'><span><samp class="option">-I...</samp><a class="copiable-link" href='#index-_002dI-option'> &para;</a></span></dt>
+<dt><samp class="option">-D...</samp></dt>
+<dt><samp class="option">-U...</samp></dt>
+<dd><a class="index-entry-id" id="index-_002dD-option"></a>
+<a class="index-entry-id" id="index-_002dU-option"></a>
+<a class="index-entry-id" id="index-_0023include"></a>
+<a class="index-entry-id" id="index-_0023define"></a>
+<a class="index-entry-id" id="index-_0023undef"></a>
+<p>These options imply <a class="ref" href="#g_t_002d_002dcpp"><samp class="option">--cpp</samp></a> and are passed along to
+<code class="command">setlcpp</code> in the order they occur.
+</p>
+<p>There must be no space between the <samp class="option">-I</samp>, <samp class="option">-D</samp>, or
+<samp class="option">-U</samp> and its sub-argument:  &lsquo;<samp class="samp">-I..</samp>&rsquo; is good but
+&lsquo;<samp class="samp">-I&nbsp;..</samp>&rsquo; fails with a message like
+&lsquo;<samp class="samp">setlcpp: Directory name missing after -I option</samp>&rsquo;.
+</p>
+<a class="index-entry-id" id="index-SETL_005fINCLUDE_005fPATH"></a>
+<p>Directories listed in the
+<code class="env"><a class="ref" href="#SETL_005fINCLUDE_005fPATH">SETL_INCLUDE_PATH</a></code> environment variable
+will be searched <em class="emph">after</em> any specified via <samp class="option">-I</samp> options
+when an <code class="code">#include</code> directive is encountered.
+There are no predefined default search directories.
+</p>
+<a class="anchor" id="g_t_002d_002dcompile"></a></dd>
+<dt id='index-_002d_002dcompile-option'><span><samp class="option">--compile</samp><a class="copiable-link" href='#index-_002d_002dcompile-option'> &para;</a></span></dt>
+<dt><samp class="option">-c</samp></dt>
+<dd><a class="index-entry-id" id="index-_002dc-option"></a>
+<a class="index-entry-id" id="index-compile_002donly-mode"></a>
+<a class="index-entry-id" id="index-compiler"></a>
+<a class="index-entry-id" id="index-translator"></a>
+<a class="index-entry-id" id="index-SETL-virtual-machine-code-1"></a>
+<p>Runs only <code class="command">setltran</code>, the GNU SETL translator (compiler).
+Produces (human-readable) GNU SETL Virtual Machine code on stdout.
+</p>
+</dd>
+<dt id='index-_002d_002dtranslated-option'><span><samp class="option">--translated</samp><a class="copiable-link" href='#index-_002d_002dtranslated-option'> &para;</a></span></dt>
+<dt><samp class="option">-t</samp></dt>
+<dd><a class="index-entry-id" id="index-_002dt-option"></a>
+<a class="index-entry-id" id="index-run_002donly-mode"></a>
+<a class="index-entry-id" id="index-compiler-1"></a>
+<a class="index-entry-id" id="index-translator-1"></a>
+<a class="index-entry-id" id="index-SETL-virtual-machine-code-2"></a>
+<p>Assumes that the input is GNU SETL Virtual Machine code, such as
+might have been produced by &lsquo;<samp class="samp">setl&nbsp;<span class="w-nolinebreak-text">-c</span></samp>&rsquo;<!-- /@w -->.
+</p>
+<a class="anchor" id="setl-_002d_002dfont_002dhints"></a></dd>
+<dt id='index-_002d_002dfont_002dhints-option'><span><samp class="option">--font-hints</samp><a class="copiable-link" href='#index-_002d_002dfont_002dhints-option'> &para;</a></span></dt>
+<dd><a class="index-entry-id" id="index-font-hints"></a>
+<a class="index-entry-id" id="index-hints_002c-font"></a>
+<a class="index-entry-id" id="index-prettyprinting-hints"></a>
+<p>Spews prettyprinting hints corresponding to the source input, and
+then exits successfully.  Implies <samp class="option">--nocpp</samp>, though you can
+put a <samp class="option">--cpp</samp> after the <samp class="option">--font-hints</samp> option to override
+that and thereby get hints for the source as already preprocessed.
+</p>
+<p>The hints are output as 3 integers:  beginning offset, ending
+offset, and suggested font.  There is one line of these per
+token of input.  Comments count as whitespace.
+The offsets can be thought of as referring to
+the cracks between the characters, so if the first input character
+is a whole token by itself, its beginning and ending offsets
+are 0 and 1 respectively.
+</p>
+<p>If the font codes are taken to mean roman for 1, italic for 2,
+and bold for 3, then predefined tokens of the SETL language will
+be in bold, literals in roman, and user identifiers in italics
+(though user-defined <em class="emph">operators</em>, i.e., those introduced by
+<code class="code">op</code> or <code class="code">operator</code> declarations, will be in bold).
+No font hints are given for comments, which probably look best in
+roman under this presentation scheme.
+</p>
+<p>The <samp class="option">--font-hints</samp> option is passed to <code class="command">setltran</code>
+(<a class="ref" href="#setltran-_002d_002dfont_002dhints"><samp class="option">setltran --font-hints</samp></a>).
+</p>
+<a class="index-entry-id" id="index-Texinfo"></a>
+<p>Here is a little program called <samp class="file">texinfo.setl</samp> which produces
+Texinfo output (see the GNU <cite class="cite">Texinfo</cite> manual or
+<a class="uref" href="https://www.gnu.org/software/texinfo/">https://www.gnu.org/software/texinfo/</a>).
+It maps 2 to <code class="code">@emph</code> and 3 to <code class="code">@strong</code>, and leaves
+everything else in the default font.  With its several single-letter
+variable names, it is perhaps not a splendid example of lucid SETL
+programming, but it has a couple of tuple formers that might amuse
+old fans of the World&rsquo;s Most Wonderful Programming Language:
+</p>
+<div class="example smallexample">
+<pre class="example-preformatted">pgmfile := command_line(1) ? 'texinfo.setl';
+n := #'# 1 &quot;' + #pgmfile + #'&quot;' + 1;  -- ugh
+p := fileno open ('setl --font-hints '+pgmfile, 'pipe-from');
+hints := [[i-n,j-n,k] : doing reada(p,i,j,k); while not eof];
+close(p);
+s := getfile pgmfile;
+m := 0;
+putchar (''+/[at_sub s(m+1..i) + decorate (s(i+1..j), k) :
+              [i,j,k] in hints step m := j; ]);
+putchar (at_sub s(m+1..));
+
+proc decorate (s, k);  -- decorate string s using font hint k
+  case k
+  when 2    =&gt; return '@emph{'+at_sub s+'}';
+  when 3    =&gt; return '@strong{'+at_sub s+'}';
+  otherwise =&gt; return at_sub s;
+  end case;
+end proc;
+
+op at_sub (s);
+  gsub (s, '@', '@@');  -- double any existing @ signs
+  gsub (s, '{', '@{');  -- and take care of braces
+  gsub (s, '}', '@}');
+  return s;
+end op;
+</pre></div>
+
+<p>Applied to itself (the default!), the above program&rsquo;s output is as
+follows.  Note that this output looks sort of OK in HTML and in
+TeX-based renderings (DVI, whence PDF and PostScript), but is
+virtually illegible in an <code class="command">info</code> reader.  This program is
+of course a mere toy, however, and the gentle reader is referred to
+<a class="uref" href="https://cs.nyu.edu/media/publications/bacon_david.pdf">dB&rsquo;s thesis</a>,
+Appendix A, for an example of what can be done with
+a much fussier and more comprehensive pretty-printer:
+</p>
+<div class="display">
+<pre class="display-preformatted"><em class="emph">pgmfile</em> <strong class="strong">:=</strong> <strong class="strong">command_line</strong><strong class="strong">(</strong>1<strong class="strong">)</strong> <strong class="strong">?</strong> &rsquo;texinfo.setl&rsquo;<strong class="strong">;</strong>
+<em class="emph">n</em> <strong class="strong">:=</strong> <strong class="strong">#</strong>&rsquo;# 1 &quot;&rsquo; <strong class="strong">+</strong> <strong class="strong">#</strong><em class="emph">pgmfile</em> <strong class="strong">+</strong> <strong class="strong">#</strong>&rsquo;&quot;&rsquo; <strong class="strong">+</strong> 1<strong class="strong">;</strong>  &ndash; ugh
+<em class="emph">p</em> <strong class="strong">:=</strong> <strong class="strong">fileno</strong> <strong class="strong">open</strong> <strong class="strong">(</strong>&rsquo;setl &ndash;font-hints &rsquo;<strong class="strong">+</strong><em class="emph">pgmfile</em><strong class="strong">,</strong> &rsquo;pipe-from&rsquo;<strong class="strong">)</strong><strong class="strong">;</strong>
+<em class="emph">hints</em> <strong class="strong">:=</strong> <strong class="strong">[</strong><strong class="strong">[</strong><em class="emph">i</em><strong class="strong">-</strong><em class="emph">n</em><strong class="strong">,</strong><em class="emph">j</em><strong class="strong">-</strong><em class="emph">n</em><strong class="strong">,</strong><em class="emph">k</em><strong class="strong">]</strong> <strong class="strong">:</strong> <strong class="strong">doing</strong> <strong class="strong">reada</strong><strong class="strong">(</strong><em class="emph">p</em><strong class="strong">,</strong><em class="emph">i</em><strong class="strong">,</strong><em class="emph">j</em><strong class="strong">,</strong><em class="emph">k</em><strong class="strong">)</strong><strong class="strong">;</strong> <strong class="strong">while</strong> <strong class="strong">not</strong> <strong class="strong">eof</strong><strong class="strong">]</strong><strong class="strong">;</strong>
+<strong class="strong">close</strong><strong class="strong">(</strong><em class="emph">p</em><strong class="strong">)</strong><strong class="strong">;</strong>
+<em class="emph">s</em> <strong class="strong">:=</strong> <strong class="strong">getfile</strong> <em class="emph">pgmfile</em><strong class="strong">;</strong>
+<em class="emph">m</em> <strong class="strong">:=</strong> 0<strong class="strong">;</strong>
+<strong class="strong">putchar</strong> <strong class="strong">(</strong>&rdquo;<strong class="strong">+</strong><strong class="strong">/</strong><strong class="strong">[</strong><strong class="strong">at_sub</strong> <em class="emph">s</em><strong class="strong">(</strong><em class="emph">m</em><strong class="strong">+</strong>1<strong class="strong">..</strong><em class="emph">i</em><strong class="strong">)</strong> <strong class="strong">+</strong> <em class="emph">decorate</em> <strong class="strong">(</strong><em class="emph">s</em><strong class="strong">(</strong><em class="emph">i</em><strong class="strong">+</strong>1<strong class="strong">..</strong><em class="emph">j</em><strong class="strong">)</strong><strong class="strong">,</strong> <em class="emph">k</em><strong class="strong">)</strong> <strong class="strong">:</strong>
+              <strong class="strong">[</strong><em class="emph">i</em><strong class="strong">,</strong><em class="emph">j</em><strong class="strong">,</strong><em class="emph">k</em><strong class="strong">]</strong> <strong class="strong">in</strong> <em class="emph">hints</em> <strong class="strong">step</strong> <em class="emph">m</em> <strong class="strong">:=</strong> <em class="emph">j</em><strong class="strong">;</strong> <strong class="strong">]</strong><strong class="strong">)</strong><strong class="strong">;</strong>
+<strong class="strong">putchar</strong> <strong class="strong">(</strong><strong class="strong">at_sub</strong> <em class="emph">s</em><strong class="strong">(</strong><em class="emph">m</em><strong class="strong">+</strong>1<strong class="strong">..</strong><strong class="strong">)</strong><strong class="strong">)</strong><strong class="strong">;</strong>
+
+<strong class="strong">proc</strong> <em class="emph">decorate</em> <strong class="strong">(</strong><em class="emph">s</em><strong class="strong">,</strong> <em class="emph">k</em><strong class="strong">)</strong><strong class="strong">;</strong>  &ndash; decorate string s using font hint k
+  <strong class="strong">case</strong> <em class="emph">k</em>
+  <strong class="strong">when</strong> 2    <strong class="strong">=&gt;</strong> <strong class="strong">return</strong> &rsquo;@emph{&rsquo;<strong class="strong">+</strong><strong class="strong">at_sub</strong> <em class="emph">s</em><strong class="strong">+</strong>&rsquo;}&rsquo;<strong class="strong">;</strong>
+  <strong class="strong">when</strong> 3    <strong class="strong">=&gt;</strong> <strong class="strong">return</strong> &rsquo;@strong{&rsquo;<strong class="strong">+</strong><strong class="strong">at_sub</strong> <em class="emph">s</em><strong class="strong">+</strong>&rsquo;}&rsquo;<strong class="strong">;</strong>
+  <strong class="strong">otherwise</strong> <strong class="strong">=&gt;</strong> <strong class="strong">return</strong> <strong class="strong">at_sub</strong> <em class="emph">s</em><strong class="strong">;</strong>
+  <strong class="strong">end</strong> <strong class="strong">case</strong><strong class="strong">;</strong>
+<strong class="strong">end</strong> <strong class="strong">proc</strong><strong class="strong">;</strong>
+
+<strong class="strong">op</strong> <strong class="strong">at_sub</strong> <strong class="strong">(</strong><em class="emph">s</em><strong class="strong">)</strong><strong class="strong">;</strong>
+  <strong class="strong">gsub</strong> <strong class="strong">(</strong><em class="emph">s</em><strong class="strong">,</strong> &rsquo;@&rsquo;<strong class="strong">,</strong> &rsquo;@@&rsquo;<strong class="strong">)</strong><strong class="strong">;</strong>  &ndash; double any existing @ signs
+  <strong class="strong">gsub</strong> <strong class="strong">(</strong><em class="emph">s</em><strong class="strong">,</strong> &rsquo;{&rsquo;<strong class="strong">,</strong> &rsquo;@{&rsquo;<strong class="strong">)</strong><strong class="strong">;</strong>  &ndash; and take care of braces
+  <strong class="strong">gsub</strong> <strong class="strong">(</strong><em class="emph">s</em><strong class="strong">,</strong> &rsquo;}&rsquo;<strong class="strong">,</strong> &rsquo;@}&rsquo;<strong class="strong">)</strong><strong class="strong">;</strong>
+  <strong class="strong">return</strong> <em class="emph">s</em><strong class="strong">;</strong>
+<strong class="strong">end</strong> <strong class="strong">op</strong><strong class="strong">;</strong>
+</pre></div>
+
+<p>Note how this program deals with the unpleasant fact that even
+programs that are not passed through <code class="command">setlcpp</code> get a line
+of the form &lsquo;<samp class="samp">#&nbsp;1&nbsp;&quot;<var class="var">filename</var>&quot;</samp>&rsquo;<!-- /@w --> prepended on
+their way into <code class="command">setltran</code>.  A slightly simpler variation on
+this program is suggested in the
+corresponding <code class="command">setltran</code> option description
+(<a class="ref" href="#setltran-_002d_002dfont_002dhints"><samp class="option">setltran --font-hints</samp></a>).
+</p>
+<a class="anchor" id="setl-_002d_002dkeyword_002dcase"></a><a class="anchor" id="setl-_002d_002didentifier_002dcase"></a></dd>
+<dt id='index-_002d_002dkeyword_002dcase-option'><span><samp class="option">--keyword-case=upper|lower|any</samp><a class="copiable-link" href='#index-_002d_002dkeyword_002dcase-option'> &para;</a></span></dt>
+<dt><samp class="option">--identifier-case=upper|lower|any|mixed</samp></dt>
+<dd><a class="index-entry-id" id="index-_002d_002didentifier_002dcase-option"></a>
+<a class="index-entry-id" id="index-lettercase"></a>
+<p>By default, the GNU SETL translator recognizes
+keywords and user identifiers case-insensitively,
+i.e., in <code class="code">any</code> lettercase.  Details on this and the other
+possibilities can be found with the corresponding <code class="command">setltran</code>
+option descriptions
+(<a class="ref" href="#setltran-_002d_002dkeyword_002dcase"><samp class="option">setltran --keyword-case</samp></a> and <a class="ref" href="#setltran-_002d_002didentifier_002dcase"><samp class="option">setltran --identifier-case</samp></a>).
+</p>
+<a class="anchor" id="g_t_002d_002dmaxmem-option"></a></dd>
+<dt id='index-_002d_002dmaxmem-option'><span><samp class="option">--maxmem=<var class="var">n</var></samp><a class="copiable-link" href='#index-_002d_002dmaxmem-option'> &para;</a></span></dt>
+<dd><a class="index-entry-id" id="index-memory-limit"></a>
+<a class="index-entry-id" id="index-limit_002c-memory"></a>
+<a class="index-entry-id" id="index-SETL-virtual-machine"></a>
+<p>Limits the amount of memory that the GNU SETL
+Virtual Machine allows to be allocated for data
+</p>
+<p>The decimal number <code class="code"><var class="var">n</var></code> may include a case-insensitive suffix
+<code class="code">K</code> (1024), <code class="code">M</code> (1024K), or <code class="code">G</code> (1024M).
+</p>
+<p>The default is unlimited, up to what the host system will bear.  This
+default can be explicitly specified with &lsquo;<samp class="samp">--maxmem=0</samp>&rsquo;.
+</p>
+<a class="anchor" id="g_t_002d_002drestricted"></a></dd>
+<dt id='index-_002d_002drestricted-option'><span><samp class="option">--restricted</samp><a class="copiable-link" href='#index-_002d_002drestricted-option'> &para;</a></span></dt>
+<dt><samp class="option">-r</samp></dt>
+<dd><a class="index-entry-id" id="index-_002dr-option"></a>
+<a class="index-entry-id" id="index-restricted-mode"></a>
+<a class="index-entry-id" id="index-security_002c-restricted-mode"></a>
+<a class="index-entry-id" id="index-untrusted-client-programs_002c-restricted-mode"></a>
+<a class="index-entry-id" id="index-client-programs_002c-untrusted_002c-restricted-mode"></a>
+<a class="index-entry-id" id="index-SETL-virtual-machine-1"></a>
+<p>If <samp class="option">--restricted</samp> (or equivalently <samp class="option">-r</samp>) is specified,
+the GNU SETL Virtual Machine disallows
+certain operations, such as file and socket operations,
+that can pose security risks.
+For specifics, see <a data-manual="setl-lib" href="setl-lib.html#restricted">Restricted Mode</a> in <cite class="cite"><span class="r">the</span> GNU SETL Library Reference</cite>.
+</p>
+<p>Restricted mode is intended to let you run untrusted client
+programs.  For example, you might wish to do this to let
+your students test and submit their SETL programs directly
+on and through your Web site.
+<a class="uref" href="https://setl.org/setl/setl-server.html">Dave&rsquo;s Famous Original SETL Server</a> accepts programs through
+a web form and runs them in restricted mode.
+</p>
+<p>This mode would also be suitable for a browser plugin that supports
+SETL <em class="dfn">markup</em> (SETL program text embedded in Web pages).
+</p>
+<p>To allow access to specific resources even in restricted mode, use as
+many <a class="ref" href="#g_t_002d_002dallow_002d_002e_002e_002e"><samp class="option">--allow-...</samp></a> options as required.
+</p>
+<a class="anchor" id="g_t_002d_002dallow_002d_002e_002e_002e"></a><a class="anchor" id="g_t_002d_002dallow_002dopen"></a><a class="anchor" id="g_t_002d_002dallow_002dfd_002dopen"></a><a class="anchor" id="g_t_002d_002dallow_002dmkstemp"></a><a class="anchor" id="g_t_002d_002dallow_002dfilter"></a><a class="anchor" id="g_t_002d_002dallow_002dsystem"></a></dd>
+<dt id='index-_002d_002dallow_002d_002e_002e_002e-options'><span><samp class="option">--allow-open=<var class="var">what</var>,<var class="var">how</var> &hellip;</samp><a class="copiable-link" href='#index-_002d_002dallow_002d_002e_002e_002e-options'> &para;</a></span></dt>
+<dt><samp class="option">--allow-fd-open=<var class="var">fd</var>,<var class="var">how</var> &hellip;</samp></dt>
+<dt><samp class="option">--allow-mkstemp=<var class="var">template</var> &hellip;</samp></dt>
+<dt><samp class="option">--allow-filter=<var class="var">command</var> &hellip;</samp></dt>
+<dt><samp class="option">--allow-system=<var class="var">command</var> &hellip;</samp></dt>
+<dd><a class="index-entry-id" id="index-open_002c-selectively-allowing"></a>
+<a class="index-entry-id" id="index-mkstemp_002c-selectively-allowing"></a>
+<a class="index-entry-id" id="index-filter_002c-selectively-allowing"></a>
+<a class="index-entry-id" id="index-system_002c-selectively-allowing"></a>
+<a class="index-entry-id" id="index-security_002c-allowing-selective-access-to-resources"></a>
+<a class="index-entry-id" id="index-untrusted-client-programs_002c-access-to-resources"></a>
+<a class="index-entry-id" id="index-client-programs_002c-access-to-resources"></a>
+<p>These options, which may be used multiple times, drill little holes in
+the firewall erected by the <a class="ref" href="#g_t_002d_002drestricted"><samp class="option">--restricted</samp></a> option,
+giving the SETL program access to particular resources
+specified at <code class="command">setl</code> invocation time.
+</p>
+<p>For example, you can give your students the time of day with
+&lsquo;<samp class="samp">--allow-open=profhost:daytime,tcp-client</samp>&rsquo;.
+</p>
+<p>Or, if you start their programs in an environment
+where file descriptor 4 is already open on some pipe, socket, or file
+you want them to be able to read from, then &lsquo;<samp class="samp">--allow-fd-open=4,r</samp>&rsquo;
+would do the trick.
+</p>
+<p>The arg &lsquo;<samp class="samp">--allow-mkstemp=/tmp/homework-1XXXXXX</samp>&rsquo; allows the
+SETL <code class="code"><a data-manual="setl-lib" href="setl-lib.html#mkstemp">mkstemp</a></code> primitive to be called with the given template,
+for the safe use of temporary scratch files in restricted mode.
+</p>
+<p>Likewise, &lsquo;<samp class="samp">--allow-filter=fmt</samp>&rsquo; lets the SETL program apply
+<code class="code"><a data-manual="setl-lib" href="setl-lib.html#filter">filter</a></code> to the commmand <code class="command">fmt</code>, and
+&lsquo;<samp class="samp">--allow-system=&quot;mail prof &lt;/tmp/summary$(uid)&quot;</samp>&rsquo; lets the
+program call <code class="code"><a data-manual="setl-lib" href="setl-lib.html#system">system</a></code> with a very particular <code class="command">mail</code>
+command.
+</p>
+<p>Note that commands, filenames, and templates in <samp class="option">--allow-...</samp>
+args will require appropriate quoting to deal with internal spaces and
+other special characters when a standard Bourne-type shell is used to
+invoke <code class="command">setl</code>, as that latter example illustrates.
+</p>
+<p>Meaningful values of <code class="code"><var class="var">what</var></code>, <code class="code"><var class="var">fd</var></code>, and <code class="code"><var class="var">how</var></code> are
+those accepted by the SETL <code class="code"><a data-manual="setl-lib" href="setl-lib.html#open">open</a></code> primitive,
+except that a <code class="code">tuple</code> argument to <code class="code">open</code>
+must be represented as a pair of strings separated by a colon in
+<samp class="option">--allow-open</samp> options.  Specify integer values as
+strings of decimal digits.
+</p>
+<p>There should be no space around the comma that separates <code class="code"><var class="var">what</var></code>
+or <code class="code"><var class="var">fd</var></code> from <code class="code"><var class="var">how</var></code>.
+</p>
+<p>Timer streams are always allowed to be opened, without the need to give
+an <samp class="option">--allow-open</samp> option for them.
+</p>
+<p>The <code class="code"><var class="var">what</var></code> part of an <samp class="option">--allow-open</samp> argument must be
+matched exactly in the SETL program&rsquo;s <code class="code">open</code> call (or equivalent
+auto-open), with these exceptions:  (1) the names of signal-catching,
+signal-ignoring, and signal-defaulting streams need only be equivalent
+according to the usual <code class="code">open</code> convention; and (2) when <code class="code"><var class="var">what</var></code>
+is a network (host:service) spec, the matching is case-insensitive.
+</p>
+<p>The case-sensitive matching for commands and filenames is the safest
+way to treat an <samp class="option">--allow-open</samp> security exemption, even though
+<code class="code">open</code> itself may behave case-insensitively on some combinations
+of OS and filesystem.
+</p>
+<a class="anchor" id="g_t_002d_002dsetlcpp"></a></dd>
+<dt id='index-_002d_002dsetlcpp-option'><span><samp class="option">--setlcpp=<var class="var">command</var></samp><a class="copiable-link" href='#index-_002d_002dsetlcpp-option'> &para;</a></span></dt>
+<dd><a class="index-entry-id" id="index-preprocessor-command"></a>
+<p>This specifies a preprocessor command to be used in place of the default
+<code class="command">setlcpp</code>.  The default is that if <code class="command">setl</code> appears to
+have been invoked using a specific pathname (i.e., there is a
+directory separator character in <code class="code">argv[0]</code> at the C level),
+then <code class="command">setlcpp</code> is sought in the same directory as
+<code class="command">setl</code> was ostensibly found in.  Otherwise, given no
+directory separator character, the <code class="env">PATH</code>
+environment variable is searched in the usual POSIX way for a
+directory containing an executable <code class="command">setlcpp</code>.
+</p>
+<p>The <code class="code"><var class="var">command</var></code> in the <samp class="option">--setlcpp</samp> option is in fact
+taken as the initial substring of a command to be passed, unquoted,
+with appended args such as <samp class="option">-D...</samp> and <samp class="option">-I...</samp>, quoted,
+to the POSIX standard (Bourne-compatible) shell.
+Thus <code class="env">PATH</code> is also consulted if the specified <code class="code"><var class="var">command</var></code>
+has no directory separator character in its first token.
+</p>
+<a class="anchor" id="g_t_002d_002dsetltran"></a></dd>
+<dt id='index-_002d_002dsetltran-option'><span><samp class="option">--setltran=<var class="var">command</var></samp><a class="copiable-link" href='#index-_002d_002dsetltran-option'> &para;</a></span></dt>
+<dd><a class="index-entry-id" id="index-translator-command"></a>
+<p>This specifies a translator command to be used in place of the default
+<code class="command">setltran</code>.  The default that if <code class="command">setl</code> appears to
+have been invoked using a specific pathname (i.e., there is a
+directory separator character in <code class="code">argv[0]</code> at the C level),
+then <code class="command">setltran</code> is sought in the same directory as
+<code class="command">setl</code> was ostensibly found in.  Otherwise, given no
+directory separator character, the <code class="env">PATH</code>
+environment variable is searched in the usual POSIX way for a
+directory containing an executable <code class="command">setltran</code>.
+</p>
+<p>The <code class="code"><var class="var">command</var></code> in the <samp class="option">--setltran</samp> option is in fact
+taken as the initial substring of a command to be passed, unquoted,
+with appended args such as <samp class="option">--verbose</samp>,
+to the POSIX standard (Bourne-compatible) shell.
+Thus <code class="env">PATH</code> is also consulted if the specified <code class="code"><var class="var">command</var></code>
+has no directory separator character in its first token.
+</p>
+<a class="anchor" id="setl-_002d_002dhelp"></a></dd>
+<dt id='index-_002d_002dhelp-option'><span><samp class="option">--help</samp><a class="copiable-link" href='#index-_002d_002dhelp-option'> &para;</a></span></dt>
+<dt><samp class="option">-h</samp></dt>
+<dd><a class="index-entry-id" id="index-_002dh-option"></a>
+<a class="index-entry-id" id="index-help_002c-setl"></a>
+<p>Spews a command summary on stdout, and exits successfully.
+</p>
+<a class="anchor" id="setl-_002d_002dversion"></a></dd>
+<dt id='index-_002d_002dversion-option'><span><samp class="option">--version</samp><a class="copiable-link" href='#index-_002d_002dversion-option'> &para;</a></span></dt>
+<dd><a class="index-entry-id" id="index-version_002c-setl"></a>
+<p>Spews GNU SETL version information on stdout, and exits successfully.
+</p>
+<a class="anchor" id="setl-_002d_002dverbose"></a></dd>
+<dt id='index-_002d_002dverbose-option'><span><samp class="option">--verbose</samp><a class="copiable-link" href='#index-_002d_002dverbose-option'> &para;</a></span></dt>
+<dt><samp class="option">-v</samp></dt>
+<dd><a class="index-entry-id" id="index-_002dv-option"></a>
+<a class="index-entry-id" id="index-verbose-mode"></a>
+<p>Spews some garbage on stderr during execution for the amusement of nerds.
+</p>
+<a class="anchor" id="setl-_002d_002ddebug"></a></dd>
+<dt id='index-_002d_002ddebug-option'><span><samp class="option">--debug</samp><a class="copiable-link" href='#index-_002d_002ddebug-option'> &para;</a></span></dt>
+<dd><a class="index-entry-id" id="index-SETL-virtual-machine-2"></a>
+<p>In a normal build of <code class="command">setl</code>, the <samp class="option">--debug</samp> option does
+nothing at run time.  But if the preprocessor symbol <code class="code">DEBUG_TRACE</code>
+was asserted when <code class="command">setl</code> was built, then <samp class="option">--debug</samp>
+causes instruction-by-instruction tracing of GNU SETL Virtual Machine
+execution, on stderr.
+</p>
+<p>Regardless of <code class="code">DEBUG_TRACE</code>, this option is passed to
+<code class="command">setltran</code> (<a class="ref" href="#setltran-_002d_002ddebug"><samp class="option">setltran --debug</samp></a>).
+</p>
+</dd>
+</dl>
+
+<p>A single hyphen is acceptable in place of the double hyphen in all
+the above options.  Single-letter options only take a single hyphen,
+however.  Also, single-letter options may not be &ldquo;clustered&rdquo;:  each
+option must be a separate argument, so &lsquo;<samp class="samp">setl&nbsp;<span class="w-nolinebreak-text">-c</span>&nbsp;<span class="w-nolinebreak-text">-v</span></samp>&rsquo;<!-- /@w --> wins but
+&lsquo;<samp class="samp">setl&nbsp;<span class="w-nolinebreak-text">-cv</span></samp>&rsquo;<!-- /@w --> loses.
+</p>
+<p>Possibilities for the <code class="code"><var class="var">input</var></code> argument to the
+<code class="command">setl</code> command are tried in the following order:
+</p>
+<dl class="table">
+<dt id='index-reading-program-from-file-descriptor'><span><samp class="option">-<var class="var">fd</var></samp><a class="copiable-link" href='#index-reading-program-from-file-descriptor'> &para;</a></span></dt>
+<dd><a class="index-entry-id" id="index-file-descriptor_002c-reading-program-from"></a>
+<p>Program comes from the already open file descriptor
+<code class="code"><var class="var">fd</var></code>, where <code class="code"><var class="var">fd</var></code> is a decimal integer.
+</p>
+</dd>
+<dt id='index-reading-program-from-stdin'><span><samp class="option"><var class="var">-</var></samp><a class="copiable-link" href='#index-reading-program-from-stdin'> &para;</a></span></dt>
+<dd><a class="index-entry-id" id="index-stdin_002c-reading-program-from"></a>
+<a class="index-entry-id" id="index-_002d-_0028read-from-stdin_0029"></a>
+<p>Program comes from the standard input (stdin).  This is the default
+if there are no other input arguments to <code class="command">setl</code>.
+</p>
+</dd>
+<dt id='index-reading-program-from-command-output'><span><samp class="option">|<var class="var">command</var></samp><a class="copiable-link" href='#index-reading-program-from-command-output'> &para;</a></span></dt>
+<dd><a class="index-entry-id" id="index-command_002c-reading-program-from-output-of"></a>
+<p>Program comes from the standard output of <code class="code"><var class="var">command</var></code>.
+</p>
+</dd>
+<dt id='index-reading-program-from-file'><span><samp class="option"><var class="var">filename</var></samp><a class="copiable-link" href='#index-reading-program-from-file'> &para;</a></span></dt>
+<dd><a class="index-entry-id" id="index-file_002c-reading-program-from"></a>
+<p>Program comes from the file <code class="code"><var class="var">filename</var></code>.
+</p>
+</dd>
+<dt id='index-reading-program-from-string'><span><samp class="option"><var class="var">string</var></samp><a class="copiable-link" href='#index-reading-program-from-string'> &para;</a></span></dt>
+<dd><a class="index-entry-id" id="index-string_002c-reading-program-from"></a>
+<a class="index-entry-id" id="index-reading-program-from-command_002dline-argument"></a>
+<a class="index-entry-id" id="index-command_002dline-argument_002c-reading-program-from"></a>
+<p>Program comes from the argument <code class="code"><var class="var">string</var></code> itself.
+</p>
+</dd>
+</dl>
+
+
+<a class="anchor" id="hashbang"></a><hr>
+</div>
+<div class="section-level-extent" id="g_t_0023_0021-invocation">
+<h3 class="section" id="g_t_0023_0021-invocation-1"><code class="code">#!</code> invocation</h3>
+
+<a class="index-entry-id" id="index-_0023_0021-invocation"></a>
+<a class="index-entry-id" id="index-hashbang-_0028_0023_0021_0029"></a>
+<a class="index-entry-id" id="index-SETL-script"></a>
+<a class="index-entry-id" id="index-command_005fname_002c-command_005fline"></a>
+
+
+<p>On systems that support the convention in which any script beginning
+with the characters <code class="code">#!</code> (<em class="dfn">hashbang</em>)
+is passed to the interpreter whose absolute pathname appears right after
+the <code class="code">#!</code>, the <code class="command">setl</code> command may be run indirectly
+to create SETL <em class="dfn">scripts</em>.
+</p>
+<p>Here is an example:
+</p>
+<div class="example">
+<pre class="example-preformatted">#! /usr/bin/setl
+print (command_name, command_line);
+</pre></div>
+
+<p>If that script is put in <code class="command">/tmp/prtcmd</code> and made executable,
+and if <code class="command">setl</code> (together with <code class="command">setlcpp</code> and
+<code class="command">setltran</code>) is installed in <code class="command">/usr/bin</code>,
+then the shell command
+</p>
+<div class="example">
+<pre class="example-preformatted">/tmp/prtcmd a2 'Hetu' 'eh you' 57
+</pre></div>
+
+<p>will give the output
+</p>
+<div class="example">
+<pre class="example-preformatted">/tmp/prtcmd [a2 Hetu 'eh you' '57']
+</pre></div>
+
+<p>Note that the pathname of
+the script is available to the program as the string
+<code class="code"><a data-manual="setl-lib" href="setl-lib.html#command_005fname">command_name</a></code>, and the arguments to the script
+as the tuple of strings <code class="code"><a data-manual="setl-lib" href="setl-lib.html#command_005fline">command_line</a></code>.
+</p>
+<p>Another possibility is to begin the shell script
+as follows when you don&rsquo;t wish to specify an absolute pathname for
+the <code class="command">setl</code> command but would rather have it found in the
+user&rsquo;s <code class="env">PATH</code>, and don&rsquo;t need to pass any
+options to <code class="command">setl</code>:
+</p>
+<div class="example">
+<pre class="example-preformatted">#! /usr/bin/env setl
+</pre></div>
+
+<a class="index-entry-id" id="index-shell-script_002c-embedding-SETL-programs-in"></a>
+<a class="index-entry-id" id="index-_002fbin_002fsh"></a>
+
+<p>Multi-line SETL programs can also be embedded in shell scripts.
+Example:
+</p>
+<div class="example">
+<pre class="example-preformatted">#! /bin/sh
+setl -3 3&lt;&lt;'!' &quot;$@&quot;
+print (&quot;Command args:&quot;, command_line);
+print (&quot;Please enter a number, string, set, or tuple:&quot;);
+read (v);
+print (&quot;Thank you.  I now have&quot;, type v, &quot;v =&quot;, v);
+!
+</pre></div>
+
+<p>The above script tells <code class="command">setl</code> to
+read source code from POSIX file descriptor 3, which is directed
+to the in-line <em class="dfn">here</em> document that ends with a bang.  The single
+quotes around the first bang indicate, in the bizarre and arcane
+language of the Bourne shell, that the SETL program text is to be
+taken literally, not subjected to parameter expansion,
+command substitution, or arithmetic expansion.
+</p>
+<p>So, if the above script is executed or even just <em class="dfn">sourced</em> by a
+Bourne-compatible shell, it will prompt on stdout and read from stdin,
+just as an equivalent &lsquo;<samp class="samp">#!</samp>&rsquo; SETL script would when executed, or
+as a free-standing SETL program run by the <code class="command">setl</code> command
+would.  Using this technique, it is easy to embed any number of SETL
+programs in a shell script.
+</p>
+<a class="index-entry-id" id="index-_0023line-directive-1"></a>
+<p>Note, however, that if a program in-lined in that way has a syntax
+error or experiences an execution error, the diagnostic will refer to
+a program named &lsquo;<samp class="samp">-3</samp>&rsquo;, and a line number relative to where the
+program begins.  A <code class="code">#line</code> directive can be used to work around
+this problem.  For example, if the above script is called <code class="command">bach</code>,
+then the line
+</p>
+
+<p>could be inserted as the first line of the program to ensure that
+diagnostics refer to <code class="command">bach</code> and the correct line number of
+the script.  Then if the user enters an invalid input, the diagnostic
+will point to line 6 of <code class="command">bach</code>, the <code class="code">read</code> statement.
+</p>
+<a class="index-entry-id" id="index-_002fbin_002fbash"></a>
+<p>That literal line number in the <code class="code">#line</code> directive is obviously a
+maintenance hazard, but if you are willing to assume a working
+<code class="command">/bin/bash</code>, and approve of the shell making &ldquo;here-document&rdquo;
+substitutions for sequences such as <code class="code">$...</code> in your SETL code,
+then another way to embed it in <code class="command">bach</code> is:
+</p>
+<div class="example">
+<pre class="example-preformatted">#! /bin/bash
+# Lines of shell script ...
+setl -3 3&lt;&lt;! args to SETL program ...
+#line $((LINENO+2)) &quot;bach&quot;
+-- Lines of SETL program ...
+!
+# More lines of shell script ...
+</pre></div>
+
+<p>Finally, a very short SETL program can be entirely contained within
+a command-line argument; here is a functional equivalent to the
+<code class="command">bach</code> scripts above:
+</p>
+<div class="example">
+<pre class="example-preformatted">#! /bin/sh
+setl '
+print (&quot;Command args:&quot;, command_line);
+print (&quot;Please enter a number, string, set, or tuple:&quot;);
+read (v);
+print (&quot;Thank you.  I now have&quot;, type v, &quot;v =&quot;, v);
+' &quot;$@&quot;
+</pre></div>
+
+<p>Note that special care must be taken of apostrophes in a program
+embedded in this last way (or of double quotes if those are used to
+enclose it), in order to keep the shell happy.
+</p>
+
+
+<hr>
+</div>
+<div class="section-level-extent" id="envt-vars">
+<h3 class="section" id="Environment-variables">Environment variables</h3>
+<a class="index-entry-id" id="index-environment-variables_002c-setl-command"></a>
+
+<p>The environment variables to which the <code class="command">setl</code> command is
+sensitive are as follows.
+</p>
+<dl class="table">
+<dt id='index-HOME-environment-variable'><span><code class="env">HOME</code><a class="copiable-link" href='#index-HOME-environment-variable'> &para;</a></span></dt>
+<dd><p>This identifies the user&rsquo;s home directory, if any.  It gives the
+default for the SETL <code class="code"><a data-manual="setl-lib" href="setl-lib.html#chdir">chdir</a></code> parameter.
+</p>
+</dd>
+<dt id='index-PATH-environment-variable'><span><code class="env">PATH</code><a class="copiable-link" href='#index-PATH-environment-variable'> &para;</a></span></dt>
+<dd><a class="index-entry-id" id="index-executables_002c-search-path-for"></a>
+<a class="index-entry-id" id="index-search-path-for-executables"></a>
+<p>For commands launched by your SETL program, e.g., by
+<code class="code"><a data-manual="setl-lib" href="setl-lib.html#system">system</a></code> or <code class="code"><a data-manual="setl-lib" href="setl-lib.html#filter">filter</a></code>, or by an <code class="code"><a data-manual="setl-lib" href="setl-lib.html#open">open</a></code> on
+a pipe or pump stream, the <code class="env">PATH</code> environment variable is used
+in locating the executable.  <code class="env">PATH</code> is also used in searching for the
+<code class="command">setlcpp</code> and <code class="command">setltran</code> executables when <code class="command">setl</code>
+itself appears to have been found in a directory listed in <code class="env">PATH</code>
+(i.e., when there is no directory separator character in <code class="code">argv[0]</code>
+at the C level) and where this search is not overridden by a
+<a class="ref" href="#g_t_002d_002dsetlcpp"><samp class="option">--setlcpp</samp></a> or <a class="ref" href="#g_t_002d_002dsetltran"><samp class="option">--setltran</samp></a> option.
+</p>
+<a class="anchor" id="SETL_005fLINEBUF_005fSTDERR"></a></dd>
+<dt id='index-SETL_005fLINEBUF_005fSTDERR-environment-variable'><span><code class="env">SETL_LINEBUF_STDERR</code><a class="copiable-link" href='#index-SETL_005fLINEBUF_005fSTDERR-environment-variable'> &para;</a></span></dt>
+<dd><p>By default, characters on the standard output stream (<code class="code"><a data-manual="setl-lib" href="setl-lib.html#stderr">stderr</a></code>)
+are flushed (written out) as soon as possible; i.e., the stream is
+<em class="dfn">unbuffered</em> (see <a data-manual="setl-lib" href="setl-lib.html#Buffering">Buffering</a> in <cite class="cite"><span class="r">the</span> GNU SETL Library Reference</cite>).
+But if <code class="env">SETL_LINEBUF_STDERR</code> is set (to anything,
+even the null string), then stderr is <em class="dfn">line buffered</em>, meaning that
+characters may not be written out until the next newline is written to
+stderr by the SETL program.
+</p>
+<p>This can be convenient when a bunch of different processes all want to
+issue diagnostics to the terminal at the same time, as it greatly
+reduces the likelihood that those messages will be intermingled on a
+character-by-character basis.  In a production-level set of related
+processes, of course, it is probably better to redirect everyone&rsquo;s
+stderr to a common server that respects newlines and can perform
+additional functions such as keeping a log, presenting a highlighted
+real-time display, etc.
+</p>
+</dd>
+</dl>
+
+
+<hr>
+</div>
+<div class="section-level-extent" id="signals">
+<h3 class="section" id="Signals">Signals</h3>
+<a class="index-entry-id" id="index-signals_002c-setl-command"></a>
+
+<p>For the signals that can be caught directly by the user&rsquo;s SETL program
+using <code class="code"><a data-manual="setl-lib" href="setl-lib.html#open">open</a></code> on a signal stream,
+see <a data-manual="setl-lib" href="setl-lib.html#signals">Signal streams</a> in <cite class="cite"><span class="r">the</span> GNU SETL Library Reference</cite>.
+</p>
+
+<hr>
+</div>
+<div class="section-level-extent" id="exit-status">
+<h3 class="section" id="Exit-status">Exit status</h3>
+<a class="index-entry-id" id="index-exit-status_002c-setl-command"></a>
+<p>The <code class="command">setl</code> command exits with a non-zero status in the event
+of an error.  Specifically, if the invocation of <code class="command">setlcpp</code>
+fails, <code class="command">setl</code> returns its (error) status.  Otherwise, if
+<code class="command">setltran</code> fails, <code class="command">setl</code> returns that status.
+(If the failure of <code class="command">setlcpp</code> or <code class="command">setltran</code> is
+due to termination by a signal, the status will be 128 plus the
+signal number, in mimicry of the standard shell convention.)
+Otherwise, if <code class="command">setl</code> itself encounters an unrecoverable
+error, it issues a diagnostic and returns 1.  But if a <code class="code">stop</code>
+statement is executed, <code class="command">setl</code> exits with the status given
+by the <code class="code">stop</code> argument.  That status defaults to 0, just as when
+the program flows through its last statement.
+</p>
+<p>Note that although <code class="code">stop</code> accepts any integer small enough to fit
+into a C <code class="code">int</code>, it is returned modulo 256 to the invoker of the
+<code class="command">setl</code> command.
+</p>
+<p>If you want your program&rsquo;s exit status to be that of the last
+subcommand it waited for, and mimic the shell in the case of abnormal
+termination by signal, you could use this little horror:
+</p>
+<div class="example">
+<pre class="example-preformatted">stop if status &gt;= 0 then status else 128 + abs status end;
+</pre></div>
+
+<p>Otherwise, if you only care that your exit status be zero or nonzero
+according as the last subcommand succeeded or failed, or you know that
+the last subcommand was actually being managed by an enclosing shell
+(the usual case, unless you begin the subcommand with the word
+<code class="code">exec</code>), or even if you just don&rsquo;t mind having the exit values
+associated with signal-triggered terminations a little weirdly mapped
+(the other exit codes will come through fine), you can generally get
+away with the much simpler
+</p>
+<div class="example">
+<pre class="example-preformatted">stop status;
+</pre></div>
+
+
+
+<hr>
+</div>
+</div>
+<div class="unnumbered-level-extent" id="setlcpp">
+<h2 class="unnumbered" id="The-setlcpp-command">The <code class="command">setlcpp</code> command</h2>
+<a class="index-entry-id" id="index-preprocessor-1"></a>
+
+<p>The <code class="command">setlcpp</code> command is a modification of <code class="command">cpp</code>, the
+GNU C PreProcessor.  The main extension to GNU CPP is the provision
+of a <samp class="option">-lang-setl</samp> option, which should normally be used when
+<code class="command">setlcpp</code> is applied to SETL programs.
+</p>
+<p>In the GNU SETL system, <code class="command">setlcpp</code> is usually run
+automatically by the <code class="command"><a class="ref" href="#setl">setl</a></code> command
+and seldom directly from the interactive command line.
+</p>
+
+
+<hr>
+<div class="section-level-extent" id="setlcpp-examples">
+<h3 class="section" id="Examples-1">Examples</h3>
+<a class="index-entry-id" id="index-examples_002c-setlcpp"></a>
+
+<p>This is the output of the command &lsquo;<samp class="samp">setlcpp&nbsp;<span class="w-nolinebreak-text">--help</span></samp>&rsquo;<!-- /@w -->:
+</p>
+<div class="example">
+<pre class="example-preformatted">
+
+GNU SETL programming language preprocessor
+
+Usage: setlcpp [OPTIONS] [INPUT [OUTPUT]]
+
+  --help, -h       display this help on stdout and exit
+  --version        display version info on stdout and exit
+  -lang-setl       SETL lexical environment; implies -$
+  CPP-OPTION       GNU CPP option
+
+If INPUT is &quot;-&quot; or is not specified, standard input is used.
+Otherwise, INPUT must name a readable file.  Similarly, OUTPUT
+must name a writable file, or be &quot;-&quot; for the default stdout.
+
+The &quot;SETL_INCLUDE_PATH&quot; environment variable, if -lang-setl is
+specified, extends the list of directories given by -I options.
+Directory names must be separated by a &quot;:&quot; character.
+
+Other environment variables are as for GNU CPP version 2.7.2.1.
+
+Note also the --[no]cpp option of the &quot;setl&quot; command.
+
+If the Texinfo documentation is installed, &quot;info setlcpp&quot; may work.
+PDF and HTML docs are usually under share/doc/setl/ somewhere.
+
+See setl.org for more documentation, source code, etc.
+
+Please report bugs to David.Bacon@nyu.edu.
+
+</pre></div>
+
+<p>Now suppose the file <samp class="file">main.setl</samp> contains
+</p>
+<div class="example">
+<pre class="example-preformatted">-- This is a comment at the top of main.setl.
+-- Let's now incorporate inc.setl:
+#include &quot;inc.setl&quot;
+print (corpor, version);
+</pre></div>
+
+<p>and the file <samp class="file">inc.setl</samp> contains
+</p>
+<div class="example">
+<pre class="example-preformatted">$ For nostalgic reasons, this is also a comment.
+#define corpor &quot;SETL, Inc.&quot;
+const version = __VERSION__;
+$ Here ends the included file.
+</pre></div>
+
+<p>Then the output of &lsquo;<samp class="samp">setlcpp&nbsp;<span class="w-nolinebreak-text">-C</span>&nbsp;<span class="w-nolinebreak-text">-lang-setl</span>&nbsp;main.setl</samp>&rsquo;<!-- /@w --> (which
+is how <code class="command">setl</code> invokes <code class="command">setlcpp</code>) is
+</p>
+<div class="example">
+<pre class="example-preformatted">-- This is a comment at the top of main.setl.
+-- Let's now incorporate inc.setl:
+$ For nostalgic reasons, this is also a comment.
+ 
+const version = &quot;2.7.2.1&quot;;
+$ Here ends the included file.
+ 
+print (&quot;SETL, Inc.&quot;, version);
+</pre></div>
+
+<p>Note that a SETL <code class="code">const</code> declaration may often serve as well as
+or better than a preprocessor <code class="code">#define</code>.  A preprocessor symbol,
+however, can be particularly useful for governing conditional source
+code inclusion via <code class="code">#if</code> or <code class="code">#ifdef</code>.  Macros that take
+arguments have their uses too, though the user should always be aware
+of the literal expansion of arguments so as to be on guard against
+side-effects that result from multiple evaluations of an expression.
+</p>
+
+<hr>
+</div>
+<div class="section-level-extent" id="setlcpp-details">
+<h3 class="section" id="The-setlcpp-command-and-arguments">The <code class="command">setlcpp</code> command and arguments</h3>
+
+<p>Here is the general form of the <code class="command">setlcpp</code> command:
+</p>
+<div class="example">
+<pre class="example-preformatted"><code class="command">setlcpp</code> [<var class="var">options</var>] [<var class="var">input</var> [<var class="var">output</var>]]
+</pre></div>
+
+<p>The <code class="code"><var class="var">options</var></code> include:
+</p>
+<dl class="table">
+<dd>
+<a class="anchor" id="setlcpp-_002d_002dhelp"></a></dd>
+<dt id='index-_002d_002dhelp-option-1'><span><samp class="option">--help</samp><a class="copiable-link" href='#index-_002d_002dhelp-option-1'> &para;</a></span></dt>
+<dt><samp class="option">-h</samp></dt>
+<dd><a class="index-entry-id" id="index-_002dh-option-1"></a>
+<a class="index-entry-id" id="index-help_002c-setlcpp"></a>
+<p>Spews a command summary on stdout, and exits successfully.
+</p>
+<a class="anchor" id="setlcpp-_002d_002dversion"></a></dd>
+<dt id='index-_002d_002dversion-option-1'><span><samp class="option">--version</samp><a class="copiable-link" href='#index-_002d_002dversion-option-1'> &para;</a></span></dt>
+<dd><a class="index-entry-id" id="index-version_002c-setlcpp"></a>
+<p>Spews <code class="command">setlcpp</code> version information on stdout, and exits
+successfully.
+</p>
+<a class="anchor" id="g_t_002dlang_002dsetl"></a></dd>
+<dt id='index-_002dlang_002dsetl-option'><span><samp class="option">-lang-setl</samp><a class="copiable-link" href='#index-_002dlang_002dsetl-option'> &para;</a></span></dt>
+<dd><p>Assumes that the input is a SETL program, so that its lexical
+peculiarities can be accommodated.  Otherwise,
+<samp class="option">-lang-c</samp>, which was once a standard <code class="command">cpp</code> option,
+will be assumed.
+</p>
+<p>The <samp class="option">-lang-setl</samp> option also makes <code class="command">setlcpp</code>
+recognize the <code class="env"><a class="ref" href="#SETL_005fINCLUDE_005fPATH">SETL_INCLUDE_PATH</a></code> environment variable.
+</p>
+<a class="anchor" id="cpp_002doption"></a></dd>
+<dt id='index-cpp-_0028GNU-C-Preprocessor_0029'><span><samp class="option"><var class="var">cpp-option</var></samp><a class="copiable-link" href='#index-cpp-_0028GNU-C-Preprocessor_0029'> &para;</a></span></dt>
+<dd><a class="index-entry-id" id="index-GNU-C-Preprocessor-_0028cpp_0029"></a>
+<p>Any other argument beginning with a hyphen (&lsquo;<samp class="samp">-</samp>&rsquo;) is interpreted
+as if by the GNU C Preprocessor (<code class="command">cpp</code>), except that there
+are no predefined default <em class="dfn">include</em> directories such as
+<samp class="file">/usr/include</samp>.
+</p>
+<a class="index-entry-id" id="index-Texinfo-1"></a>
+<p>As of this writing, <code class="command">setlcpp</code> is based on the version of
+<code class="command">cpp</code> corresponding to GCC 2.7.2.1.  That original is bundled
+with the GNU SETL source distribution, including its Texinfo
+(<samp class="file">cpp.texi</samp> and <samp class="file">cpp.info*</samp>) documentation.  For most
+purposes, however, you may find that the command &lsquo;<samp class="samp">info&nbsp;cpp</samp>&rsquo;<!-- /@w -->
+on your system or the on-line GNU CPP manual at
+<a class="uref" href="http://gcc.gnu.org/onlinedocs/">http://gcc.gnu.org/onlinedocs/</a>
+gives adequate if somewhat anachronistic information.
+Otherwise, to get the version-specific truth, unpack
+<samp class="file">cpp-2.7.2.1.tgz</samp> and in the resulting subdirectory do this:
+</p>
+<div class="example">
+<pre class="example-preformatted">info -f ./cpp.info
+</pre></div>
+
+</dd>
+</dl>
+
+<a class="index-entry-id" id="index-_002d-_0028stdin-or-stdout_002c-setlcpp_0029"></a>
+<p>If <code class="code"><var class="var">input</var></code> is a hyphen (<samp class="option">-</samp>) or is not specified,
+<code class="command">setlcpp</code> reads from standard input (stdin).
+</p>
+<p>The <code class="code"><var class="var">output</var></code> argument, which can only be present if
+<code class="code"><var class="var">input</var></code> is present, must name a writable file or be a
+hyphen representing standard output (stdout), the default.
+</p>
+<p>Note that <code class="command">setlcpp</code> is case-sensitive despite any
+<samp class="option">--keyword-case</samp> or <samp class="option">--identifier-case</samp> options that
+might have been passed to a parent <code class="command">setl</code> command.
+</p>
+<a class="index-entry-id" id="index-exit-status_002c-setlcpp-command"></a>
+<p>Like <code class="command">cpp</code>, the <code class="command">setlcpp</code> command returns 0 to the
+operating system on success, non-zero on failure.
+</p>
+
+<hr>
+</div>
+<div class="section-level-extent" id="setlcpp-envt-vars">
+<h3 class="section" id="Environment-variables-1">Environment variables</h3>
+<a class="index-entry-id" id="index-environment-variables_002c-setlcpp-command"></a>
+
+<dl class="table">
+<dd>
+<a class="anchor" id="SETL_005fINCLUDE_005fPATH"></a></dd>
+<dt id='index-SETL_005fINCLUDE_005fPATH-1'><span><code class="env">SETL_INCLUDE_PATH</code><a class="copiable-link" href='#index-SETL_005fINCLUDE_005fPATH-1'> &para;</a></span></dt>
+<dd><a class="index-entry-id" id="index-C_005fINCLUDE_005fPATH"></a>
+<a class="index-entry-id" id="index-_002dI-option-1"></a>
+<a class="index-entry-id" id="index-_002dlang_002dsetl-option-1"></a>
+<a class="index-entry-id" id="index-_002dnostdinc-option"></a>
+<p>If the <code class="command">setlcpp</code> <a class="ref" href="#g_t_002dlang_002dsetl"><samp class="option">-lang-setl</samp></a> option was given, then
+<code class="env">SETL_INCLUDE_PATH</code> extends the list of directories
+named in <samp class="option">-I</samp> options, much as <code class="env">C_INCLUDE_PATH</code>
+does in the <samp class="option">-lang-c</samp> case.  The standard <code class="command">cpp</code>
+option <samp class="option">-nostdinc</samp> will cause <code class="env">SETL_INCLUDE_PATH</code> to be
+ignored, however.
+</p>
+</dd>
+</dl>
+
+<p>For details on other environment variables, see the references
+cited under <a class="ref" href="#cpp_002doption"><samp class="option"><var class="var">cpp-option</var></samp></a>.
+</p>
+
+
+<hr>
+</div>
+</div>
+<div class="unnumbered-level-extent" id="setltran">
+<h2 class="unnumbered" id="The-setltran-command">The <code class="command">setltran</code> command</h2>
+<a class="index-entry-id" id="index-compiler-2"></a>
+<a class="index-entry-id" id="index-translator-2"></a>
+<a class="index-entry-id" id="index-SETL-virtual-machine-code-3"></a>
+
+<p>The <code class="command">setltran</code> command takes SETL programs
+and compiles them into a simple assembly-like language
+that the <code class="command"><a class="ref" href="#setl">setl</a></code> command can interpret as
+GNU SETL Virtual Machine code.
+</p>
+<p>In the GNU SETL system, <code class="command">setltran</code> is usually run
+automatically by the <code class="command"><a class="ref" href="#setl">setl</a></code> command
+and seldom directly.
+</p>
+
+
+<hr>
+<div class="section-level-extent" id="setltran-examples">
+<h3 class="section" id="Examples-2">Examples</h3>
+<a class="index-entry-id" id="index-examples_002c-setltran"></a>
+
+<p>This is the output of the command &lsquo;<samp class="samp">setltran&nbsp;<span class="w-nolinebreak-text">--help</span></samp>&rsquo;<!-- /@w -->:
+</p>
+<div class="example">
+<pre class="example-preformatted">
+
+GNU SETL programming language translator (compiler)
+
+Usage: setltran [OPTIONS] [FILENAME | - | STRING]
+
+  --help, -h      display this help on stdout and exit
+  --version       display version info on stdout and exit
+  --font-hints    emit source prettyprinting hints, period
+  --verbose, -v   otiose sucrose on stderr
+  --debug         trace parsing, etc. on stderr
+  --keyword-case=any|upper|lower   (&quot;stropping&quot; convention) -
+                   control SETL keyword recognition (default any)
+  --identifier-case=any|upper|lower|mixed   control recognition
+                   of user variable names (default any)
+
+The setltran command reads from standard input by default or if &quot;-&quot;
+is specified.  Otherwise, if FILENAME names a readable file, it reads
+from there.  Failing that, it reads directly from STRING.
+
+When the translator is invoked by a command like &quot;setl -c ...&quot;, the
+preprocessor (setlcpp) is applied first if necessary.
+
+If the Texinfo documentation is installed, &quot;info setltran&quot; may work.
+PDF and HTML docs are usually under share/doc/setl/ somewhere.
+
+See setl.org for more documentation, source code, etc.
+
+Please report bugs to David.Bacon@nyu.edu.
+
+</pre></div>
+
+<p>This is the output (on stdout) of the command
+&lsquo;<samp class="samp">setltran&nbsp;&quot;print(57);&quot;</samp>&rsquo;<!-- /@w -->, with tab stops every 8 columns
+(tabs separate opcodes and operands):
+</p>
+<div class="example">
+<pre class="example-preformatted"># This is code for the GNU SETL Virtual Machine.
+%SOURCE
+print(57);
+     1  print(57);
+%CODE
+#       print(57);
+     0          mainproc        U__MAIN
+     0          call    U__unnamed_SETL_program &gt;-
+     0          copy    &lt;I_0    &gt;STATUS
+     0          stop    &lt;STATUS
+     0          end     U__MAIN
+     0          proc    U__unnamed_SETL_program &gt;RET
+     6          scall   S_PRINT &lt;I_57   &gt;-
+     6          copy    &lt;I_0    &gt;STATUS
+     6          stop    &lt;STATUS
+     6          end     U__unnamed_SETL_program
+%EXECUTE
+</pre></div>
+
+<a class="index-entry-id" id="index-SETL-virtual-machine-code-4"></a>
+<p>For more information on GNU SETL Virtual Machine code,
+see the <cite class="cite"><a data-manual="setl-imp" href="setl-imp.html#Top">GNU SETL Implementation Notes</a></cite> [stub].
+</p>
+
+<hr>
+</div>
+<div class="section-level-extent" id="setltran-details">
+<h3 class="section" id="The-setltran-command-and-arguments">The <code class="command">setltran</code> command and arguments</h3>
+
+<p>Here is the general form of the <code class="command">setltran</code> command:
+</p>
+<div class="example">
+<pre class="example-preformatted"><code class="command">setltran</code> [<var class="var">options</var>] [<var class="var">input</var>]
+</pre></div>
+
+<p>The options include:
+</p>
+<dl class="table">
+<dd>
+<a class="anchor" id="setltran-_002d_002dhelp"></a></dd>
+<dt id='index-_002d_002dhelp-option-2'><span><samp class="option">--help</samp><a class="copiable-link" href='#index-_002d_002dhelp-option-2'> &para;</a></span></dt>
+<dt><samp class="option">-h</samp></dt>
+<dd><a class="index-entry-id" id="index-_002dh-option-2"></a>
+<a class="index-entry-id" id="index-help_002c-setltran"></a>
+<p>Spews a command summary on stdout, and exits successfully.
+</p>
+<a class="anchor" id="setltran-_002d_002dversion"></a></dd>
+<dt id='index-_002d_002dversion-option-2'><span><samp class="option">--version</samp><a class="copiable-link" href='#index-_002d_002dversion-option-2'> &para;</a></span></dt>
+<dd><a class="index-entry-id" id="index-version_002c-setltran"></a>
+<p>Spews <code class="command">setltran</code> version information on stdout, and exits
+successfully.
+</p>
+<a class="anchor" id="setltran-_002d_002dfont_002dhints"></a></dd>
+<dt id='index-_002d_002dfont_002dhints-option-1'><span><samp class="option">--font-hints</samp><a class="copiable-link" href='#index-_002d_002dfont_002dhints-option-1'> &para;</a></span></dt>
+<dd><a class="index-entry-id" id="index-font-hints-1"></a>
+<a class="index-entry-id" id="index-prettyprinting-hints-1"></a>
+<p>Spews prettyprinting hints corresponding to the source input.
+</p>
+<p>It is left as an exercise to the reader to simplify the
+<samp class="file">texinfo.setl</samp> program in the description of the
+<code class="command">setl</code> command&rsquo;s corresponding option
+(<a class="ref" href="#setl-_002d_002dfont_002dhints"><samp class="option">setl --font-hints</samp></a>).
+Hint:  by invoking <code class="command">setltran</code> as the subprocess instead of
+<code class="command">setl</code>, you can eliminate the offset variable, <code class="code"><var class="var">n</var></code>.
+For extra credit, state why.
+</p>
+<a class="anchor" id="setltran-_002d_002dverbose"></a></dd>
+<dt id='index-_002d_002dverbose-option-1'><span><samp class="option">--verbose</samp><a class="copiable-link" href='#index-_002d_002dverbose-option-1'> &para;</a></span></dt>
+<dt><samp class="option">-v</samp></dt>
+<dd><a class="index-entry-id" id="index-_002dv-option-1"></a>
+<a class="index-entry-id" id="index-verbose-mode-1"></a>
+<p>On stderr, reports each of the major phases of processing,
+such as lexical analysis, parsing, semantic analysis, etc.
+</p>
+<a class="anchor" id="setltran-_002d_002ddebug"></a></dd>
+<dt id='index-_002d_002ddebug-option-1'><span><samp class="option">--debug</samp><a class="copiable-link" href='#index-_002d_002ddebug-option-1'> &para;</a></span></dt>
+<dd><p>On stderr, traces the gory details of shift-reduce parsing
+and dumps some tables.  The author really prefers recursive descent
+parsers; <code class="command">setltran</code> is an aberration.
+</p>
+<p>This option also causes files <samp class="file">parse.tree</samp> and
+<samp class="file">flattened.tree</samp> to be created in the current working directory.
+</p>
+<a class="anchor" id="setltran-_002d_002dkeyword_002dcase"></a><a class="anchor" id="setltran-_002d_002didentifier_002dcase"></a></dd>
+<dt id='index-_002d_002dkeyword_002dcase-option-1'><span><samp class="option">--keyword-case=upper|lower|any</samp><a class="copiable-link" href='#index-_002d_002dkeyword_002dcase-option-1'> &para;</a></span></dt>
+<dt><samp class="option">--identifier-case=upper|lower|any|mixed</samp></dt>
+<dd><a class="index-entry-id" id="index-_002d_002didentifier_002dcase-option-1"></a>
+<a class="index-entry-id" id="index-recognizing-keywords_002c-identifiers"></a>
+<a class="index-entry-id" id="index-keyword-case_002c-recognizing"></a>
+<a class="index-entry-id" id="index-identifier-case_002c-recognizing"></a>
+<a class="index-entry-id" id="index-case_002c-keyword-and-identifier"></a>
+<a class="index-entry-id" id="index-lettercase-1"></a>
+<a class="index-entry-id" id="index-upper-case-option"></a>
+<a class="index-entry-id" id="index-lower-case-option"></a>
+<a class="index-entry-id" id="index-any-case-option"></a>
+<a class="index-entry-id" id="index-mixed-case-option"></a>
+<a class="index-entry-id" id="index-stropping-convention"></a>
+<a class="index-entry-id" id="index-Algol-68"></a>
+<p>By default, <code class="command">setltran</code> recognizes
+keywords and user-introduced identifiers case-insensitively,
+i.e., in <code class="code">any</code> lettercase.
+</p>
+<p>However, it can be useful to restrict the recognition for stylistic or
+maintenance reasons.
+</p>
+<p>For example, since new keywords sometimes enter the language, and
+&ldquo;customized&rdquo; implementations can add many more, one might adopt a
+convention of <code class="code">--keyword-case=upper</code> to ensure that only uppercase
+identifiers are recognized as keywords, no matter what new keywords
+might later be introduced.
+</p>
+<p>That happens to correspond to the ancient and venerable Algol 68
+<em class="dfn">upper</em> stropping convention.  <em class="dfn">Point</em> stropping, incidentally,
+was quite dreadful:  keywords had to be denoted by leading dots.
+Fortunately for Algol 68 programmers,
+there was also <em class="dfn">res</em> (standing for <em class="dfn">reserved word</em>) stropping,
+which imposed no restriction on the lettercase of keywords.
+That corresponds to the GNU SETL default.
+</p>
+<p>A combination of <code class="code">--keyword-case=lower</code> and
+<code class="code">--identifier-case=mixed</code>
+gives a case-sensitive convention resembling that of C/C++ and Java.
+</p>
+<p>The <code class="command">setl</code> command passes these lettercase options through
+to <code class="command">setltran</code>.
+</p>
+</dd>
+</dl>
+
+<a class="index-entry-id" id="index-_002d-_0028read-from-stdin_0029-1"></a>
+<p>The <code class="command">setltran</code> command takes up to one <code class="code"><var class="var">input</var></code>
+argument in addition to any options specified.  It must be the name of
+a readable file, or a single hyphen (<samp class="option">-</samp>) meaning standard input
+(the default), or a string containing an entire SETL program.
+</p>
+<a class="index-entry-id" id="index-exit-status_002c-setltran-command"></a>
+<p>Finally, <code class="command">setltran</code> exits with a code of 0 on success, or a
+higher number on failure.
+</p>
+
+
+
+<hr>
+</div>
+</div>
+<div class="unnumbered-level-extent" id="Index">
+<h2 class="unnumbered" id="Index-1">Index</h2>
+
+<div class="printindex cp-printindex">
+<table class="cp-letters-header-printindex"><tr><th>Jump to: &nbsp; </th><td><a class="summary-letter-printindex" href="#Index_cp_symbol-1"><b>#</b></a>
+ &nbsp; 
+<a class="summary-letter-printindex" href="#Index_cp_symbol-2"><b>-</b></a>
+ &nbsp; 
+<a class="summary-letter-printindex" href="#Index_cp_symbol-3"><b>/</b></a>
+ &nbsp; 
+<br>
+<a class="summary-letter-printindex" href="#Index_cp_letter-A"><b>A</b></a>
+ &nbsp; 
+<a class="summary-letter-printindex" href="#Index_cp_letter-C"><b>C</b></a>
+ &nbsp; 
+<a class="summary-letter-printindex" href="#Index_cp_letter-E"><b>E</b></a>
+ &nbsp; 
+<a class="summary-letter-printindex" href="#Index_cp_letter-F"><b>F</b></a>
+ &nbsp; 
+<a class="summary-letter-printindex" href="#Index_cp_letter-G"><b>G</b></a>
+ &nbsp; 
+<a class="summary-letter-printindex" href="#Index_cp_letter-H"><b>H</b></a>
+ &nbsp; 
+<a class="summary-letter-printindex" href="#Index_cp_letter-I"><b>I</b></a>
+ &nbsp; 
+<a class="summary-letter-printindex" href="#Index_cp_letter-K"><b>K</b></a>
+ &nbsp; 
+<a class="summary-letter-printindex" href="#Index_cp_letter-L"><b>L</b></a>
+ &nbsp; 
+<a class="summary-letter-printindex" href="#Index_cp_letter-M"><b>M</b></a>
+ &nbsp; 
+<a class="summary-letter-printindex" href="#Index_cp_letter-O"><b>O</b></a>
+ &nbsp; 
+<a class="summary-letter-printindex" href="#Index_cp_letter-P"><b>P</b></a>
+ &nbsp; 
+<a class="summary-letter-printindex" href="#Index_cp_letter-R"><b>R</b></a>
+ &nbsp; 
+<a class="summary-letter-printindex" href="#Index_cp_letter-S"><b>S</b></a>
+ &nbsp; 
+<a class="summary-letter-printindex" href="#Index_cp_letter-T"><b>T</b></a>
+ &nbsp; 
+<a class="summary-letter-printindex" href="#Index_cp_letter-U"><b>U</b></a>
+ &nbsp; 
+<a class="summary-letter-printindex" href="#Index_cp_letter-V"><b>V</b></a>
+ &nbsp; 
+</td></tr></table>
+<table class="cp-entries-printindex" border="0">
+<tr><td></td><th class="entries-header-printindex">Index Entry</th><td>&nbsp;</td><th class="sections-header-printindex"> Section</th></tr>
+<tr><td colspan="4"> <hr></td></tr>
+<tr><th id="Index_cp_symbol-1">#</th><td></td><td></td></tr>
+<tr><td></td><td class="printindex-index-entry"><a href="#index-_0023_0021-invocation"><code class="code">#!</code> invocation</a>:</td><td>&nbsp;</td><td class="printindex-index-section"><a href="#g_t_0023_0021-invocation">#! invocation</a></td></tr>
+<tr><td></td><td class="printindex-index-entry"><a href="#index-_0023define"><code class="code">#define</code></a>:</td><td>&nbsp;</td><td class="printindex-index-section"><a href="#details">details</a></td></tr>
+<tr><td></td><td class="printindex-index-entry"><a href="#index-_0023if_002c-_0023ifdef_002c-_0023ifndef"><code class="code">#if</code>, <code class="code">#ifdef</code>, <code class="code">#ifndef</code></a>:</td><td>&nbsp;</td><td class="printindex-index-section"><a href="#details">details</a></td></tr>
+<tr><td></td><td class="printindex-index-entry"><a href="#index-_0023include"><code class="code">#include</code></a>:</td><td>&nbsp;</td><td class="printindex-index-section"><a href="#details">details</a></td></tr>
+<tr><td></td><td class="printindex-index-entry"><a href="#index-_0023line-directive"><code class="code">#line</code> directive</a>:</td><td>&nbsp;</td><td class="printindex-index-section"><a href="#details">details</a></td></tr>
+<tr><td></td><td class="printindex-index-entry"><a href="#index-_0023line-directive-1"><code class="code">#line</code> directive</a>:</td><td>&nbsp;</td><td class="printindex-index-section"><a href="#g_t_0023_0021-invocation">#! invocation</a></td></tr>
+<tr><td></td><td class="printindex-index-entry"><a href="#index-_0023undef"><code class="code">#undef</code></a>:</td><td>&nbsp;</td><td class="printindex-index-section"><a href="#details">details</a></td></tr>
+<tr><td colspan="4"> <hr></td></tr>
+<tr><th id="Index_cp_symbol-2">-</th><td></td><td></td></tr>
+<tr><td></td><td class="printindex-index-entry"><a href="#index-_002d-_0028read-from-stdin_0029"><samp class="option">-</samp> (read from stdin)</a>:</td><td>&nbsp;</td><td class="printindex-index-section"><a href="#details">details</a></td></tr>
+<tr><td></td><td class="printindex-index-entry"><a href="#index-_002d-_0028read-from-stdin_0029-1"><samp class="option">-</samp> (read from stdin)</a>:</td><td>&nbsp;</td><td class="printindex-index-section"><a href="#setltran-details">setltran details</a></td></tr>
+<tr><td></td><td class="printindex-index-entry"><a href="#index-_002d-_0028stdin-or-stdout_002c-setlcpp_0029"><samp class="option">-</samp> (stdin or stdout, <code class="command">setlcpp</code>)</a>:</td><td>&nbsp;</td><td class="printindex-index-section"><a href="#setlcpp-details">setlcpp details</a></td></tr>
+<tr><td></td><td class="printindex-index-entry"><a href="#index-_002d_002dallow_002d_002e_002e_002e-options"><samp class="option">--allow-...</samp> options</a>:</td><td>&nbsp;</td><td class="printindex-index-section"><a href="#details">details</a></td></tr>
+<tr><td></td><td class="printindex-index-entry"><a href="#index-_002d_002dcompile-option"><samp class="option">--compile</samp> option</a>:</td><td>&nbsp;</td><td class="printindex-index-section"><a href="#details">details</a></td></tr>
+<tr><td></td><td class="printindex-index-entry"><a href="#index-_002d_002dcpp-option"><samp class="option">--cpp</samp> option</a>:</td><td>&nbsp;</td><td class="printindex-index-section"><a href="#details">details</a></td></tr>
+<tr><td></td><td class="printindex-index-entry"><a href="#index-_002d_002ddebug-option"><samp class="option">--debug</samp> option</a>:</td><td>&nbsp;</td><td class="printindex-index-section"><a href="#details">details</a></td></tr>
+<tr><td></td><td class="printindex-index-entry"><a href="#index-_002d_002ddebug-option-1"><samp class="option">--debug</samp> option</a>:</td><td>&nbsp;</td><td class="printindex-index-section"><a href="#setltran-details">setltran details</a></td></tr>
+<tr><td></td><td class="printindex-index-entry"><a href="#index-_002d_002dfont_002dhints-option"><samp class="option">--font-hints</samp> option</a>:</td><td>&nbsp;</td><td class="printindex-index-section"><a href="#details">details</a></td></tr>
+<tr><td></td><td class="printindex-index-entry"><a href="#index-_002d_002dfont_002dhints-option-1"><samp class="option">--font-hints</samp> option</a>:</td><td>&nbsp;</td><td class="printindex-index-section"><a href="#setltran-details">setltran details</a></td></tr>
+<tr><td></td><td class="printindex-index-entry"><a href="#index-_002d_002dhelp-option"><samp class="option">--help</samp> option</a>:</td><td>&nbsp;</td><td class="printindex-index-section"><a href="#details">details</a></td></tr>
+<tr><td></td><td class="printindex-index-entry"><a href="#index-_002d_002dhelp-option-1"><samp class="option">--help</samp> option</a>:</td><td>&nbsp;</td><td class="printindex-index-section"><a href="#setlcpp-details">setlcpp details</a></td></tr>
+<tr><td></td><td class="printindex-index-entry"><a href="#index-_002d_002dhelp-option-2"><samp class="option">--help</samp> option</a>:</td><td>&nbsp;</td><td class="printindex-index-section"><a href="#setltran-details">setltran details</a></td></tr>
+<tr><td></td><td class="printindex-index-entry"><a href="#index-_002d_002didentifier_002dcase-option"><samp class="option">--identifier-case</samp> option</a>:</td><td>&nbsp;</td><td class="printindex-index-section"><a href="#details">details</a></td></tr>
+<tr><td></td><td class="printindex-index-entry"><a href="#index-_002d_002didentifier_002dcase-option-1"><samp class="option">--identifier-case</samp> option</a>:</td><td>&nbsp;</td><td class="printindex-index-section"><a href="#setltran-details">setltran details</a></td></tr>
+<tr><td></td><td class="printindex-index-entry"><a href="#index-_002d_002dkeyword_002dcase-option"><samp class="option">--keyword-case</samp> option</a>:</td><td>&nbsp;</td><td class="printindex-index-section"><a href="#details">details</a></td></tr>
+<tr><td></td><td class="printindex-index-entry"><a href="#index-_002d_002dkeyword_002dcase-option-1"><samp class="option">--keyword-case</samp> option</a>:</td><td>&nbsp;</td><td class="printindex-index-section"><a href="#setltran-details">setltran details</a></td></tr>
+<tr><td></td><td class="printindex-index-entry"><a href="#index-_002d_002dmaxmem-option"><samp class="option">--maxmem</samp> option</a>:</td><td>&nbsp;</td><td class="printindex-index-section"><a href="#details">details</a></td></tr>
+<tr><td></td><td class="printindex-index-entry"><a href="#index-_002d_002dnocpp-option"><samp class="option">--nocpp</samp> option</a>:</td><td>&nbsp;</td><td class="printindex-index-section"><a href="#details">details</a></td></tr>
+<tr><td></td><td class="printindex-index-entry"><a href="#index-_002d_002drestricted-option"><samp class="option">--restricted</samp> option</a>:</td><td>&nbsp;</td><td class="printindex-index-section"><a href="#details">details</a></td></tr>
+<tr><td></td><td class="printindex-index-entry"><a href="#index-_002d_002dsetlcpp-option"><samp class="option">--setlcpp</samp> option</a>:</td><td>&nbsp;</td><td class="printindex-index-section"><a href="#details">details</a></td></tr>
+<tr><td></td><td class="printindex-index-entry"><a href="#index-_002d_002dsetltran-option"><samp class="option">--setltran</samp> option</a>:</td><td>&nbsp;</td><td class="printindex-index-section"><a href="#details">details</a></td></tr>
+<tr><td></td><td class="printindex-index-entry"><a href="#index-_002d_002dtranslated-option"><samp class="option">--translated</samp> option</a>:</td><td>&nbsp;</td><td class="printindex-index-section"><a href="#details">details</a></td></tr>
+<tr><td></td><td class="printindex-index-entry"><a href="#index-_002d_002dverbose-option"><samp class="option">--verbose</samp> option</a>:</td><td>&nbsp;</td><td class="printindex-index-section"><a href="#details">details</a></td></tr>
+<tr><td></td><td class="printindex-index-entry"><a href="#index-_002d_002dverbose-option-1"><samp class="option">--verbose</samp> option</a>:</td><td>&nbsp;</td><td class="printindex-index-section"><a href="#setltran-details">setltran details</a></td></tr>
+<tr><td></td><td class="printindex-index-entry"><a href="#index-_002d_002dversion-option"><samp class="option">--version</samp> option</a>:</td><td>&nbsp;</td><td class="printindex-index-section"><a href="#details">details</a></td></tr>
+<tr><td></td><td class="printindex-index-entry"><a href="#index-_002d_002dversion-option-1"><samp class="option">--version</samp> option</a>:</td><td>&nbsp;</td><td class="printindex-index-section"><a href="#setlcpp-details">setlcpp details</a></td></tr>
+<tr><td></td><td class="printindex-index-entry"><a href="#index-_002d_002dversion-option-2"><samp class="option">--version</samp> option</a>:</td><td>&nbsp;</td><td class="printindex-index-section"><a href="#setltran-details">setltran details</a></td></tr>
+<tr><td></td><td class="printindex-index-entry"><a href="#index-_002dc-option"><samp class="option">-c</samp> option</a>:</td><td>&nbsp;</td><td class="printindex-index-section"><a href="#details">details</a></td></tr>
+<tr><td></td><td class="printindex-index-entry"><a href="#index-_002dD-option"><samp class="option">-D</samp> option</a>:</td><td>&nbsp;</td><td class="printindex-index-section"><a href="#details">details</a></td></tr>
+<tr><td></td><td class="printindex-index-entry"><a href="#index-_002dh-option"><samp class="option">-h</samp> option</a>:</td><td>&nbsp;</td><td class="printindex-index-section"><a href="#details">details</a></td></tr>
+<tr><td></td><td class="printindex-index-entry"><a href="#index-_002dh-option-1"><samp class="option">-h</samp> option</a>:</td><td>&nbsp;</td><td class="printindex-index-section"><a href="#setlcpp-details">setlcpp details</a></td></tr>
+<tr><td></td><td class="printindex-index-entry"><a href="#index-_002dh-option-2"><samp class="option">-h</samp> option</a>:</td><td>&nbsp;</td><td class="printindex-index-section"><a href="#setltran-details">setltran details</a></td></tr>
+<tr><td></td><td class="printindex-index-entry"><a href="#index-_002dI-option"><samp class="option">-I</samp> option</a>:</td><td>&nbsp;</td><td class="printindex-index-section"><a href="#details">details</a></td></tr>
+<tr><td></td><td class="printindex-index-entry"><a href="#index-_002dI-option-1"><samp class="option">-I</samp> option</a>:</td><td>&nbsp;</td><td class="printindex-index-section"><a href="#setlcpp-envt-vars">setlcpp envt vars</a></td></tr>
+<tr><td></td><td class="printindex-index-entry"><a href="#index-_002dlang_002dsetl-option"><samp class="option">-lang-setl</samp> option</a>:</td><td>&nbsp;</td><td class="printindex-index-section"><a href="#setlcpp-details">setlcpp details</a></td></tr>
+<tr><td></td><td class="printindex-index-entry"><a href="#index-_002dlang_002dsetl-option-1"><samp class="option">-lang-setl</samp> option</a>:</td><td>&nbsp;</td><td class="printindex-index-section"><a href="#setlcpp-envt-vars">setlcpp envt vars</a></td></tr>
+<tr><td></td><td class="printindex-index-entry"><a href="#index-_002dnostdinc-option"><samp class="option">-nostdinc</samp> option</a>:</td><td>&nbsp;</td><td class="printindex-index-section"><a href="#setlcpp-envt-vars">setlcpp envt vars</a></td></tr>
+<tr><td></td><td class="printindex-index-entry"><a href="#index-_002dr-option"><samp class="option">-r</samp> option</a>:</td><td>&nbsp;</td><td class="printindex-index-section"><a href="#details">details</a></td></tr>
+<tr><td></td><td class="printindex-index-entry"><a href="#index-_002dt-option"><samp class="option">-t</samp> option</a>:</td><td>&nbsp;</td><td class="printindex-index-section"><a href="#details">details</a></td></tr>
+<tr><td></td><td class="printindex-index-entry"><a href="#index-_002dU-option"><samp class="option">-U</samp> option</a>:</td><td>&nbsp;</td><td class="printindex-index-section"><a href="#details">details</a></td></tr>
+<tr><td></td><td class="printindex-index-entry"><a href="#index-_002dv-option"><samp class="option">-v</samp> option</a>:</td><td>&nbsp;</td><td class="printindex-index-section"><a href="#details">details</a></td></tr>
+<tr><td></td><td class="printindex-index-entry"><a href="#index-_002dv-option-1"><samp class="option">-v</samp> option</a>:</td><td>&nbsp;</td><td class="printindex-index-section"><a href="#setltran-details">setltran details</a></td></tr>
+<tr><td colspan="4"> <hr></td></tr>
+<tr><th id="Index_cp_symbol-3">/</th><td></td><td></td></tr>
+<tr><td></td><td class="printindex-index-entry"><a href="#index-_002fbin_002fbash"><code class="command">/bin/bash</code></a>:</td><td>&nbsp;</td><td class="printindex-index-section"><a href="#g_t_0023_0021-invocation">#! invocation</a></td></tr>
+<tr><td></td><td class="printindex-index-entry"><a href="#index-_002fbin_002fsh"><code class="command">/bin/sh</code></a>:</td><td>&nbsp;</td><td class="printindex-index-section"><a href="#g_t_0023_0021-invocation">#! invocation</a></td></tr>
+<tr><td colspan="4"> <hr></td></tr>
+<tr><th id="Index_cp_letter-A">A</th><td></td><td></td></tr>
+<tr><td></td><td class="printindex-index-entry"><a href="#index-Algol-68">Algol 68</a>:</td><td>&nbsp;</td><td class="printindex-index-section"><a href="#setltran-details">setltran details</a></td></tr>
+<tr><td></td><td class="printindex-index-entry"><a href="#index-any-case-option"><samp class="option">any</samp> case option</a>:</td><td>&nbsp;</td><td class="printindex-index-section"><a href="#setltran-details">setltran details</a></td></tr>
+<tr><td colspan="4"> <hr></td></tr>
+<tr><th id="Index_cp_letter-C">C</th><td></td><td></td></tr>
+<tr><td></td><td class="printindex-index-entry"><a href="#index-case_002c-keyword-and-identifier">case, keyword and identifier</a>:</td><td>&nbsp;</td><td class="printindex-index-section"><a href="#setltran-details">setltran details</a></td></tr>
+<tr><td></td><td class="printindex-index-entry"><a href="#index-client-programs_002c-access-to-resources">client programs, access to resources</a>:</td><td>&nbsp;</td><td class="printindex-index-section"><a href="#details">details</a></td></tr>
+<tr><td></td><td class="printindex-index-entry"><a href="#index-client-programs_002c-untrusted_002c-restricted-mode">client programs, untrusted, restricted mode</a>:</td><td>&nbsp;</td><td class="printindex-index-section"><a href="#details">details</a></td></tr>
+<tr><td></td><td class="printindex-index-entry"><a href="#index-command_002c-reading-program-from-output-of">command, reading program from output of</a>:</td><td>&nbsp;</td><td class="printindex-index-section"><a href="#details">details</a></td></tr>
+<tr><td></td><td class="printindex-index-entry"><a href="#index-command_002dline-argument_002c-reading-program-from">command-line argument, reading program from</a>:</td><td>&nbsp;</td><td class="printindex-index-section"><a href="#details">details</a></td></tr>
+<tr><td></td><td class="printindex-index-entry"><a href="#index-command_005fname_002c-command_005fline"><code class="code">command_name</code>, <code class="code">command_line</code></a>:</td><td>&nbsp;</td><td class="printindex-index-section"><a href="#g_t_0023_0021-invocation">#! invocation</a></td></tr>
+<tr><td></td><td class="printindex-index-entry"><a href="#index-compile_002donly-mode">compile-only mode</a>:</td><td>&nbsp;</td><td class="printindex-index-section"><a href="#details">details</a></td></tr>
+<tr><td></td><td class="printindex-index-entry"><a href="#index-compiler">compiler</a>:</td><td>&nbsp;</td><td class="printindex-index-section"><a href="#details">details</a></td></tr>
+<tr><td></td><td class="printindex-index-entry"><a href="#index-compiler-1">compiler</a>:</td><td>&nbsp;</td><td class="printindex-index-section"><a href="#details">details</a></td></tr>
+<tr><td></td><td class="printindex-index-entry"><a href="#index-compiler-2">compiler</a>:</td><td>&nbsp;</td><td class="printindex-index-section"><a href="#setltran">setltran</a></td></tr>
+<tr><td></td><td class="printindex-index-entry"><a href="#index-cpp-_0028GNU-C-Preprocessor_0029"><code class="command">cpp</code> (GNU C Preprocessor)</a>:</td><td>&nbsp;</td><td class="printindex-index-section"><a href="#setlcpp-details">setlcpp details</a></td></tr>
+<tr><td></td><td class="printindex-index-entry"><a href="#index-C_005fINCLUDE_005fPATH"><code class="env">C_INCLUDE_PATH</code></a>:</td><td>&nbsp;</td><td class="printindex-index-section"><a href="#setlcpp-envt-vars">setlcpp envt vars</a></td></tr>
+<tr><td colspan="4"> <hr></td></tr>
+<tr><th id="Index_cp_letter-E">E</th><td></td><td></td></tr>
+<tr><td></td><td class="printindex-index-entry"><a href="#index-environment-variables_002c-setl-command">environment variables, <code class="command">setl</code> command</a>:</td><td>&nbsp;</td><td class="printindex-index-section"><a href="#envt-vars">envt vars</a></td></tr>
+<tr><td></td><td class="printindex-index-entry"><a href="#index-environment-variables_002c-setlcpp-command">environment variables, <code class="command">setlcpp</code> command</a>:</td><td>&nbsp;</td><td class="printindex-index-section"><a href="#setlcpp-envt-vars">setlcpp envt vars</a></td></tr>
+<tr><td></td><td class="printindex-index-entry"><a href="#index-examples_002c-setl">examples, <code class="command">setl</code></a>:</td><td>&nbsp;</td><td class="printindex-index-section"><a href="#examples">examples</a></td></tr>
+<tr><td></td><td class="printindex-index-entry"><a href="#index-examples_002c-setlcpp">examples, <code class="command">setlcpp</code></a>:</td><td>&nbsp;</td><td class="printindex-index-section"><a href="#setlcpp-examples">setlcpp examples</a></td></tr>
+<tr><td></td><td class="printindex-index-entry"><a href="#index-examples_002c-setltran">examples, <code class="command">setltran</code></a>:</td><td>&nbsp;</td><td class="printindex-index-section"><a href="#setltran-examples">setltran examples</a></td></tr>
+<tr><td></td><td class="printindex-index-entry"><a href="#index-executables_002c-search-path-for">executables, search path for</a>:</td><td>&nbsp;</td><td class="printindex-index-section"><a href="#envt-vars">envt vars</a></td></tr>
+<tr><td></td><td class="printindex-index-entry"><a href="#index-exit-status_002c-setl-command">exit status, <code class="command">setl</code> command</a>:</td><td>&nbsp;</td><td class="printindex-index-section"><a href="#exit-status">exit status</a></td></tr>
+<tr><td></td><td class="printindex-index-entry"><a href="#index-exit-status_002c-setlcpp-command">exit status, <code class="command">setlcpp</code> command</a>:</td><td>&nbsp;</td><td class="printindex-index-section"><a href="#setlcpp-details">setlcpp details</a></td></tr>
+<tr><td></td><td class="printindex-index-entry"><a href="#index-exit-status_002c-setltran-command">exit status, <code class="command">setltran</code> command</a>:</td><td>&nbsp;</td><td class="printindex-index-section"><a href="#setltran-details">setltran details</a></td></tr>
+<tr><td colspan="4"> <hr></td></tr>
+<tr><th id="Index_cp_letter-F">F</th><td></td><td></td></tr>
+<tr><td></td><td class="printindex-index-entry"><a href="#index-file-descriptor_002c-reading-program-from">file descriptor, reading program from</a>:</td><td>&nbsp;</td><td class="printindex-index-section"><a href="#details">details</a></td></tr>
+<tr><td></td><td class="printindex-index-entry"><a href="#index-file_002c-reading-program-from">file, reading program from</a>:</td><td>&nbsp;</td><td class="printindex-index-section"><a href="#details">details</a></td></tr>
+<tr><td></td><td class="printindex-index-entry"><a href="#index-filter_002c-selectively-allowing"><code class="code">filter</code>, selectively allowing</a>:</td><td>&nbsp;</td><td class="printindex-index-section"><a href="#details">details</a></td></tr>
+<tr><td></td><td class="printindex-index-entry"><a href="#index-font-hints">font hints</a>:</td><td>&nbsp;</td><td class="printindex-index-section"><a href="#details">details</a></td></tr>
+<tr><td></td><td class="printindex-index-entry"><a href="#index-font-hints-1">font hints</a>:</td><td>&nbsp;</td><td class="printindex-index-section"><a href="#setltran-details">setltran details</a></td></tr>
+<tr><td colspan="4"> <hr></td></tr>
+<tr><th id="Index_cp_letter-G">G</th><td></td><td></td></tr>
+<tr><td></td><td class="printindex-index-entry"><a href="#index-GNU-C-Preprocessor-_0028cpp_0029">GNU C Preprocessor (<code class="command">cpp</code>)</a>:</td><td>&nbsp;</td><td class="printindex-index-section"><a href="#setlcpp-details">setlcpp details</a></td></tr>
+<tr><td colspan="4"> <hr></td></tr>
+<tr><th id="Index_cp_letter-H">H</th><td></td><td></td></tr>
+<tr><td></td><td class="printindex-index-entry"><a href="#index-hashbang-_0028_0023_0021_0029">hashbang (<code class="code">#!</code>)</a>:</td><td>&nbsp;</td><td class="printindex-index-section"><a href="#g_t_0023_0021-invocation">#! invocation</a></td></tr>
+<tr><td></td><td class="printindex-index-entry"><a href="#index-help_002c-setl">help, <code class="command">setl</code></a>:</td><td>&nbsp;</td><td class="printindex-index-section"><a href="#details">details</a></td></tr>
+<tr><td></td><td class="printindex-index-entry"><a href="#index-help_002c-setlcpp">help, <code class="command">setlcpp</code></a>:</td><td>&nbsp;</td><td class="printindex-index-section"><a href="#setlcpp-details">setlcpp details</a></td></tr>
+<tr><td></td><td class="printindex-index-entry"><a href="#index-help_002c-setltran">help, <code class="command">setltran</code></a>:</td><td>&nbsp;</td><td class="printindex-index-section"><a href="#setltran-details">setltran details</a></td></tr>
+<tr><td></td><td class="printindex-index-entry"><a href="#index-hints_002c-font">hints, font</a>:</td><td>&nbsp;</td><td class="printindex-index-section"><a href="#details">details</a></td></tr>
+<tr><td></td><td class="printindex-index-entry"><a href="#index-HOME-environment-variable"><code class="env">HOME</code> environment variable</a>:</td><td>&nbsp;</td><td class="printindex-index-section"><a href="#envt-vars">envt vars</a></td></tr>
+<tr><td colspan="4"> <hr></td></tr>
+<tr><th id="Index_cp_letter-I">I</th><td></td><td></td></tr>
+<tr><td></td><td class="printindex-index-entry"><a href="#index-identifier-case_002c-recognizing">identifier case, recognizing</a>:</td><td>&nbsp;</td><td class="printindex-index-section"><a href="#setltran-details">setltran details</a></td></tr>
+<tr><td colspan="4"> <hr></td></tr>
+<tr><th id="Index_cp_letter-K">K</th><td></td><td></td></tr>
+<tr><td></td><td class="printindex-index-entry"><a href="#index-keyword-case_002c-recognizing">keyword case, recognizing</a>:</td><td>&nbsp;</td><td class="printindex-index-section"><a href="#setltran-details">setltran details</a></td></tr>
+<tr><td colspan="4"> <hr></td></tr>
+<tr><th id="Index_cp_letter-L">L</th><td></td><td></td></tr>
+<tr><td></td><td class="printindex-index-entry"><a href="#index-lettercase">lettercase</a>:</td><td>&nbsp;</td><td class="printindex-index-section"><a href="#details">details</a></td></tr>
+<tr><td></td><td class="printindex-index-entry"><a href="#index-lettercase-1">lettercase</a>:</td><td>&nbsp;</td><td class="printindex-index-section"><a href="#setltran-details">setltran details</a></td></tr>
+<tr><td></td><td class="printindex-index-entry"><a href="#index-limit_002c-memory">limit, memory</a>:</td><td>&nbsp;</td><td class="printindex-index-section"><a href="#details">details</a></td></tr>
+<tr><td></td><td class="printindex-index-entry"><a href="#index-lower-case-option"><samp class="option">lower</samp> case option</a>:</td><td>&nbsp;</td><td class="printindex-index-section"><a href="#setltran-details">setltran details</a></td></tr>
+<tr><td colspan="4"> <hr></td></tr>
+<tr><th id="Index_cp_letter-M">M</th><td></td><td></td></tr>
+<tr><td></td><td class="printindex-index-entry"><a href="#index-macro">macro</a>:</td><td>&nbsp;</td><td class="printindex-index-section"><a href="#details">details</a></td></tr>
+<tr><td></td><td class="printindex-index-entry"><a href="#index-memory-limit">memory limit</a>:</td><td>&nbsp;</td><td class="printindex-index-section"><a href="#details">details</a></td></tr>
+<tr><td></td><td class="printindex-index-entry"><a href="#index-mixed-case-option"><samp class="option">mixed</samp> case option</a>:</td><td>&nbsp;</td><td class="printindex-index-section"><a href="#setltran-details">setltran details</a></td></tr>
+<tr><td></td><td class="printindex-index-entry"><a href="#index-mkstemp_002c-selectively-allowing"><code class="code">mkstemp</code>, selectively allowing</a>:</td><td>&nbsp;</td><td class="printindex-index-section"><a href="#details">details</a></td></tr>
+<tr><td colspan="4"> <hr></td></tr>
+<tr><th id="Index_cp_letter-O">O</th><td></td><td></td></tr>
+<tr><td></td><td class="printindex-index-entry"><a href="#index-open_002c-selectively-allowing"><code class="code">open</code>, selectively allowing</a>:</td><td>&nbsp;</td><td class="printindex-index-section"><a href="#details">details</a></td></tr>
+<tr><td colspan="4"> <hr></td></tr>
+<tr><th id="Index_cp_letter-P">P</th><td></td><td></td></tr>
+<tr><td></td><td class="printindex-index-entry"><a href="#index-PATH-environment-variable"><code class="env">PATH</code> environment variable</a>:</td><td>&nbsp;</td><td class="printindex-index-section"><a href="#envt-vars">envt vars</a></td></tr>
+<tr><td></td><td class="printindex-index-entry"><a href="#index-preprocessor">preprocessor</a>:</td><td>&nbsp;</td><td class="printindex-index-section"><a href="#details">details</a></td></tr>
+<tr><td></td><td class="printindex-index-entry"><a href="#index-preprocessor-1">preprocessor</a>:</td><td>&nbsp;</td><td class="printindex-index-section"><a href="#setlcpp">setlcpp</a></td></tr>
+<tr><td></td><td class="printindex-index-entry"><a href="#index-preprocessor-command">preprocessor command</a>:</td><td>&nbsp;</td><td class="printindex-index-section"><a href="#details">details</a></td></tr>
+<tr><td></td><td class="printindex-index-entry"><a href="#index-prettyprinting-hints">prettyprinting hints</a>:</td><td>&nbsp;</td><td class="printindex-index-section"><a href="#details">details</a></td></tr>
+<tr><td></td><td class="printindex-index-entry"><a href="#index-prettyprinting-hints-1">prettyprinting hints</a>:</td><td>&nbsp;</td><td class="printindex-index-section"><a href="#setltran-details">setltran details</a></td></tr>
+<tr><td colspan="4"> <hr></td></tr>
+<tr><th id="Index_cp_letter-R">R</th><td></td><td></td></tr>
+<tr><td></td><td class="printindex-index-entry"><a href="#index-reading-program-from-command-output">reading program from command output</a>:</td><td>&nbsp;</td><td class="printindex-index-section"><a href="#details">details</a></td></tr>
+<tr><td></td><td class="printindex-index-entry"><a href="#index-reading-program-from-command_002dline-argument">reading program from command-line argument</a>:</td><td>&nbsp;</td><td class="printindex-index-section"><a href="#details">details</a></td></tr>
+<tr><td></td><td class="printindex-index-entry"><a href="#index-reading-program-from-file">reading program from file</a>:</td><td>&nbsp;</td><td class="printindex-index-section"><a href="#details">details</a></td></tr>
+<tr><td></td><td class="printindex-index-entry"><a href="#index-reading-program-from-file-descriptor">reading program from file descriptor</a>:</td><td>&nbsp;</td><td class="printindex-index-section"><a href="#details">details</a></td></tr>
+<tr><td></td><td class="printindex-index-entry"><a href="#index-reading-program-from-stdin">reading program from stdin</a>:</td><td>&nbsp;</td><td class="printindex-index-section"><a href="#details">details</a></td></tr>
+<tr><td></td><td class="printindex-index-entry"><a href="#index-reading-program-from-string">reading program from string</a>:</td><td>&nbsp;</td><td class="printindex-index-section"><a href="#details">details</a></td></tr>
+<tr><td></td><td class="printindex-index-entry"><a href="#index-recognizing-keywords_002c-identifiers">recognizing keywords, identifiers</a>:</td><td>&nbsp;</td><td class="printindex-index-section"><a href="#setltran-details">setltran details</a></td></tr>
+<tr><td></td><td class="printindex-index-entry"><a href="#index-restricted-mode">restricted mode</a>:</td><td>&nbsp;</td><td class="printindex-index-section"><a href="#details">details</a></td></tr>
+<tr><td></td><td class="printindex-index-entry"><a href="#index-run_002donly-mode">run-only mode</a>:</td><td>&nbsp;</td><td class="printindex-index-section"><a href="#details">details</a></td></tr>
+<tr><td colspan="4"> <hr></td></tr>
+<tr><th id="Index_cp_letter-S">S</th><td></td><td></td></tr>
+<tr><td></td><td class="printindex-index-entry"><a href="#index-search-path-for-executables">search path for executables</a>:</td><td>&nbsp;</td><td class="printindex-index-section"><a href="#envt-vars">envt vars</a></td></tr>
+<tr><td></td><td class="printindex-index-entry"><a href="#index-security_002c-allowing-selective-access-to-resources">security, allowing selective access to resources</a>:</td><td>&nbsp;</td><td class="printindex-index-section"><a href="#details">details</a></td></tr>
+<tr><td></td><td class="printindex-index-entry"><a href="#index-security_002c-restricted-mode">security, restricted mode</a>:</td><td>&nbsp;</td><td class="printindex-index-section"><a href="#details">details</a></td></tr>
+<tr><td></td><td class="printindex-index-entry"><a href="#index-SETL-script">SETL script</a>:</td><td>&nbsp;</td><td class="printindex-index-section"><a href="#g_t_0023_0021-invocation">#! invocation</a></td></tr>
+<tr><td></td><td class="printindex-index-entry"><a href="#index-SETL-virtual-machine">SETL virtual machine</a>:</td><td>&nbsp;</td><td class="printindex-index-section"><a href="#details">details</a></td></tr>
+<tr><td></td><td class="printindex-index-entry"><a href="#index-SETL-virtual-machine-1">SETL virtual machine</a>:</td><td>&nbsp;</td><td class="printindex-index-section"><a href="#details">details</a></td></tr>
+<tr><td></td><td class="printindex-index-entry"><a href="#index-SETL-virtual-machine-2">SETL virtual machine</a>:</td><td>&nbsp;</td><td class="printindex-index-section"><a href="#details">details</a></td></tr>
+<tr><td></td><td class="printindex-index-entry"><a href="#index-SETL-virtual-machine-code">SETL virtual machine code</a>:</td><td>&nbsp;</td><td class="printindex-index-section"><a href="#setl">setl</a></td></tr>
+<tr><td></td><td class="printindex-index-entry"><a href="#index-SETL-virtual-machine-code-1">SETL virtual machine code</a>:</td><td>&nbsp;</td><td class="printindex-index-section"><a href="#details">details</a></td></tr>
+<tr><td></td><td class="printindex-index-entry"><a href="#index-SETL-virtual-machine-code-2">SETL virtual machine code</a>:</td><td>&nbsp;</td><td class="printindex-index-section"><a href="#details">details</a></td></tr>
+<tr><td></td><td class="printindex-index-entry"><a href="#index-SETL-virtual-machine-code-3">SETL virtual machine code</a>:</td><td>&nbsp;</td><td class="printindex-index-section"><a href="#setltran">setltran</a></td></tr>
+<tr><td></td><td class="printindex-index-entry"><a href="#index-SETL-virtual-machine-code-4">SETL virtual machine code</a>:</td><td>&nbsp;</td><td class="printindex-index-section"><a href="#setltran-examples">setltran examples</a></td></tr>
+<tr><td></td><td class="printindex-index-entry"><a href="#index-SETL_005fINCLUDE_005fPATH"><code class="env">SETL_INCLUDE_PATH</code></a>:</td><td>&nbsp;</td><td class="printindex-index-section"><a href="#details">details</a></td></tr>
+<tr><td></td><td class="printindex-index-entry"><a href="#index-SETL_005fINCLUDE_005fPATH-1"><code class="env">SETL_INCLUDE_PATH</code></a>:</td><td>&nbsp;</td><td class="printindex-index-section"><a href="#setlcpp-envt-vars">setlcpp envt vars</a></td></tr>
+<tr><td></td><td class="printindex-index-entry"><a href="#index-SETL_005fLINEBUF_005fSTDERR-environment-variable"><code class="env">SETL_LINEBUF_STDERR</code> environment variable</a>:</td><td>&nbsp;</td><td class="printindex-index-section"><a href="#envt-vars">envt vars</a></td></tr>
+<tr><td></td><td class="printindex-index-entry"><a href="#index-shell-script_002c-embedding-SETL-programs-in">shell script, embedding SETL programs in</a>:</td><td>&nbsp;</td><td class="printindex-index-section"><a href="#g_t_0023_0021-invocation">#! invocation</a></td></tr>
+<tr><td></td><td class="printindex-index-entry"><a href="#index-signals_002c-setl-command">signals, <code class="command">setl</code> command</a>:</td><td>&nbsp;</td><td class="printindex-index-section"><a href="#signals">signals</a></td></tr>
+<tr><td></td><td class="printindex-index-entry"><a href="#index-stdin_002c-reading-program-from">stdin, reading program from</a>:</td><td>&nbsp;</td><td class="printindex-index-section"><a href="#details">details</a></td></tr>
+<tr><td></td><td class="printindex-index-entry"><a href="#index-string_002c-reading-program-from">string, reading program from</a>:</td><td>&nbsp;</td><td class="printindex-index-section"><a href="#details">details</a></td></tr>
+<tr><td></td><td class="printindex-index-entry"><a href="#index-stropping-convention">stropping convention</a>:</td><td>&nbsp;</td><td class="printindex-index-section"><a href="#setltran-details">setltran details</a></td></tr>
+<tr><td></td><td class="printindex-index-entry"><a href="#index-system_002c-selectively-allowing"><code class="code">system</code>, selectively allowing</a>:</td><td>&nbsp;</td><td class="printindex-index-section"><a href="#details">details</a></td></tr>
+<tr><td colspan="4"> <hr></td></tr>
+<tr><th id="Index_cp_letter-T">T</th><td></td><td></td></tr>
+<tr><td></td><td class="printindex-index-entry"><a href="#index-Texinfo">Texinfo</a>:</td><td>&nbsp;</td><td class="printindex-index-section"><a href="#details">details</a></td></tr>
+<tr><td></td><td class="printindex-index-entry"><a href="#index-Texinfo-1">Texinfo</a>:</td><td>&nbsp;</td><td class="printindex-index-section"><a href="#setlcpp-details">setlcpp details</a></td></tr>
+<tr><td></td><td class="printindex-index-entry"><a href="#index-translator">translator</a>:</td><td>&nbsp;</td><td class="printindex-index-section"><a href="#details">details</a></td></tr>
+<tr><td></td><td class="printindex-index-entry"><a href="#index-translator-1">translator</a>:</td><td>&nbsp;</td><td class="printindex-index-section"><a href="#details">details</a></td></tr>
+<tr><td></td><td class="printindex-index-entry"><a href="#index-translator-2">translator</a>:</td><td>&nbsp;</td><td class="printindex-index-section"><a href="#setltran">setltran</a></td></tr>
+<tr><td></td><td class="printindex-index-entry"><a href="#index-translator-command">translator command</a>:</td><td>&nbsp;</td><td class="printindex-index-section"><a href="#details">details</a></td></tr>
+<tr><td colspan="4"> <hr></td></tr>
+<tr><th id="Index_cp_letter-U">U</th><td></td><td></td></tr>
+<tr><td></td><td class="printindex-index-entry"><a href="#index-untrusted-client-programs_002c-access-to-resources">untrusted client programs, access to resources</a>:</td><td>&nbsp;</td><td class="printindex-index-section"><a href="#details">details</a></td></tr>
+<tr><td></td><td class="printindex-index-entry"><a href="#index-untrusted-client-programs_002c-restricted-mode">untrusted client programs, restricted mode</a>:</td><td>&nbsp;</td><td class="printindex-index-section"><a href="#details">details</a></td></tr>
+<tr><td></td><td class="printindex-index-entry"><a href="#index-upper-case-option"><samp class="option">upper</samp> case option</a>:</td><td>&nbsp;</td><td class="printindex-index-section"><a href="#setltran-details">setltran details</a></td></tr>
+<tr><td colspan="4"> <hr></td></tr>
+<tr><th id="Index_cp_letter-V">V</th><td></td><td></td></tr>
+<tr><td></td><td class="printindex-index-entry"><a href="#index-verbose-mode">verbose mode</a>:</td><td>&nbsp;</td><td class="printindex-index-section"><a href="#details">details</a></td></tr>
+<tr><td></td><td class="printindex-index-entry"><a href="#index-verbose-mode-1">verbose mode</a>:</td><td>&nbsp;</td><td class="printindex-index-section"><a href="#setltran-details">setltran details</a></td></tr>
+<tr><td></td><td class="printindex-index-entry"><a href="#index-version_002c-setl">version, <code class="command">setl</code></a>:</td><td>&nbsp;</td><td class="printindex-index-section"><a href="#details">details</a></td></tr>
+<tr><td></td><td class="printindex-index-entry"><a href="#index-version_002c-setlcpp">version, <code class="command">setlcpp</code></a>:</td><td>&nbsp;</td><td class="printindex-index-section"><a href="#setlcpp-details">setlcpp details</a></td></tr>
+<tr><td></td><td class="printindex-index-entry"><a href="#index-version_002c-setltran">version, <code class="command">setltran</code></a>:</td><td>&nbsp;</td><td class="printindex-index-section"><a href="#setltran-details">setltran details</a></td></tr>
+<tr><td colspan="4"> <hr></td></tr>
+</table>
+<table class="cp-letters-footer-printindex"><tr><th>Jump to: &nbsp; </th><td><a class="summary-letter-printindex" href="#Index_cp_symbol-1"><b>#</b></a>
+ &nbsp; 
+<a class="summary-letter-printindex" href="#Index_cp_symbol-2"><b>-</b></a>
+ &nbsp; 
+<a class="summary-letter-printindex" href="#Index_cp_symbol-3"><b>/</b></a>
+ &nbsp; 
+<br>
+<a class="summary-letter-printindex" href="#Index_cp_letter-A"><b>A</b></a>
+ &nbsp; 
+<a class="summary-letter-printindex" href="#Index_cp_letter-C"><b>C</b></a>
+ &nbsp; 
+<a class="summary-letter-printindex" href="#Index_cp_letter-E"><b>E</b></a>
+ &nbsp; 
+<a class="summary-letter-printindex" href="#Index_cp_letter-F"><b>F</b></a>
+ &nbsp; 
+<a class="summary-letter-printindex" href="#Index_cp_letter-G"><b>G</b></a>
+ &nbsp; 
+<a class="summary-letter-printindex" href="#Index_cp_letter-H"><b>H</b></a>
+ &nbsp; 
+<a class="summary-letter-printindex" href="#Index_cp_letter-I"><b>I</b></a>
+ &nbsp; 
+<a class="summary-letter-printindex" href="#Index_cp_letter-K"><b>K</b></a>
+ &nbsp; 
+<a class="summary-letter-printindex" href="#Index_cp_letter-L"><b>L</b></a>
+ &nbsp; 
+<a class="summary-letter-printindex" href="#Index_cp_letter-M"><b>M</b></a>
+ &nbsp; 
+<a class="summary-letter-printindex" href="#Index_cp_letter-O"><b>O</b></a>
+ &nbsp; 
+<a class="summary-letter-printindex" href="#Index_cp_letter-P"><b>P</b></a>
+ &nbsp; 
+<a class="summary-letter-printindex" href="#Index_cp_letter-R"><b>R</b></a>
+ &nbsp; 
+<a class="summary-letter-printindex" href="#Index_cp_letter-S"><b>S</b></a>
+ &nbsp; 
+<a class="summary-letter-printindex" href="#Index_cp_letter-T"><b>T</b></a>
+ &nbsp; 
+<a class="summary-letter-printindex" href="#Index_cp_letter-U"><b>U</b></a>
+ &nbsp; 
+<a class="summary-letter-printindex" href="#Index_cp_letter-V"><b>V</b></a>
+ &nbsp; 
+</td></tr></table>
+</div>
+
+</div>
+</div>
+
+
+
+</body>
+</html>

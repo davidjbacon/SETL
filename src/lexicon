@@ -1,0 +1,526 @@
+graphic     code        ext   comments
+
+$           Comment     no    '$' is never really a token
+--          Comment     setl2
+$           Comment     yes   C-style comment inside /* ... */
+
+$           Accum       no    binary op when followed by :=
+$           Bop1        no    placeholder
+$           Bop2        no    placeholder
+$           Bop3        no    placeholder
+$           Bop4        no    placeholder
+$           Bop5        no    placeholder
+$           Bop6        no    placeholder
+$           Bop7        no    placeholder
+$           Bop8        no    placeholder
+$           Bop9        no    placeholder
+$           Bop10       no    placeholder
+$           Bop11       no    placeholder
+$           Bop12       no    placeholder
+$           Bop13       no    placeholder
+$           Bop14       no    placeholder
+$           Bop15       no    placeholder
+$           Bop16       no    placeholder
+$           C_code      yes   embedded C++ code inside \c ... \s
+$           Command_name yes  user-declared command name
+$           Bop_name    no    user-declared op name, Bop7
+$           Uop_name    no    user-declared op name, Uop15
+$           Machine     yes   "machine code" inside [: ... :]
+$           Name        no    user tag
+$           Ref_name    no    refinement tag
+$           Macro_name  no    macro tag
+$           Integer     no    unsigned integer denotation
+$           Real_       no    unsigned "real" denotation
+$           String      no    string denotation
+$           Uop1        no    placeholder
+$           Uop2        no    placeholder
+$           Uop3        no    placeholder
+$           Uop4        no    placeholder
+$           Uop5        no    placeholder
+$           Uop6        no    placeholder
+$           Uop7        no    placeholder
+$           Uop8        no    placeholder
+$           Uop9        no    placeholder
+$           Uop10       no    placeholder
+$           Uop11       no    placeholder
+$           Uop12       no    placeholder
+$           Uop13       no    placeholder
+$           Uop14       no    placeholder
+$           Uop15       no    placeholder
+$           Uop16       no    placeholder
+
+#           Uop15       no    Sharp
+(           '('         no    Lparen
+(/          '['         no    Lbracket
+(*)         Variadic    no    suffix denoting variable # of args
+)           ')'         no    Rparen
+*           '*'         no    Star or Bop12
+**          Bop13       no    exponentiation, now right associative
++           '+'         no    Plus, Bop11 or Uop15
+,           ','         no    Comma
+-           '-'         no    Minus, sometimes a Bop11 or Uop15
+.           '.'         setl2 field separator, scope resolver
+..          Dots        no    "ellipsis"
+...         Dots        no    "ellipsis"
+/           '/'         no    Slash, Bop12 or part of "op/"
+/)          ']'         no    Rbracket
+/=          Bop6        no    Ne
+:           ':'         no    Colon
+::          Doublecolon no    refinement coming
+:=          Becomes     no    plain assignment
+;           ';'         no    Semicolon
+<           Bop6        no    Lt
+<<          '{'         no    Lbrace
+<=          Bop6        no    Le
+=           '='         no    sometimes a Bop6
+=>          Implies     setl2 in CASE stmt
+>           Bop6        no    Gt
+>=          Bop6        no    Ge
+>>          '}'         no    Rbrace
+?           Bop8        no    Query
+[           '['         no    Lbracket
+]           ']'         no    Rbracket
+^           Uop15       setl2 ^x means _memory(x) (obs.)
+{           '{'         no    Lbrace
+|           '|'         no    St
+!           '|'         no    St
+}           '}'         no    Rbrace
+
+ABORT       Sysproc     setl2
+ABS         Uop15       no
+ACCEPT      Sysproc     yes
+ACOS        Uop15       no
+ALL         ALL         no
+AND         Bop4        no
+ANY         Sysproc     no
+APPLY       Sysproc     yes
+ARB         Uop15       no
+ARG         Uop15       yes
+ASIN        Uop15       no
+ASSERT      ASSERT      no
+ATAN        Uop15       no
+ATAN2       Bop12       no
+ATOM        ATOM        no
+BACK        BACK        no
+BASE        BASE        no
+BINSTR      Uop15       setl2
+BIT_AND     Bop12       yes   (now like '*'; was Bop4 like AND)
+BIT_OR      Bop11       yes   (now like '+'; was Bop3 like OR)
+BIT_XOR     Bop11       yes   (now like '+'; was Bop3 like XOR)
+BIT_NOT     Uop15       yes   (now like most uops; was Uop5 like NOT)
+BODY        BODY        setl2
+BOOLEAN     BOOLEAN     no
+BREAK       Sysproc     no
+CALL        CALL        yes
+CALLF       Sysproc     no
+CALLOUT     Sysproc     setl2
+CALLOUT2    Sysproc     setl2
+CALLS       CALLS       no
+CASE        CASE        no
+CEIL        Uop15       no
+CHAR        Uop15       no
+CHDIR       Sysproc     yes
+CLASS       CLASS       setl2
+CLEAR_ERROR Sysproc     yes
+CLOCK       Sysproc     yes
+CLOSE       Sysproc     no
+CLOSE_AWAIT Syscon      yes
+CLOSE_AUTOREAP Syscon   yes
+CLOSE_ZOMBIE Syscon     yes
+COMMAND     COMMAND     yes
+COMMAND_LINE Sysval     setl2
+COMMAND_NAME Sysval     yes
+COMPILE     Uop15       yes
+COMPLEX     Uop15       yes
+CONST       CONST       no
+CONTINUE    CONTINUE    no
+COS         Uop15       no
+COSH        Uop15       yes
+DATE        Sysval      no
+DEBUG       DEBUG       no
+DENOTYPE    Uop15       yes
+DIRECTORY   DIRECTORY   no    (obs.)
+DIV         Bop12       no
+DO          DO          no
+DOING       DOING       no
+DOMAIN      Uop15       no
+DOUBLE      Uop15       yes
+DROP        DROP        no
+DUP         Uop15       yes
+DUP2        Sysproc     yes
+EJECT       Sysproc     no
+ELMT        ELMT        no
+ELSE        ELSE        no
+ELSEIF      ELSEIF      no
+END         END         no
+ENDM        ENDM        no
+EOF         Sysproc     no   (was a purely nullary Sysval in old SETL)
+ERROR       ERROR       no
+EVAL        Uop15       yes
+EVEN        Uop5        no   (was Uop15)
+EXEC        Sysproc     yes
+EXECUTE     Uop15       yes
+EXISTS      EXISTS      no
+EXIT        EXIT        no
+EXP         Uop15       no
+EXPORTS     EXPORTS     no    (obs.)
+EXPR        EXPR        no
+FAIL        FAIL        no
+FALSE       Syscon      no
+FDATE       Sysproc     yes
+FEXISTS     Uop5        setl2  (but with prec like other BOOLEAN uops)
+FILENAME    Uop15       yes
+FILENO      Uop15       yes
+FILEPOS     Uop15       yes
+FILTER      Sysproc     yes
+FIX         Uop15       no
+FIXED       Sysproc     yes
+FLOAT       Uop15       no
+FLOATING    Sysproc     yes
+FLOOR       Uop15       no
+FLUSH       Sysproc     yes
+FOR         FOR         no
+FORALL      FORALL      no
+FORK        Sysproc     yes
+FPRINTF     Sysproc     yes
+FROM        FROM        no
+FROMB       FROMB       no
+FROME       FROME       no
+FSCANF      Sysproc     yes
+FSIZE       Uop15       setl2
+FTRUNC      Sysproc     yes
+GENERAL     GENERAL     no
+GET         Sysproc     no   (now SETL2-compatible)
+GETA        Sysproc     setl2
+GETB        Sysproc     no
+GETC        Uop15       yes
+GETCHAR     Sysproc     yes
+GETEGID     Sysproc     yes
+GETEM       Sysproc     no
+GETENV      Uop15       yes
+GETEUID     Sysproc     yes
+GETF        Sysproc     no
+GETFILE     Uop15       yes
+GETGID      Sysproc     yes
+GETIPP      Sysproc     no
+GETK        Sysproc     no
+GETLINE     Uop15       yes
+GETN        Sysproc     yes
+GETPGID     Sysproc     yes
+GETPGRP     Sysproc     yes
+GETPID      Sysproc     yes
+GETPPID     Sysproc     yes
+GETS        Sysproc     setl2
+GETSID      Sysproc     yes
+GETSPP      Sysproc     no
+GETUID      Sysproc     yes
+GETWD       Sysproc     yes
+GLOB        Uop15       yes
+GLOBAL      GLOBAL      yes
+GMARK       Sysproc     yes
+GO          GO          yes
+GOTO        GOTO        no
+GSUB        Sysproc     yes
+HEX         Uop15       yes
+HOST        Sysproc     no
+HOSTADDR    Sysval      yes
+HOSTNAME    Sysval      yes
+ICHAR       Uop15       yes
+IF          IF          no
+IMAG        Uop15       yes
+IMPL        Bop2        no
+IMPORTS     IMPORTS     no    (obs.)
+IN          IN          no    can also be a Bop6
+INCS        Bop6        no
+INHERIT     INHERIT     setl2
+INIT        INIT        no
+INT         Uop15       yes
+INTEGER     INTEGER     no
+INTSLASH    Sysvar      yes
+IP_ADDRESSES Sysproc    yes
+IP_NAMES    Sysproc     yes
+IS_ATOM     Uop5        no
+IS_BOOLEAN  Uop5        no
+IS_COMPLEX  Uop5        yes
+IS_DOUBLE   Uop5        yes
+IS_FLOAT    Uop5        yes
+IS_INT      Uop5        yes
+IS_INTEGER  Uop5        no
+IS_MAP      Uop5        no
+IS_MMAP     Uop5        yes
+IS_NUMERIC  Uop5        yes
+IS_OM       Uop5        yes
+IS_OPEN     Uop5        yes
+IS_OP       Uop5        yes
+IS_OPERATOR Uop5        yes
+IS_PROC     Uop5        yes
+IS_PROCEDURE Uop5       yes
+IS_REAL     Uop5        no
+IS_ROUTINE  Uop5        yes
+IS_SET      Uop5        no
+IS_SMAP     Uop5        yes
+IS_STRING   Uop5        no
+IS_THERE    Uop5        yes
+IS_TUPLE    Uop5        no
+JOIN        Sysproc     yes
+KILL        Sysproc     yes
+LAMBDA      LAMBDA      setl2
+LAST_ERRNO  Sysval      yes
+LAST_ERROR  Sysval      yes
+LEN         Sysproc     no
+LESS        Bop10       no
+LESSB       Bop10       yes
+LESSE       Bop10       yes
+LESSF       Bop10       no
+LEV         Sysval      no
+LEXISTS     Uop5        yes   (was Uop15, now like other BOOLEAN uops)
+LIB         LIB         no
+LIBRARIES   LIBRARIES   no    (obs.)
+LIBRARY     LIBRARY     no    (obs.)
+LINK        Sysproc     yes
+LOCAL       LOCAL       no
+LOG         Uop15       no
+LOOP        LOOP        no
+LPAD        Sysproc     no
+MACRO       MACRO       no
+MAGIC       Sysvar      yes
+MAIN        MAIN        yes
+MAP         MAP         no
+MARK        Sysproc     yes
+MATCH       Sysproc     no
+MAX         Bop11       no
+MEM_ALLOC   Sysproc     yes
+MEM_FREE    Sysproc     yes
+MEM_REALLOC Sysproc     yes
+MEM_COPY    Sysproc     yes
+MEM_FETCH_C_STRING Sysproc yes
+MEM_FETCH_STRING Sysproc yes
+MEM_STORE_C_STRING Sysproc yes
+MEM_STORE_STRING Sysproc yes
+MKSTEMP     Sysproc     yes
+MIN         Bop11       no
+MMAP        MMAP        no
+MOD         Bop12       no
+MODE        MODE        no
+MODULE      MODULE      no    (obs.)
+NARGS       Sysval      no
+NEWAT       Sysproc     no
+NO_ERROR    Syscon      yes
+NOT         Uop5        no
+NOTANY      Sysproc     no
+NOTEXISTS   NOTEXISTS   no
+NOTIN       Bop6        no
+NOTRACE     NOTRACE     no
+NPOW        Bop9        no
+NPRINT      Sysproc     setl2
+NPRINTA     Sysproc     setl2
+NULL        Null        setl2 (case subterfuge to avoid macro conflicts)
+ODD         Uop5        no   (was Uop15)
+OF          OF          no
+OK          Sysproc     no
+OM          Syscon      no
+OP          OP          no
+OPEN        Sysproc     no
+OPERATOR    OP          no
+OR          Bop3        no
+OTHERWISE   OTHERWISE   setl2
+PACKAGE     PACKAGE     setl2
+PACKED      PACKED      no
+PACK_SHORT  Uop15       yes
+PACK_UNSIGNED_SHORT Uop15 yes
+PACK_INT    Uop15       yes
+PACK_UNSIGNED_INT Uop15 yes
+PACK_LONG   Uop15       yes  (this case must cover C memory pointers)
+PACK_UNSIGNED_LONG Uop15 yes
+PACK_LONG_LONG Uop15    yes
+PACK_UNSIGNED_LONG_LONG Uop15 yes
+PACK_INTEGER Uop15      yes
+PACK_DOUBLE Uop15       yes
+PACK_FLOAT  Uop15       yes
+PACK_REAL   Uop15       yes
+PASS        PASS        no
+PEEKC       Uop15       yes
+PEEKCHAR    Sysproc     yes
+PEER_ADDRESS Uop15      yes
+PEER_NAME   Uop15       yes
+PEER_PORT   Uop15       yes
+PEER_SOCKADDR Uop15     yes
+PEXISTS     Uop5        yes  (was Uop15, now like other BOOLEAN uops)
+PID         Sysproc     yes  (was a Uop15, but now want parm optional)
+PIPE        Sysproc     yes
+PIPE_FROM_CHILD Sysproc yes
+PIPE_TO_CHILD Sysproc   yes
+PLEX        PLEX        no
+PORT        Uop15       yes
+POW         Uop15       no
+PRETTY      Uop15       yes
+PRINT       Sysproc     no
+PRINTA      Sysproc     no
+PRINTF      Sysproc     yes
+PROC        PROC        no
+PROCEDURE   PROC        no
+PROG        PROG        no
+PROGRAM     PROGRAM     no
+PUMP        Sysproc     yes
+PUT         Sysproc     no  (but made reciprocal to new-style GET)
+PUTA        Sysproc     yes
+PUTB        Sysproc     no
+PUTC        Sysproc     yes
+PUTCHAR     Sysproc     yes
+PUTENV      Sysproc     yes
+PUTF        Sysproc     no
+PUTFILE     Sysproc     yes
+PUTK        Sysproc     no
+PUTLINE     Sysproc     yes
+PUTS        Sysproc     setl2
+QUIT        QUIT        no
+RANDOM      Uop15       no
+RANGE       Uop15       no
+RANY        Sysproc     no
+RBREAK      Sysproc     no
+RD          RD          no
+READ        Sysproc     no
+READA       Sysproc     no
+READLINK    Uop15       yes
+READS       Sysproc     setl2 (was a keyword in old-style modules)
+REAL        REAL        no
+RECV        Uop15       yes
+RECVFROM    Uop15       yes
+RECV_FD     Uop15       yes
+REM         Bop12       yes
+REMOTE      REMOTE      no
+RENAME      Sysproc     yes
+REPR        REPR        no
+RETURN      RETURN      no
+REVERSE     Uop15       yes
+REWIND      Sysproc     no
+RLEN        Sysproc     no
+RMATCH      Sysproc     no
+RNOTANY     Sysproc     no
+ROUND       Uop15       yes
+ROUTINE     ROUTINE     yes
+RPAD        Sysproc     no
+RSPAN       Sysproc     no
+RW          RW          no
+SCANF       Sysproc     yes
+SEEK        Sysproc     yes
+SEEK_SET    Syscon      yes
+SEEK_CUR    Syscon      yes
+SEEK_END    Syscon      yes
+SEL         SEL         setl2
+SELECT      Sysproc     yes
+SEND        Sysproc     yes
+SENDTO      Sysproc     yes
+SEND_FD     Sysproc     yes
+SET         SET         no
+SETCTTY     Sysproc     yes
+SETEGID     Sysproc     yes
+SETEM       Sysproc     no
+SETENV      Sysproc     yes
+SETEUID     Sysproc     yes
+SETGID      Sysproc     yes
+SETPGID     Sysproc     yes
+SETPGRP     Sysproc     yes
+SETRANDOM   Sysproc     yes
+SETSID      Sysproc     yes
+SETUID      Sysproc     yes
+SET_INTSLASH Sysproc    yes
+SET_MAGIC   Sysproc     yes
+SHUTDOWN    Sysproc     yes
+SHUT_RD     Syscon      yes
+SHUT_WR     Syscon      yes
+SHUT_RDWR   Syscon      yes
+SIGN        Uop15       no
+SIN         Uop15       no
+SINH        Uop15       yes
+SMAP        SMAP        no
+SOCKADDR    Uop15       yes
+SOCKETPAIR  Sysproc     yes
+SPAN        Sysproc     no
+SPARSE      SPARSE      no
+SPEC        SPEC        no
+SPLIT       Sysproc     yes
+SPRINTF     Sysproc     yes
+SQRT        Uop15       no
+SSCANF      Sysproc     yes
+ST          '|'         no
+STATEMENTS  STATEMENTS  no
+STATUS      Sysproc     yes
+STDERR      Syscon      yes
+STDIN       Syscon      yes
+STDOUT      Syscon      yes
+STEP        STEP        no
+STOP        STOP        no
+STR         Uop15       no
+STRAD       Sysproc     yes
+STRING      STRING      no
+SUB         Sysproc     yes
+SUBSET      Bop6        no
+SUCCEED     SUCCEED     no
+SYMLINK     Sysproc     yes
+SYSTEM      Sysproc     yes
+SYS_READ    Sysproc     yes
+SYS_WRITE   Sysproc     yes
+TAN         Uop15       no
+TANH        Uop15       no
+TCGETPGRP   Sysproc     yes
+TCSETPGRP   Sysproc     yes
+TERM        TERM        no
+THEN        THEN        no
+TIE         Sysproc     yes
+TIME        Sysproc     no
+TITLE       Sysproc     no
+TMPNAM      Sysproc     yes
+TO          TO          yes
+TO_LOWER    Uop15       yes
+TO_UPPER    Uop15       yes
+TOD         Sysproc     yes
+TRACE       TRACE       no
+TRIM        Sysproc     yes
+TRUE        Syscon      no
+TTY_PUMP    Sysproc     yes
+TUPLE       TUPLE       no
+TYPE        Uop15       no
+UMASK       Sysproc     yes
+UNBINSTR    Uop15       setl2
+UNGETC      Sysproc     yes
+UNGETCHAR   Sysproc     yes
+UNHEX       Uop15       yes
+UNLINK      Sysproc     yes
+UNPACK_SHORT Uop15      yes
+UNPACK_UNSIGNED_SHORT Uop15 yes
+UNPACK_INT  Uop15       yes
+UNPACK_UNSIGNED_INT Uop15 yes
+UNPACK_LONG  Uop15      yes  (this case must cover C memory pointers)
+UNPACK_UNSIGNED_LONG Uop15 yes
+UNPACK_LONG_LONG Uop15  yes
+UNPACK_UNSIGNED_LONG_LONG Uop15 yes
+UNPACK_INTEGER Uop15    yes
+UNPACK_DOUBLE Uop15     yes
+UNPACK_FLOAT Uop15      yes
+UNPACK_REAL Uop15       yes
+UNPRETTY    Uop15       yes
+UNSETCTTY   Sysproc     yes
+UNSETENV    Sysproc     yes
+UNSPEC      UNSPEC      no
+UNSTR       Uop15       yes
+UNTIE       Sysproc     yes
+UNTIL       UNTIL       no
+UNTYPED     UNTYPED     no
+USE         USE         setl2
+VAL         Uop15       no
+VAR         VAR         no
+WAIT        Sysproc     yes
+WAITPID     Sysproc     yes
+WHEN        WHEN        setl2
+WHERE       '|'         no
+WHILE       WHILE       no
+WHOLE       Sysproc     yes
+WITH        Bop10       no
+WITHB       Bop10       yes
+WITHE       Bop10       yes
+WR          WR          no
+WRITE       Sysproc     yes
+WRITEA      Sysproc     yes
+WRITES      WRITES      no    (obs.)
+YIELD       YIELD       no

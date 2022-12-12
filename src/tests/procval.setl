@@ -1,0 +1,9 @@
+s := {ROUTINE c, ROUTINE b, ROUTINE a};
+WHILE #s > 0 LOOP
+  p FROM s;
+  CALL(p);
+END;
+
+PROC a; PRINT('a');b;c; END;
+PROC b; PRINT('b');c; END;
+PROC c; PRINT('c'); END;

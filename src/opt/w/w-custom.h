@@ -1,0 +1,10 @@
+extern void	l_w_add_vertex(integer *x, integer *y);
+extern void	l_w_box(integer *ax, integer *ay, integer *bx, integer *by);
+extern void	l_w_color(integer *c);
+extern void	l_w_event(integer **k, integer **x, integer **y, integer **z);
+extern void	l_w_init(integer *x, integer *y);
+extern void	l_w_new_path(void);
+extern void	l_w_opacity(integer *c);
+extern void	l_w_polygon(void);
+extern void	l_w_sync(void);
+extern void	l_w_vector(integer *ax, integer *ay, integer *bx, integer *by);

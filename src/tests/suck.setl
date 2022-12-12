@@ -1,0 +1,11 @@
+system('"$top_srcdir/run-setl" "$srcdir/spew.setl"');
+name := '/tmp/spewage';
+s := filter('cat '+name,'');
+ASSERT s = +/[CHAR(i): i IN [0..255]];
+t := GETFILE(name);
+ASSERT #t = 256;
+assert not is_open name;
+OPEN(name,'r');
+t := GETFILE(name);
+ASSERT #t = 256;
+assert is_open name;

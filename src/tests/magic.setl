@@ -1,0 +1,9 @@
+PRINT('Initial setting of MAGIC: ',MAGIC);
+s := 'Dav*d';
+p := 'av*';
+PRINT('Subject string: ',PRETTY s);
+PRINT('Pattern string: ',PRETTY p);
+MAGIC := TRUE;
+PRINT('With MAGIC TRUE, s(p) =',PRETTY (s(p) ? '<no match>'));
+MAGIC := FALSE;
+PRINT('With MAGIC FALSE, s(p) =',PRETTY (s(p) ? '<no match>'));

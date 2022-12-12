@@ -1,0 +1,46 @@
+#! /bin/sh
+#
+# $Id: doc-dist,v 1.7 2022/12/11 05:54:23 setlorg Exp $
+#
+# Free software (c) dB - see file COPYING for license (GPL).
+#
+#
+# Make a bundle in doc/web-doc.tar which can then be unpacked
+# directly into a new web site folder.
+#
+# Use:  doc-dist [srcdir]
+#
+# where srcdir is the top level of the build tree where you
+# built the documentation (one level above its doc/ subdir),
+# defaulting to ".".
+#
+# For my convenience, I need doc/ to be writable, and I will
+# clobber any pdf.zip or info.zip or web-doc.tar file there.
+
+srcdir=${1:-.}
+cd "$srcdir"/doc || exit 1
+
+bundle=web-doc.tar
+
+rm -f pdf.zip
+zip -q pdf.zip *.pdf || exit 1
+echo ''
+unzip -l pdf.zip
+
+rm -f info.zip
+zip -q info.zip *.info || exit 1
+echo ''
+unzip -l info.zip
+
+tar cf "$bundle" \
+ index.html \
+ setl*.html \
+ pdf.zip \
+ info.zip || exit 1
+echo ''
+echo "Bundle:  $bundle"
+tar tvf "$bundle"
+
+# clean up
+echo ''
+rm pdf.zip info.zip

@@ -1,0 +1,22 @@
+$ Connected components of a graph
+
+g := {{1,2},{3,4}};
+conn(g);
+
+g := {{1,2},{2,3},{3,4}};
+conn(g);
+
+g := {{1,2},{2,3},{4,5}};
+conn(g);
+
+PROC conn (g);
+  VAR s, ss, t;  $ locals
+  print ('Graph: ',g);
+  s := {};
+  (FOR e IN g)
+    t := {ss IN s | EXISTS f IN ss | e*f /= {}};
+    s -:= t;
+    s +:= {{e}+/t};
+  END;
+  print ('Connected components: ',s);
+END PROC conn;

@@ -1,0 +1,39 @@
+av
+*
+a
+
+DAVE
+david
+David
+Daveed
+*Daveed
+vee
+*Davud
+*David loves Kamloops
+*David leaves Kamloops
+[a i e a e a o o]
+*D++v++d l++++v++s K++ml++++ps
+['++' '++' '++++' '++' '++' '++++']
+*D-v-d l-v-s K-ml-ps
+[s]
+*D-v-d l-v-s K-ml-p
+s
+*D-v-d l-v- K-ml-p
+[4 4]
+[[4 4] [10 10]]
+[3 5]
+[[3 5] [9 11]]
+['*D-v-d' 'l-v-' 'K-ml-p']
+['*D' v 'd l' v ' K' ml p]
+['' 'D-v-d l-v- K-ml-p']
+['*D-v-d l-v- K-ml-p']
+/* hi */
+C comment:    another one:  /* /* bye */  and a turd:  /*** burd ***/  and an unclosed opening:  /*
+/* /* bye */
+C comment:    another one:    and a turd:  /*** burd ***/  and an unclosed opening:  /*
+    another one:    and a turd:  /*** burd ***/  and an unclosed opening:  /*
+    another one:    and a 
+[13 20]
+[[13 20] [37 48] [64 77]]
+['/* hi */' '/* /* bye */' '/*** burd ***/']
+C comment:    another one:    and a turd:    and an unclosed opening:  /*

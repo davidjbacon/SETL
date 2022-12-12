@@ -1,0 +1,11 @@
+W_ADD_VERTEX  Sysproc   yes
+W_BOX         Sysproc   yes
+W_COLOR       Sysproc   yes
+W_COLOUR      Sysproc   yes
+W_EVENT       Sysproc   yes
+W_INIT        Sysproc   yes
+W_NEW_PATH    Sysproc   yes
+W_OPACITY     Sysproc   yes
+W_POLYGON     Sysproc   yes
+W_SYNC        Sysproc   yes
+W_VECTOR      Sysproc   yes

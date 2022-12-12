@@ -1,0 +1,8 @@
+program ha_ha_kirk;
+
+  t := [1..100];
+  s := {} WITH/ t;
+--s := {x: x IN t};
+  print(#s);
+
+end ha_ha_kirk;

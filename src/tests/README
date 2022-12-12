@@ -1,0 +1,89 @@
+$Id: README,v 1.6 2021/01/08 16:59:52 setlorg Exp $
+
+Free software (c) dB - see file COPYING for license (GPL).
+
+
+The files in this directory represent a woefully incomplete and mostly
+rather ancient set of miscellaneous tests that are run as a basic
+sanity check when a "make check" is done from the top-level Makefile
+(two levels above this directory).  Note that a "make distcheck" up
+there automatically does a "make check" too.
+
+Each test is performed by a one-line script whose name begins with "t-"
+and invokes a script called simple-test which compares test output with
+expected output and gives an exit status of 0 when they match.
+
+
+To add a new test:
+
+1.  Write a SETL program and give it a name, e.g., mytest.setl.
+
+2.  Run it once and collect its output in a file whose name
+    corresponds to the test program but has ".out" as the suffix. (*)
+    Thus for mytest.setl:
+
+      setl mytest.setl >mytest.out
+
+    If the program produces no output, then no .out file is needed:
+
+      setl mytest.setl
+
+    If your program requires input data on stdin, you should provide
+    this in a file with a .data suffix, e.g.:
+
+      setl mytest.setl <mytest.data >mytest.out
+
+    The simple-test script can also handle cases where instead of
+    providing static test output as above, you prefer to create test
+    output dynamically using some other command.  (The static or
+    dynamic output will be compared with the SETL program output when
+    the test is run.)  For the dynamic case, you need to supply an
+    executable script named (say) mytest.sh to create the test output
+    on stdout, and make sure mytest.out does not exist (simple-test
+    looks for the static output file first).
+
+3.  Create a test script consistent with the naming convention, i.e.,
+    t-mytest for the above example.  Note that some of the existing
+    test scripts invoke the simple-test script with the diff-read
+    script as a second arg, and some simply go with the default
+    diff command.  The diff-read script is used in cases where tiny
+    floating-point differences may be expected from one platform to
+    another, and/or where the elements of sets may be printed in
+    different orders.  (For GNU SETL, the latter is in theory only,
+    as it prints sets in a consistent order across platforms.)
+
+4.  Add your new t-* script and *.setl program to the lists named
+    respectively test_scripts and test_programs in Makefile.am.
+    (Actually test_programs is now derived automatically from
+    test_scripts, so just update the test_scripts list.)  Also
+    extend test_data if appropriate, and extend either test_outputs
+    or test_sh according to whether you are providing a static
+    *.out file or using a *.sh script to create output on the fly
+    (see step 2 above).
+
+(*) Given the update-out script mentioned below, if you have already
+updated Makefile.am, you don't need ever to run your program directly
+(which can be a slight nuisance if your SETL implementation is built
+but not yet installed) as shown in step 1 above, but simply create
+mytest.out as an empty file and then use "make update-out test=mytest"
+to update it with the current output.
+
+
+To update the output for a test:
+
+If the output for a test changes because of a change in the test
+program or input, you can update the .out file by doing this in the
+build directory (e.g., ../../../setl-build/src/tests/):
+
+  make update-out test=mytest
+
+Basically, that clears the old log, runs the test again (expect a FAIL
+to be reported because of the .out mismatch), and patches the .out file
+according to the diffs reported in the regenerated log.  If you repeat
+that make command, you should then see a PASS if the test produces the
+same output again.
+
+
+TODO:  Many more tests are needed, and the paltry set of existing ones
+could be better organized.  Creating and maintaining a decent
+regression suite takes significant effort!

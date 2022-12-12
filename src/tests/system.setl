@@ -1,0 +1,6 @@
+LOOP FOR i IN [1..100] DO
+  SYSTEM('"$top_srcdir/run-setl" "$srcdir/hello.setl" >/dev/null');
+  IF i MOD 10 = 0 THEN
+    PRINTA(STDERR,'TIME',TIME,'ms., CLOCK',CLOCK,'ms.');
+  END IF;
+END LOOP;

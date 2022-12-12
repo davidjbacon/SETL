@@ -1,0 +1,5 @@
+cmd := 'ls "'+getenv 'srcdir'+'"/*.setl';
+open(cmd,'pipe-in');
+printa(stderr,'Output of command ',cmd,':');
+putfile('',getfile cmd);
+printa(stderr,'That''s all, folks!');

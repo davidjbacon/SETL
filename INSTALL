@@ -1,0 +1,129 @@
+$Id: INSTALL,v 1.23 2018/01/24 02:39:52 setlorg Exp $
+
+Free software (c) dB - see file COPYING for license (GPL).
+
+This file is part of GNU SETL.
+
+
+Quickstart
+----------
+
+You can do a ./configure first if it thrills you, but otherwise an
+immediate plain
+
+  $ make
+
+will guide you interactively through the config and build.  Then
+
+  $ make check
+  $ make install  [as superuser if necessary]
+
+should require no further interaction.
+
+If you know what you are doing, then invoking ./configure with one or
+more command-line arguments will do the setup non-interactively.
+
+See the GNU Make section below if "make" begs you to install it.
+
+
+General requirements
+--------------------
+
+Expect best results for Posixy (Unix-supportive) environments such as
+Linux, QNX, Solaris, the BSDs, HP-UX, AIX, IRIX, Darwin, and Cygwin.
+See below for system-specific notes.
+
+A few common free development tools such as GCC and Bison are required.
+
+The generic installation instructions in the INSTALL files in subdirs
+can be ignored if you are driving all operations from the top level,
+which is recommended for most casual users and installers.  But if you
+are a maintainer familiar with GNU conventions, the Makefiles created
+in build subdirs provide friendly sub-environments too.
+
+
+Cross-compiling
+---------------
+
+To build GNU SETL for a system other than the one being used for the
+build, use a --host arg (a host "alias") when setting up the config.
+It is not normally necessary to override --build, which is initialized
+using config.guess in the GNU-style configure script invocations.
+
+Naturally, you need an appropriate toolset for compiling and linking
+against the host's libraries, and if there is enough harmony between
+the host alias and the names of those tools, you might not even need
+to specify additional things like CC=... explicitly.
+
+See the GNU Autoconf manual for more details on cross-compilation.
+
+
+Compiling and cross-compiling on QNX
+------------------------------------
+
+Cross-compilation is the normal mode of operation when building for the
+real-time operating system QNX.  Although the QNX dev kit (Momentics)
+for QNX comes with a gcc driver that can be used for native compilation
+on QNX, the cross-compilation command on all Momentics installations is
+qcc, which is QNX's repackaging of the GNU C compiler together with
+configs for all the supported CPUs.  The qcc command is run on a Linux,
+Windows, or QNX platform to produce code for an x86, ppc, arm, etc. CPU
+running QNX.
+
+GNU SETL supports QNX cross-compilation with a minimum of fuss.  During
+the setup (configuration) phase, when you are prompted for additional
+configure script options, you need to compose an argument of the form
+
+  --host={CPU}-qnx{VERSION}
+
+where {CPU} is from the following list, and {VERSION} is 6.3.2, 6.5.0,
+or whatever version of QNX Neutrino you want to generate GNU SETL
+executables for:
+
+  armbe      [not in 6.5.0]
+  armle
+  armv7      [not in 6.3.2]
+  mipsbe
+  mipsle
+  ppcbe
+  ppcbe-spe  [not in 6.3.2]
+  shle
+  x86
+
+For example, for a PowerPC SPE architecture running QNX 6.5.0:
+
+  --host=ppcbe-spe-qnx6.5.0
+
+Note that QNX documentation refers to the host on which the compiled
+code is to run as the "target", at odds with how GNU uses the terms:
+
+  GNU    QNX
+  ---    ---
+  build  host
+  host   target
+  target  ?
+
+(The GNU sense of "target" is not relevant to the SETL interpreter, as
+it does not generate machine code.)
+
+
+GNU Make
+--------
+
+If your "make" command tells you that you need GNU Make, you should
+install it, as gmake if possible, and then use the gmake command to
+drive all building, checking, installing, uninstalling, cleaning, and
+redistributing operations in GNU SETL distributions.
+
+Unless you happen to know the right incantations to grab a prepackaged
+gmake for your system (and maybe even then), it is usually easiest to
+go to the GNU Make page (https://www.gnu.org/software/make/) and
+download the (very portable) source.  In the unpacked archive do this
+(possibly with an extra --prefix={installation-root} on the configure
+command if you don't want /usr/local as the stem for the install):
+
+  $ ./configure --program-prefix=g
+  $ make
+  ... privilege elevation if necessary ...
+  # make install
+

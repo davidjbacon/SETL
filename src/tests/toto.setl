@@ -1,0 +1,17 @@
+eat 'pudding';
+rock 'me' 'gently';
+print(rock 'this' 666);
+drink;
+
+command eat(what);
+  print('eat',what);
+end eat;
+
+command drink;
+  print('drink');
+end command drink;
+
+command rock(who,how);
+  print('rock',who,how);
+  return 69.95;
+end;

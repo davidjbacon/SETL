@@ -1,0 +1,20 @@
+-- Child program.
+--
+-- For each line on stdin from the parent, open the file named on
+-- that line and pass the fd (file descriptor for reading the file)
+-- up to the parent on stdout.
+--
+-- So this is a "pump" only in that we read on stdin and reply on
+-- stdout.  We don't send any data on stdout, only file descriptors.
+--
+$tie (stdin, stdout);  -- auto-flush stdout whenever stdin is read
+fd := om;  -- for emphasis (fd is om at this point anyway)
+while (s := getline stdin) /= om loop  -- loop over input lines
+  close (fd);  -- close previously opened fd if any
+  fd := fileno open(s, 'r');  -- open the file named in the input line
+  send_fd (stdout, fd);  -- send its fd up to the parent
+  -- Note that we do not close the fd until we are sure the parent has
+  -- received it, which is indicated by its sending us another line or
+  -- "closing" us (which we see as an eof on stdin).
+end loop;
+close (fd);  -- for neatness

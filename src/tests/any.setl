@@ -1,0 +1,62 @@
+PROGRAM test_old_string_primitives;
+
+d := "david"; PRINT();
+a := ANY(d,"abcde"); prt(a,d,#d);
+b := ANY(d,"abcde"); prt(b,d,#d);
+c := ANY(d,"abcde"); prt(c,d,#d);
+e := RANY(d,"abcde"); prt(e,d,#d);
+f := RANY(d,"abcde"); prt(f,d,#d);
+g := NOTANY(d,"abcde"); prt(g,d,#d);
+h := RNOTANY(d,"abcde"); prt(h,d,#d);
+i := RNOTANY(d,"abcde"); prt(i,d,#d);
+j := ANY(d,"abcde"); prt(j,d,#d);
+
+d := "david"; PRINT();
+a := SPAN(d,"abcde"); prt(a,d,#d);
+b := SPAN(d,"abcde"); prt(b,d,#d);
+c := BREAK(d,"abcde"); prt(c,d,#d);
+e := SPAN(d,"abcde"); prt(e,d,#d);
+f := BREAK(d,"abcde"); prt(f,d,#d);
+g := SPAN(d,"abcde"); prt(g,d,#d);
+
+d := "david"; PRINT();
+a := RSPAN(d,"abcde"); prt(a,d,#d);
+b := RSPAN(d,"abcde"); prt(b,d,#d);
+c := RBREAK(d,"abcde"); prt(c,d,#d);
+e := RSPAN(d,"abcde"); prt(e,d,#d);
+f := RBREAK(d,"abcde"); prt(f,d,#d);
+g := RSPAN(d,"abcde"); prt(g,d,#d);
+
+d := "david"; PRINT();
+a := LEN(d,3); prt(a,d,#d);
+b := LEN(d,3); prt(b,d,#d);
+c := LEN(d,3); prt(c,d,#d);
+e := LEN(d,3); prt(e,d,#d);
+
+d := "david"; PRINT();
+a := RLEN(d,3); prt(a,d,#d);
+b := RLEN(d,3); prt(b,d,#d);
+c := RLEN(d,3); prt(c,d,#d);
+e := RLEN(d,3); prt(e,d,#d);
+
+d := "david"; PRINT();
+a := MATCH(d,"da"); prt(a,d,#d);
+b := MATCH(d,"da"); prt(b,d,#d);
+c := MATCH(d,"vide"); prt(c,d,#d);
+e := MATCH(d,"vid"); prt(e,d,#d);
+f := MATCH(d,"x"); prt(f,d,#d);
+g := MATCH(d,""); prt(g,d,#d);
+
+d := "david"; PRINT();
+a := RMATCH(d,"id"); prt(a,d,#d);
+b := RMATCH(d,"id"); prt(b,d,#d);
+c := RMATCH(d,"dave"); prt(c,d,#d);
+e := RMATCH(d,"dav"); prt(e,d,#d);
+f := RMATCH(d,"x"); prt(f,d,#d);
+g := RMATCH(d,""); prt(g,d,#d);
+
+PROC prt(r,s,n);
+  PRINT('|'+r+'|'+s+'|',n);
+END prt;
+
+END test_old_string_primitives;

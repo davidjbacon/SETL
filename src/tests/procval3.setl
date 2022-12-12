@@ -1,0 +1,6 @@
+p := proc f;
+print(call(p,'x',om));
+print(call(p,'x','pkg'));
+proc f(x,y);
+  return [x,y];
+end;

@@ -1,0 +1,79 @@
+--- badly needs updating to add tests for the fancy replacement
+--- patterns - perh some of the glibc regex tests could be adapted.
+s := 'dave';
+print(s('av'));
+print(s('eating spinach for breakfast invariably causes compilers like this one to print a blank line'));
+print(s('[va]'));
+--- s('') is probably not well defined; on a Linux test it just
+--- matches the empty string as one might expect, but on Darwin
+--- it elicits an "empty (sub)expression" run-time error, even
+--- though s('()') provokes no such diagnostic.  So we substitute
+--- s('^'), which will match the empty string at the beginning of
+--- the subject, just as we expected s('') to do...
+$print(s(''));
+print(s('^'));
+print(to_upper s);
+s('e') := 'id'; print(s);
+s('d') := to_upper(s('d')); print(s);
+s('i') := 'ee'; print(s);
+$s('') := '*'; print(s);
+s('^') := '*'; print(s);
+print(sub(s,'ve*','vu')); print(s);
+s('ud$') := 'id loves Kamloops';
+print(s);
+--s('o\\{1\\}') := 'ea';  print(s);
+s('o') := 'ea';  print(s);
+print(gsub(s,'[aeiou]','++')); print(s);
+--print(gsub(s,'++*','-')); print(s);
+print(gsub(s,'\\+\\+*','-')); print(s);
+print(gsub(s,'s$')); print(s);
+print(sub(s,'s')); print(s);
+print(mark(s,'v')); print(gmark(s,'v'));
+print(mark(s,'-.-')); print(gmark(s,'-.-'));
+print(split(s));
+print(split(s,'-'));
+print(split(s,'\\*'));
+print(split(s,'h'));
+
+s := 'C comment:  /* hi */  another one:  /* /* bye */  and a turd:  /*** burd ***/  and an unclosed opening:  /*';
+t := s;
+p := '/\\*'; q := '\\*/';
+print(s(p..q)); s(p..q) := ''; print(s);
+print(s(p..q)); s(p..q) := ''; print(s);
+s(1..':') := ''; print(s);
+s('turd'..) := ''; print(s);
+print(mark(t,['/\\*','\\*/']));
+print(gmark(t,['/\\*','\\*/']));
+print(gsub(t,['/\\*','\\*/']));
+print(t);
+
+cs := +/[c in +/[char(i): i in [0...255]] | c('[a-z]') /= om];
+t := +/[random cs: i in [1..1000]];
+loop while t('s') /= OM do
+--  print(#t,t(1..#t min 72));
+  t(..'s') := '';
+end;
+--print(#t,t);
+
+-- Based on a case that evidently triggers non-LIFO temp storage alloc
+-- by regex, requiring execute.c to retreat from a go at asserting full
+-- LIFO.  It's OK, regex returns all the storage it has used on any
+-- given GNU SETL VM opcode excursion, just not necessarily in totally
+-- stackwise order.  GNU SETL can detect that because it provides the
+-- temp storage allocator to regex:
+$t := [getline stdin : until eof];
+t := [
+ ' *  Roughly speaking, what is here is mostly intended to be the',
+ ' *  implementation level directly below the "library" (lib.c), for',
+ ' *  the objects representing SETL values.',
+om];
+pfxs := {
+ ['--', '--'],
+ ['//', '//'],
+ ['#' ,  '#'],
+ ['*' ,'\\*'],
+ ['$' ,'\\$'],
+om};
+ts := {[pfx, line] : pfxpat = pfxs(pfx), line in t |
+          line('^ *'+pfxpat+'( |$)') /= om};
+assert #ts = #t;

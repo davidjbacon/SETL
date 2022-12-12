@@ -1,0 +1,8166 @@
+'"correct!"'
+[STRING 'correct!']
+
+[STRING 'correct!']
+
+[STRING 'correct!']
+
+STRING
+
+[OM]
+
+[STRING 'correct!']
+
+'''777.77777777777777777777777777777777777777'''
+[STRING '777.77777777777777777777777777777777777777']
+
+[STRING '777.77777777777777777777777777777777777777']
+
+[STRING '777.77777777777777777777777777777777777777']
+
+STRING
+
+[OM]
+
+[STRING '777.77777777777777777777777777777777777777']
+
+'777.77777777777777777777777777777777777777'
+[REAL 777.777777777778]
+
+[REAL 777.777777777778]
+
+[REAL 777.777777777778]
+
+REAL
+
+[REAL 777.777777777778]
+
+[REAL 777.777777777778]
+
+''
+***
+***  Report from 'setl'  ***
+***
+***  Error in or near line 34 of -3:
+***
+    30    return r;
+    31  end proc;
+    32  
+    33  proc test_unstr (s);
+[1m    34    x := unstr s;[0m
+[1m                     $[0m
+    35    return [type x, x];
+    36  end proc;
+***
+***  No denotation (token) found in UNSTR operand
+***
+***  Active routines:
+***
+***  U__unnamed_SETL_program.test_unstr
+***  U__unnamed_SETL_program.try
+***  U__unnamed_SETL_program
+***  U__MAIN
+***
+***  This is version 3.5.8 of GNU SETL.
+***
+
+[OM]
+
+[OM]
+
+*
+
+[OM]
+
+[OM]
+
+' '
+***
+***  Report from 'setl'  ***
+***
+***  Error in or near line 34 of -3:
+***
+    30    return r;
+    31  end proc;
+    32  
+    33  proc test_unstr (s);
+[1m    34    x := unstr s;[0m
+[1m                     $[0m
+    35    return [type x, x];
+    36  end proc;
+***
+***  No denotation (token) found in UNSTR operand
+***
+***  Active routines:
+***
+***  U__unnamed_SETL_program.test_unstr
+***  U__unnamed_SETL_program.try
+***  U__unnamed_SETL_program
+***  U__MAIN
+***
+***  This is version 3.5.8 of GNU SETL.
+***
+
+[OM]
+
+[OM]
+
+*
+
+[OM]
+
+[OM]
+
+'.'
+***
+***  Report from 'setl'  ***
+***
+***  Error in or near line 34 of -3:
+***
+    30    return r;
+    31  end proc;
+    32  
+    33  proc test_unstr (s);
+[1m    34    x := unstr s;[0m
+[1m                     $[0m
+    35    return [type x, x];
+    36  end proc;
+***
+***  Missing digits after "." in UNSTR operand
+***
+***  Active routines:
+***
+***  U__unnamed_SETL_program.test_unstr
+***  U__unnamed_SETL_program.try
+***  U__unnamed_SETL_program
+***  U__MAIN
+***
+***  This is version 3.5.8 of GNU SETL.
+***
+
+***
+***  Report from 'setl'  ***
+***
+***  Error in or near line 44 of -3:
+***
+    40    if fd = -1 then  -- subchild
+    41      print (s);  -- feed test string up to this subchild's parent
+    42      stop;  -- exit subchild
+    43    end if;
+[1m    44    reada (fd, x);  -- try to READA into x from what subchild spews[0m
+[1m                     $[0m
+    45    close (fd);
+    46    return [type x, x];
+***
+***  Missing digits after "." in READA input
+***
+***  Active routines:
+***
+***  U__unnamed_SETL_program.test_reada
+***  U__unnamed_SETL_program.try
+***  U__unnamed_SETL_program
+***  U__MAIN
+***
+***  This is version 3.5.8 of GNU SETL.
+***
+
+***
+***  Report from 'setl'  ***
+***
+***  Error in or near line 50 of -3:
+***
+    46    return [type x, x];
+    47  end proc;
+    48  
+    49  proc test_reads (s);
+[1m    50    reads (s, x);[0m
+[1m                    $[0m
+    51    return [type x, x];
+    52  end proc;
+***
+***  Missing digits after "." in first arg to READS
+***
+***  Active routines:
+***
+***  U__unnamed_SETL_program.test_reads
+***  U__unnamed_SETL_program.try
+***  U__unnamed_SETL_program
+***  U__MAIN
+***
+***  This is version 3.5.8 of GNU SETL.
+***
+
+*
+
+[OM]
+
+***
+***  Report from 'setl'  ***
+***
+***  Error in or near line 82 of -3:
+***
+    78    return r;
+    79  end proc;
+    80  
+    81  proc test_read();
+[1m    82    read (x);[0m
+[1m                $[0m
+    83    return [type x, x];
+    84  end proc;
+***
+***  Missing digits after "." in READ input
+***
+***  Active routines:
+***
+***  U__unnamed_SETL_program.test_read
+***  U__unnamed_SETL_program.try_read
+***  U__unnamed_SETL_program
+***  U__MAIN
+***
+***  This is version 3.5.8 of GNU SETL.
+***
+
+'+'
+***
+***  Report from 'setl'  ***
+***
+***  Error in or near line 34 of -3:
+***
+    30    return r;
+    31  end proc;
+    32  
+    33  proc test_unstr (s);
+[1m    34    x := unstr s;[0m
+[1m                     $[0m
+    35    return [type x, x];
+    36  end proc;
+***
+***  Missing digits after "+" in UNSTR operand
+***
+***  Active routines:
+***
+***  U__unnamed_SETL_program.test_unstr
+***  U__unnamed_SETL_program.try
+***  U__unnamed_SETL_program
+***  U__MAIN
+***
+***  This is version 3.5.8 of GNU SETL.
+***
+
+***
+***  Report from 'setl'  ***
+***
+***  Error in or near line 44 of -3:
+***
+    40    if fd = -1 then  -- subchild
+    41      print (s);  -- feed test string up to this subchild's parent
+    42      stop;  -- exit subchild
+    43    end if;
+[1m    44    reada (fd, x);  -- try to READA into x from what subchild spews[0m
+[1m                     $[0m
+    45    close (fd);
+    46    return [type x, x];
+***
+***  Missing digits after "+" in READA input
+***
+***  Active routines:
+***
+***  U__unnamed_SETL_program.test_reada
+***  U__unnamed_SETL_program.try
+***  U__unnamed_SETL_program
+***  U__MAIN
+***
+***  This is version 3.5.8 of GNU SETL.
+***
+
+***
+***  Report from 'setl'  ***
+***
+***  Error in or near line 50 of -3:
+***
+    46    return [type x, x];
+    47  end proc;
+    48  
+    49  proc test_reads (s);
+[1m    50    reads (s, x);[0m
+[1m                    $[0m
+    51    return [type x, x];
+    52  end proc;
+***
+***  Missing digits after "+" in first arg to READS
+***
+***  Active routines:
+***
+***  U__unnamed_SETL_program.test_reads
+***  U__unnamed_SETL_program.try
+***  U__unnamed_SETL_program
+***  U__MAIN
+***
+***  This is version 3.5.8 of GNU SETL.
+***
+
+*
+
+[OM]
+
+***
+***  Report from 'setl'  ***
+***
+***  Error in or near line 82 of -3:
+***
+    78    return r;
+    79  end proc;
+    80  
+    81  proc test_read();
+[1m    82    read (x);[0m
+[1m                $[0m
+    83    return [type x, x];
+    84  end proc;
+***
+***  Missing digits after "+" in READ input
+***
+***  Active routines:
+***
+***  U__unnamed_SETL_program.test_read
+***  U__unnamed_SETL_program.try_read
+***  U__unnamed_SETL_program
+***  U__MAIN
+***
+***  This is version 3.5.8 of GNU SETL.
+***
+
+'-'
+***
+***  Report from 'setl'  ***
+***
+***  Error in or near line 34 of -3:
+***
+    30    return r;
+    31  end proc;
+    32  
+    33  proc test_unstr (s);
+[1m    34    x := unstr s;[0m
+[1m                     $[0m
+    35    return [type x, x];
+    36  end proc;
+***
+***  Missing digits after "-" in UNSTR operand
+***
+***  Active routines:
+***
+***  U__unnamed_SETL_program.test_unstr
+***  U__unnamed_SETL_program.try
+***  U__unnamed_SETL_program
+***  U__MAIN
+***
+***  This is version 3.5.8 of GNU SETL.
+***
+
+***
+***  Report from 'setl'  ***
+***
+***  Error in or near line 44 of -3:
+***
+    40    if fd = -1 then  -- subchild
+    41      print (s);  -- feed test string up to this subchild's parent
+    42      stop;  -- exit subchild
+    43    end if;
+[1m    44    reada (fd, x);  -- try to READA into x from what subchild spews[0m
+[1m                     $[0m
+    45    close (fd);
+    46    return [type x, x];
+***
+***  Missing digits after "-" in READA input
+***
+***  Active routines:
+***
+***  U__unnamed_SETL_program.test_reada
+***  U__unnamed_SETL_program.try
+***  U__unnamed_SETL_program
+***  U__MAIN
+***
+***  This is version 3.5.8 of GNU SETL.
+***
+
+***
+***  Report from 'setl'  ***
+***
+***  Error in or near line 50 of -3:
+***
+    46    return [type x, x];
+    47  end proc;
+    48  
+    49  proc test_reads (s);
+[1m    50    reads (s, x);[0m
+[1m                    $[0m
+    51    return [type x, x];
+    52  end proc;
+***
+***  Missing digits after "-" in first arg to READS
+***
+***  Active routines:
+***
+***  U__unnamed_SETL_program.test_reads
+***  U__unnamed_SETL_program.try
+***  U__unnamed_SETL_program
+***  U__MAIN
+***
+***  This is version 3.5.8 of GNU SETL.
+***
+
+*
+
+[OM]
+
+***
+***  Report from 'setl'  ***
+***
+***  Error in or near line 82 of -3:
+***
+    78    return r;
+    79  end proc;
+    80  
+    81  proc test_read();
+[1m    82    read (x);[0m
+[1m                $[0m
+    83    return [type x, x];
+    84  end proc;
+***
+***  Missing digits after "-" in READ input
+***
+***  Active routines:
+***
+***  U__unnamed_SETL_program.test_read
+***  U__unnamed_SETL_program.try_read
+***  U__unnamed_SETL_program
+***  U__MAIN
+***
+***  This is version 3.5.8 of GNU SETL.
+***
+
+'+.'
+***
+***  Report from 'setl'  ***
+***
+***  Error in or near line 34 of -3:
+***
+    30    return r;
+    31  end proc;
+    32  
+    33  proc test_unstr (s);
+[1m    34    x := unstr s;[0m
+[1m                     $[0m
+    35    return [type x, x];
+    36  end proc;
+***
+***  Missing digits after "+." in UNSTR operand
+***
+***  Active routines:
+***
+***  U__unnamed_SETL_program.test_unstr
+***  U__unnamed_SETL_program.try
+***  U__unnamed_SETL_program
+***  U__MAIN
+***
+***  This is version 3.5.8 of GNU SETL.
+***
+
+***
+***  Report from 'setl'  ***
+***
+***  Error in or near line 44 of -3:
+***
+    40    if fd = -1 then  -- subchild
+    41      print (s);  -- feed test string up to this subchild's parent
+    42      stop;  -- exit subchild
+    43    end if;
+[1m    44    reada (fd, x);  -- try to READA into x from what subchild spews[0m
+[1m                     $[0m
+    45    close (fd);
+    46    return [type x, x];
+***
+***  Missing digits after "+." in READA input
+***
+***  Active routines:
+***
+***  U__unnamed_SETL_program.test_reada
+***  U__unnamed_SETL_program.try
+***  U__unnamed_SETL_program
+***  U__MAIN
+***
+***  This is version 3.5.8 of GNU SETL.
+***
+
+***
+***  Report from 'setl'  ***
+***
+***  Error in or near line 50 of -3:
+***
+    46    return [type x, x];
+    47  end proc;
+    48  
+    49  proc test_reads (s);
+[1m    50    reads (s, x);[0m
+[1m                    $[0m
+    51    return [type x, x];
+    52  end proc;
+***
+***  Missing digits after "+." in first arg to READS
+***
+***  Active routines:
+***
+***  U__unnamed_SETL_program.test_reads
+***  U__unnamed_SETL_program.try
+***  U__unnamed_SETL_program
+***  U__MAIN
+***
+***  This is version 3.5.8 of GNU SETL.
+***
+
+*
+
+[OM]
+
+***
+***  Report from 'setl'  ***
+***
+***  Error in or near line 82 of -3:
+***
+    78    return r;
+    79  end proc;
+    80  
+    81  proc test_read();
+[1m    82    read (x);[0m
+[1m                $[0m
+    83    return [type x, x];
+    84  end proc;
+***
+***  Missing digits after "+." in READ input
+***
+***  Active routines:
+***
+***  U__unnamed_SETL_program.test_read
+***  U__unnamed_SETL_program.try_read
+***  U__unnamed_SETL_program
+***  U__MAIN
+***
+***  This is version 3.5.8 of GNU SETL.
+***
+
+'-.'
+***
+***  Report from 'setl'  ***
+***
+***  Error in or near line 34 of -3:
+***
+    30    return r;
+    31  end proc;
+    32  
+    33  proc test_unstr (s);
+[1m    34    x := unstr s;[0m
+[1m                     $[0m
+    35    return [type x, x];
+    36  end proc;
+***
+***  Missing digits after "-." in UNSTR operand
+***
+***  Active routines:
+***
+***  U__unnamed_SETL_program.test_unstr
+***  U__unnamed_SETL_program.try
+***  U__unnamed_SETL_program
+***  U__MAIN
+***
+***  This is version 3.5.8 of GNU SETL.
+***
+
+***
+***  Report from 'setl'  ***
+***
+***  Error in or near line 44 of -3:
+***
+    40    if fd = -1 then  -- subchild
+    41      print (s);  -- feed test string up to this subchild's parent
+    42      stop;  -- exit subchild
+    43    end if;
+[1m    44    reada (fd, x);  -- try to READA into x from what subchild spews[0m
+[1m                     $[0m
+    45    close (fd);
+    46    return [type x, x];
+***
+***  Missing digits after "-." in READA input
+***
+***  Active routines:
+***
+***  U__unnamed_SETL_program.test_reada
+***  U__unnamed_SETL_program.try
+***  U__unnamed_SETL_program
+***  U__MAIN
+***
+***  This is version 3.5.8 of GNU SETL.
+***
+
+***
+***  Report from 'setl'  ***
+***
+***  Error in or near line 50 of -3:
+***
+    46    return [type x, x];
+    47  end proc;
+    48  
+    49  proc test_reads (s);
+[1m    50    reads (s, x);[0m
+[1m                    $[0m
+    51    return [type x, x];
+    52  end proc;
+***
+***  Missing digits after "-." in first arg to READS
+***
+***  Active routines:
+***
+***  U__unnamed_SETL_program.test_reads
+***  U__unnamed_SETL_program.try
+***  U__unnamed_SETL_program
+***  U__MAIN
+***
+***  This is version 3.5.8 of GNU SETL.
+***
+
+*
+
+[OM]
+
+***
+***  Report from 'setl'  ***
+***
+***  Error in or near line 82 of -3:
+***
+    78    return r;
+    79  end proc;
+    80  
+    81  proc test_read();
+[1m    82    read (x);[0m
+[1m                $[0m
+    83    return [type x, x];
+    84  end proc;
+***
+***  Missing digits after "-." in READ input
+***
+***  Active routines:
+***
+***  U__unnamed_SETL_program.test_read
+***  U__unnamed_SETL_program.try_read
+***  U__unnamed_SETL_program
+***  U__MAIN
+***
+***  This is version 3.5.8 of GNU SETL.
+***
+
+'.+'
+***
+***  Report from 'setl'  ***
+***
+***  Error in or near line 34 of -3:
+***
+    30    return r;
+    31  end proc;
+    32  
+    33  proc test_unstr (s);
+[1m    34    x := unstr s;[0m
+[1m                     $[0m
+    35    return [type x, x];
+    36  end proc;
+***
+***  Misplaced '+' or '-' in ".+" in UNSTR operand
+***
+***  Active routines:
+***
+***  U__unnamed_SETL_program.test_unstr
+***  U__unnamed_SETL_program.try
+***  U__unnamed_SETL_program
+***  U__MAIN
+***
+***  This is version 3.5.8 of GNU SETL.
+***
+
+***
+***  Report from 'setl'  ***
+***
+***  Error in or near line 44 of -3:
+***
+    40    if fd = -1 then  -- subchild
+    41      print (s);  -- feed test string up to this subchild's parent
+    42      stop;  -- exit subchild
+    43    end if;
+[1m    44    reada (fd, x);  -- try to READA into x from what subchild spews[0m
+[1m                     $[0m
+    45    close (fd);
+    46    return [type x, x];
+***
+***  Misplaced '+' or '-' in ".+" in READA input
+***
+***  Active routines:
+***
+***  U__unnamed_SETL_program.test_reada
+***  U__unnamed_SETL_program.try
+***  U__unnamed_SETL_program
+***  U__MAIN
+***
+***  This is version 3.5.8 of GNU SETL.
+***
+
+***
+***  Report from 'setl'  ***
+***
+***  Error in or near line 50 of -3:
+***
+    46    return [type x, x];
+    47  end proc;
+    48  
+    49  proc test_reads (s);
+[1m    50    reads (s, x);[0m
+[1m                    $[0m
+    51    return [type x, x];
+    52  end proc;
+***
+***  Misplaced '+' or '-' in ".+" in first arg to READS
+***
+***  Active routines:
+***
+***  U__unnamed_SETL_program.test_reads
+***  U__unnamed_SETL_program.try
+***  U__unnamed_SETL_program
+***  U__MAIN
+***
+***  This is version 3.5.8 of GNU SETL.
+***
+
+*
+
+[OM]
+
+***
+***  Report from 'setl'  ***
+***
+***  Error in or near line 82 of -3:
+***
+    78    return r;
+    79  end proc;
+    80  
+    81  proc test_read();
+[1m    82    read (x);[0m
+[1m                $[0m
+    83    return [type x, x];
+    84  end proc;
+***
+***  Misplaced '+' or '-' in ".+" in READ input
+***
+***  Active routines:
+***
+***  U__unnamed_SETL_program.test_read
+***  U__unnamed_SETL_program.try_read
+***  U__unnamed_SETL_program
+***  U__MAIN
+***
+***  This is version 3.5.8 of GNU SETL.
+***
+
+'.-'
+***
+***  Report from 'setl'  ***
+***
+***  Error in or near line 34 of -3:
+***
+    30    return r;
+    31  end proc;
+    32  
+    33  proc test_unstr (s);
+[1m    34    x := unstr s;[0m
+[1m                     $[0m
+    35    return [type x, x];
+    36  end proc;
+***
+***  Misplaced '+' or '-' in ".-" in UNSTR operand
+***
+***  Active routines:
+***
+***  U__unnamed_SETL_program.test_unstr
+***  U__unnamed_SETL_program.try
+***  U__unnamed_SETL_program
+***  U__MAIN
+***
+***  This is version 3.5.8 of GNU SETL.
+***
+
+***
+***  Report from 'setl'  ***
+***
+***  Error in or near line 44 of -3:
+***
+    40    if fd = -1 then  -- subchild
+    41      print (s);  -- feed test string up to this subchild's parent
+    42      stop;  -- exit subchild
+    43    end if;
+[1m    44    reada (fd, x);  -- try to READA into x from what subchild spews[0m
+[1m                     $[0m
+    45    close (fd);
+    46    return [type x, x];
+***
+***  Misplaced '+' or '-' in ".-" in READA input
+***
+***  Active routines:
+***
+***  U__unnamed_SETL_program.test_reada
+***  U__unnamed_SETL_program.try
+***  U__unnamed_SETL_program
+***  U__MAIN
+***
+***  This is version 3.5.8 of GNU SETL.
+***
+
+***
+***  Report from 'setl'  ***
+***
+***  Error in or near line 50 of -3:
+***
+    46    return [type x, x];
+    47  end proc;
+    48  
+    49  proc test_reads (s);
+[1m    50    reads (s, x);[0m
+[1m                    $[0m
+    51    return [type x, x];
+    52  end proc;
+***
+***  Misplaced '+' or '-' in ".-" in first arg to READS
+***
+***  Active routines:
+***
+***  U__unnamed_SETL_program.test_reads
+***  U__unnamed_SETL_program.try
+***  U__unnamed_SETL_program
+***  U__MAIN
+***
+***  This is version 3.5.8 of GNU SETL.
+***
+
+*
+
+[OM]
+
+***
+***  Report from 'setl'  ***
+***
+***  Error in or near line 82 of -3:
+***
+    78    return r;
+    79  end proc;
+    80  
+    81  proc test_read();
+[1m    82    read (x);[0m
+[1m                $[0m
+    83    return [type x, x];
+    84  end proc;
+***
+***  Misplaced '+' or '-' in ".-" in READ input
+***
+***  Active routines:
+***
+***  U__unnamed_SETL_program.test_read
+***  U__unnamed_SETL_program.try_read
+***  U__unnamed_SETL_program
+***  U__MAIN
+***
+***  This is version 3.5.8 of GNU SETL.
+***
+
+'.e'
+***
+***  Report from 'setl'  ***
+***
+***  Error in or near line 34 of -3:
+***
+    30    return r;
+    31  end proc;
+    32  
+    33  proc test_unstr (s);
+[1m    34    x := unstr s;[0m
+[1m                     $[0m
+    35    return [type x, x];
+    36  end proc;
+***
+***  Misplaced 'e' or 'E' in ".e" in UNSTR operand
+***
+***  Active routines:
+***
+***  U__unnamed_SETL_program.test_unstr
+***  U__unnamed_SETL_program.try
+***  U__unnamed_SETL_program
+***  U__MAIN
+***
+***  This is version 3.5.8 of GNU SETL.
+***
+
+***
+***  Report from 'setl'  ***
+***
+***  Error in or near line 44 of -3:
+***
+    40    if fd = -1 then  -- subchild
+    41      print (s);  -- feed test string up to this subchild's parent
+    42      stop;  -- exit subchild
+    43    end if;
+[1m    44    reada (fd, x);  -- try to READA into x from what subchild spews[0m
+[1m                     $[0m
+    45    close (fd);
+    46    return [type x, x];
+***
+***  Misplaced 'e' or 'E' in ".e" in READA input
+***
+***  Active routines:
+***
+***  U__unnamed_SETL_program.test_reada
+***  U__unnamed_SETL_program.try
+***  U__unnamed_SETL_program
+***  U__MAIN
+***
+***  This is version 3.5.8 of GNU SETL.
+***
+
+***
+***  Report from 'setl'  ***
+***
+***  Error in or near line 50 of -3:
+***
+    46    return [type x, x];
+    47  end proc;
+    48  
+    49  proc test_reads (s);
+[1m    50    reads (s, x);[0m
+[1m                    $[0m
+    51    return [type x, x];
+    52  end proc;
+***
+***  Misplaced 'e' or 'E' in ".e" in first arg to READS
+***
+***  Active routines:
+***
+***  U__unnamed_SETL_program.test_reads
+***  U__unnamed_SETL_program.try
+***  U__unnamed_SETL_program
+***  U__MAIN
+***
+***  This is version 3.5.8 of GNU SETL.
+***
+
+*
+
+[OM]
+
+***
+***  Report from 'setl'  ***
+***
+***  Error in or near line 82 of -3:
+***
+    78    return r;
+    79  end proc;
+    80  
+    81  proc test_read();
+[1m    82    read (x);[0m
+[1m                $[0m
+    83    return [type x, x];
+    84  end proc;
+***
+***  Misplaced 'e' or 'E' in ".e" in READ input
+***
+***  Active routines:
+***
+***  U__unnamed_SETL_program.test_read
+***  U__unnamed_SETL_program.try_read
+***  U__unnamed_SETL_program
+***  U__MAIN
+***
+***  This is version 3.5.8 of GNU SETL.
+***
+
+'+e'
+***
+***  Report from 'setl'  ***
+***
+***  Error in or near line 34 of -3:
+***
+    30    return r;
+    31  end proc;
+    32  
+    33  proc test_unstr (s);
+[1m    34    x := unstr s;[0m
+[1m                     $[0m
+    35    return [type x, x];
+    36  end proc;
+***
+***  Misplaced 'e' or 'E' in "+e" in UNSTR operand
+***
+***  Active routines:
+***
+***  U__unnamed_SETL_program.test_unstr
+***  U__unnamed_SETL_program.try
+***  U__unnamed_SETL_program
+***  U__MAIN
+***
+***  This is version 3.5.8 of GNU SETL.
+***
+
+***
+***  Report from 'setl'  ***
+***
+***  Error in or near line 44 of -3:
+***
+    40    if fd = -1 then  -- subchild
+    41      print (s);  -- feed test string up to this subchild's parent
+    42      stop;  -- exit subchild
+    43    end if;
+[1m    44    reada (fd, x);  -- try to READA into x from what subchild spews[0m
+[1m                     $[0m
+    45    close (fd);
+    46    return [type x, x];
+***
+***  Misplaced 'e' or 'E' in "+e" in READA input
+***
+***  Active routines:
+***
+***  U__unnamed_SETL_program.test_reada
+***  U__unnamed_SETL_program.try
+***  U__unnamed_SETL_program
+***  U__MAIN
+***
+***  This is version 3.5.8 of GNU SETL.
+***
+
+***
+***  Report from 'setl'  ***
+***
+***  Error in or near line 50 of -3:
+***
+    46    return [type x, x];
+    47  end proc;
+    48  
+    49  proc test_reads (s);
+[1m    50    reads (s, x);[0m
+[1m                    $[0m
+    51    return [type x, x];
+    52  end proc;
+***
+***  Misplaced 'e' or 'E' in "+e" in first arg to READS
+***
+***  Active routines:
+***
+***  U__unnamed_SETL_program.test_reads
+***  U__unnamed_SETL_program.try
+***  U__unnamed_SETL_program
+***  U__MAIN
+***
+***  This is version 3.5.8 of GNU SETL.
+***
+
+*
+
+[OM]
+
+***
+***  Report from 'setl'  ***
+***
+***  Error in or near line 82 of -3:
+***
+    78    return r;
+    79  end proc;
+    80  
+    81  proc test_read();
+[1m    82    read (x);[0m
+[1m                $[0m
+    83    return [type x, x];
+    84  end proc;
+***
+***  Misplaced 'e' or 'E' in "+e" in READ input
+***
+***  Active routines:
+***
+***  U__unnamed_SETL_program.test_read
+***  U__unnamed_SETL_program.try_read
+***  U__unnamed_SETL_program
+***  U__MAIN
+***
+***  This is version 3.5.8 of GNU SETL.
+***
+
+'-e'
+***
+***  Report from 'setl'  ***
+***
+***  Error in or near line 34 of -3:
+***
+    30    return r;
+    31  end proc;
+    32  
+    33  proc test_unstr (s);
+[1m    34    x := unstr s;[0m
+[1m                     $[0m
+    35    return [type x, x];
+    36  end proc;
+***
+***  Misplaced 'e' or 'E' in "-e" in UNSTR operand
+***
+***  Active routines:
+***
+***  U__unnamed_SETL_program.test_unstr
+***  U__unnamed_SETL_program.try
+***  U__unnamed_SETL_program
+***  U__MAIN
+***
+***  This is version 3.5.8 of GNU SETL.
+***
+
+***
+***  Report from 'setl'  ***
+***
+***  Error in or near line 44 of -3:
+***
+    40    if fd = -1 then  -- subchild
+    41      print (s);  -- feed test string up to this subchild's parent
+    42      stop;  -- exit subchild
+    43    end if;
+[1m    44    reada (fd, x);  -- try to READA into x from what subchild spews[0m
+[1m                     $[0m
+    45    close (fd);
+    46    return [type x, x];
+***
+***  Misplaced 'e' or 'E' in "-e" in READA input
+***
+***  Active routines:
+***
+***  U__unnamed_SETL_program.test_reada
+***  U__unnamed_SETL_program.try
+***  U__unnamed_SETL_program
+***  U__MAIN
+***
+***  This is version 3.5.8 of GNU SETL.
+***
+
+***
+***  Report from 'setl'  ***
+***
+***  Error in or near line 50 of -3:
+***
+    46    return [type x, x];
+    47  end proc;
+    48  
+    49  proc test_reads (s);
+[1m    50    reads (s, x);[0m
+[1m                    $[0m
+    51    return [type x, x];
+    52  end proc;
+***
+***  Misplaced 'e' or 'E' in "-e" in first arg to READS
+***
+***  Active routines:
+***
+***  U__unnamed_SETL_program.test_reads
+***  U__unnamed_SETL_program.try
+***  U__unnamed_SETL_program
+***  U__MAIN
+***
+***  This is version 3.5.8 of GNU SETL.
+***
+
+*
+
+[OM]
+
+***
+***  Report from 'setl'  ***
+***
+***  Error in or near line 82 of -3:
+***
+    78    return r;
+    79  end proc;
+    80  
+    81  proc test_read();
+[1m    82    read (x);[0m
+[1m                $[0m
+    83    return [type x, x];
+    84  end proc;
+***
+***  Misplaced 'e' or 'E' in "-e" in READ input
+***
+***  Active routines:
+***
+***  U__unnamed_SETL_program.test_read
+***  U__unnamed_SETL_program.try_read
+***  U__unnamed_SETL_program
+***  U__MAIN
+***
+***  This is version 3.5.8 of GNU SETL.
+***
+
+'+.e'
+***
+***  Report from 'setl'  ***
+***
+***  Error in or near line 34 of -3:
+***
+    30    return r;
+    31  end proc;
+    32  
+    33  proc test_unstr (s);
+[1m    34    x := unstr s;[0m
+[1m                     $[0m
+    35    return [type x, x];
+    36  end proc;
+***
+***  Misplaced 'e' or 'E' in "+.e" in UNSTR operand
+***
+***  Active routines:
+***
+***  U__unnamed_SETL_program.test_unstr
+***  U__unnamed_SETL_program.try
+***  U__unnamed_SETL_program
+***  U__MAIN
+***
+***  This is version 3.5.8 of GNU SETL.
+***
+
+***
+***  Report from 'setl'  ***
+***
+***  Error in or near line 44 of -3:
+***
+    40    if fd = -1 then  -- subchild
+    41      print (s);  -- feed test string up to this subchild's parent
+    42      stop;  -- exit subchild
+    43    end if;
+[1m    44    reada (fd, x);  -- try to READA into x from what subchild spews[0m
+[1m                     $[0m
+    45    close (fd);
+    46    return [type x, x];
+***
+***  Misplaced 'e' or 'E' in "+.e" in READA input
+***
+***  Active routines:
+***
+***  U__unnamed_SETL_program.test_reada
+***  U__unnamed_SETL_program.try
+***  U__unnamed_SETL_program
+***  U__MAIN
+***
+***  This is version 3.5.8 of GNU SETL.
+***
+
+***
+***  Report from 'setl'  ***
+***
+***  Error in or near line 50 of -3:
+***
+    46    return [type x, x];
+    47  end proc;
+    48  
+    49  proc test_reads (s);
+[1m    50    reads (s, x);[0m
+[1m                    $[0m
+    51    return [type x, x];
+    52  end proc;
+***
+***  Misplaced 'e' or 'E' in "+.e" in first arg to READS
+***
+***  Active routines:
+***
+***  U__unnamed_SETL_program.test_reads
+***  U__unnamed_SETL_program.try
+***  U__unnamed_SETL_program
+***  U__MAIN
+***
+***  This is version 3.5.8 of GNU SETL.
+***
+
+*
+
+[OM]
+
+***
+***  Report from 'setl'  ***
+***
+***  Error in or near line 82 of -3:
+***
+    78    return r;
+    79  end proc;
+    80  
+    81  proc test_read();
+[1m    82    read (x);[0m
+[1m                $[0m
+    83    return [type x, x];
+    84  end proc;
+***
+***  Misplaced 'e' or 'E' in "+.e" in READ input
+***
+***  Active routines:
+***
+***  U__unnamed_SETL_program.test_read
+***  U__unnamed_SETL_program.try_read
+***  U__unnamed_SETL_program
+***  U__MAIN
+***
+***  This is version 3.5.8 of GNU SETL.
+***
+
+'-.e'
+***
+***  Report from 'setl'  ***
+***
+***  Error in or near line 34 of -3:
+***
+    30    return r;
+    31  end proc;
+    32  
+    33  proc test_unstr (s);
+[1m    34    x := unstr s;[0m
+[1m                     $[0m
+    35    return [type x, x];
+    36  end proc;
+***
+***  Misplaced 'e' or 'E' in "-.e" in UNSTR operand
+***
+***  Active routines:
+***
+***  U__unnamed_SETL_program.test_unstr
+***  U__unnamed_SETL_program.try
+***  U__unnamed_SETL_program
+***  U__MAIN
+***
+***  This is version 3.5.8 of GNU SETL.
+***
+
+***
+***  Report from 'setl'  ***
+***
+***  Error in or near line 44 of -3:
+***
+    40    if fd = -1 then  -- subchild
+    41      print (s);  -- feed test string up to this subchild's parent
+    42      stop;  -- exit subchild
+    43    end if;
+[1m    44    reada (fd, x);  -- try to READA into x from what subchild spews[0m
+[1m                     $[0m
+    45    close (fd);
+    46    return [type x, x];
+***
+***  Misplaced 'e' or 'E' in "-.e" in READA input
+***
+***  Active routines:
+***
+***  U__unnamed_SETL_program.test_reada
+***  U__unnamed_SETL_program.try
+***  U__unnamed_SETL_program
+***  U__MAIN
+***
+***  This is version 3.5.8 of GNU SETL.
+***
+
+***
+***  Report from 'setl'  ***
+***
+***  Error in or near line 50 of -3:
+***
+    46    return [type x, x];
+    47  end proc;
+    48  
+    49  proc test_reads (s);
+[1m    50    reads (s, x);[0m
+[1m                    $[0m
+    51    return [type x, x];
+    52  end proc;
+***
+***  Misplaced 'e' or 'E' in "-.e" in first arg to READS
+***
+***  Active routines:
+***
+***  U__unnamed_SETL_program.test_reads
+***  U__unnamed_SETL_program.try
+***  U__unnamed_SETL_program
+***  U__MAIN
+***
+***  This is version 3.5.8 of GNU SETL.
+***
+
+*
+
+[OM]
+
+***
+***  Report from 'setl'  ***
+***
+***  Error in or near line 82 of -3:
+***
+    78    return r;
+    79  end proc;
+    80  
+    81  proc test_read();
+[1m    82    read (x);[0m
+[1m                $[0m
+    83    return [type x, x];
+    84  end proc;
+***
+***  Misplaced 'e' or 'E' in "-.e" in READ input
+***
+***  Active routines:
+***
+***  U__unnamed_SETL_program.test_read
+***  U__unnamed_SETL_program.try_read
+***  U__unnamed_SETL_program
+***  U__MAIN
+***
+***  This is version 3.5.8 of GNU SETL.
+***
+
+'.+e'
+***
+***  Report from 'setl'  ***
+***
+***  Error in or near line 34 of -3:
+***
+    30    return r;
+    31  end proc;
+    32  
+    33  proc test_unstr (s);
+[1m    34    x := unstr s;[0m
+[1m                     $[0m
+    35    return [type x, x];
+    36  end proc;
+***
+***  Misplaced '+' or '-' in ".+" in UNSTR operand
+***
+***  Active routines:
+***
+***  U__unnamed_SETL_program.test_unstr
+***  U__unnamed_SETL_program.try
+***  U__unnamed_SETL_program
+***  U__MAIN
+***
+***  This is version 3.5.8 of GNU SETL.
+***
+
+***
+***  Report from 'setl'  ***
+***
+***  Error in or near line 44 of -3:
+***
+    40    if fd = -1 then  -- subchild
+    41      print (s);  -- feed test string up to this subchild's parent
+    42      stop;  -- exit subchild
+    43    end if;
+[1m    44    reada (fd, x);  -- try to READA into x from what subchild spews[0m
+[1m                     $[0m
+    45    close (fd);
+    46    return [type x, x];
+***
+***  Misplaced '+' or '-' in ".+" in READA input
+***
+***  Active routines:
+***
+***  U__unnamed_SETL_program.test_reada
+***  U__unnamed_SETL_program.try
+***  U__unnamed_SETL_program
+***  U__MAIN
+***
+***  This is version 3.5.8 of GNU SETL.
+***
+
+***
+***  Report from 'setl'  ***
+***
+***  Error in or near line 50 of -3:
+***
+    46    return [type x, x];
+    47  end proc;
+    48  
+    49  proc test_reads (s);
+[1m    50    reads (s, x);[0m
+[1m                    $[0m
+    51    return [type x, x];
+    52  end proc;
+***
+***  Misplaced '+' or '-' in ".+" in first arg to READS
+***
+***  Active routines:
+***
+***  U__unnamed_SETL_program.test_reads
+***  U__unnamed_SETL_program.try
+***  U__unnamed_SETL_program
+***  U__MAIN
+***
+***  This is version 3.5.8 of GNU SETL.
+***
+
+*
+
+[OM]
+
+***
+***  Report from 'setl'  ***
+***
+***  Error in or near line 82 of -3:
+***
+    78    return r;
+    79  end proc;
+    80  
+    81  proc test_read();
+[1m    82    read (x);[0m
+[1m                $[0m
+    83    return [type x, x];
+    84  end proc;
+***
+***  Misplaced '+' or '-' in ".+" in READ input
+***
+***  Active routines:
+***
+***  U__unnamed_SETL_program.test_read
+***  U__unnamed_SETL_program.try_read
+***  U__unnamed_SETL_program
+***  U__MAIN
+***
+***  This is version 3.5.8 of GNU SETL.
+***
+
+'.-e'
+***
+***  Report from 'setl'  ***
+***
+***  Error in or near line 34 of -3:
+***
+    30    return r;
+    31  end proc;
+    32  
+    33  proc test_unstr (s);
+[1m    34    x := unstr s;[0m
+[1m                     $[0m
+    35    return [type x, x];
+    36  end proc;
+***
+***  Misplaced '+' or '-' in ".-" in UNSTR operand
+***
+***  Active routines:
+***
+***  U__unnamed_SETL_program.test_unstr
+***  U__unnamed_SETL_program.try
+***  U__unnamed_SETL_program
+***  U__MAIN
+***
+***  This is version 3.5.8 of GNU SETL.
+***
+
+***
+***  Report from 'setl'  ***
+***
+***  Error in or near line 44 of -3:
+***
+    40    if fd = -1 then  -- subchild
+    41      print (s);  -- feed test string up to this subchild's parent
+    42      stop;  -- exit subchild
+    43    end if;
+[1m    44    reada (fd, x);  -- try to READA into x from what subchild spews[0m
+[1m                     $[0m
+    45    close (fd);
+    46    return [type x, x];
+***
+***  Misplaced '+' or '-' in ".-" in READA input
+***
+***  Active routines:
+***
+***  U__unnamed_SETL_program.test_reada
+***  U__unnamed_SETL_program.try
+***  U__unnamed_SETL_program
+***  U__MAIN
+***
+***  This is version 3.5.8 of GNU SETL.
+***
+
+***
+***  Report from 'setl'  ***
+***
+***  Error in or near line 50 of -3:
+***
+    46    return [type x, x];
+    47  end proc;
+    48  
+    49  proc test_reads (s);
+[1m    50    reads (s, x);[0m
+[1m                    $[0m
+    51    return [type x, x];
+    52  end proc;
+***
+***  Misplaced '+' or '-' in ".-" in first arg to READS
+***
+***  Active routines:
+***
+***  U__unnamed_SETL_program.test_reads
+***  U__unnamed_SETL_program.try
+***  U__unnamed_SETL_program
+***  U__MAIN
+***
+***  This is version 3.5.8 of GNU SETL.
+***
+
+*
+
+[OM]
+
+***
+***  Report from 'setl'  ***
+***
+***  Error in or near line 82 of -3:
+***
+    78    return r;
+    79  end proc;
+    80  
+    81  proc test_read();
+[1m    82    read (x);[0m
+[1m                $[0m
+    83    return [type x, x];
+    84  end proc;
+***
+***  Misplaced '+' or '-' in ".-" in READ input
+***
+***  Active routines:
+***
+***  U__unnamed_SETL_program.test_read
+***  U__unnamed_SETL_program.try_read
+***  U__unnamed_SETL_program
+***  U__MAIN
+***
+***  This is version 3.5.8 of GNU SETL.
+***
+
+'.7'
+[REAL 0.7]
+
+[REAL 0.7]
+
+[REAL 0.7]
+
+REAL
+
+[REAL 0.7]
+
+[REAL 0.7]
+
+'+7'
+[INTEGER 7]
+
+[INTEGER 7]
+
+[INTEGER 7]
+
+INTEGER
+
+[INTEGER 7]
+
+[INTEGER 7]
+
+'-7'
+[INTEGER -7]
+
+[INTEGER -7]
+
+[INTEGER -7]
+
+INTEGER
+
+[INTEGER -7]
+
+[INTEGER -7]
+
+'+.7'
+[REAL 0.7]
+
+[REAL 0.7]
+
+[REAL 0.7]
+
+REAL
+
+[REAL 0.7]
+
+[REAL 0.7]
+
+'-.7'
+[REAL -0.7]
+
+[REAL -0.7]
+
+[REAL -0.7]
+
+REAL
+
+[REAL -0.7]
+
+[REAL -0.7]
+
+'.+7'
+***
+***  Report from 'setl'  ***
+***
+***  Error in or near line 34 of -3:
+***
+    30    return r;
+    31  end proc;
+    32  
+    33  proc test_unstr (s);
+[1m    34    x := unstr s;[0m
+[1m                     $[0m
+    35    return [type x, x];
+    36  end proc;
+***
+***  Misplaced '+' or '-' in ".+" in UNSTR operand
+***
+***  Active routines:
+***
+***  U__unnamed_SETL_program.test_unstr
+***  U__unnamed_SETL_program.try
+***  U__unnamed_SETL_program
+***  U__MAIN
+***
+***  This is version 3.5.8 of GNU SETL.
+***
+
+***
+***  Report from 'setl'  ***
+***
+***  Error in or near line 44 of -3:
+***
+    40    if fd = -1 then  -- subchild
+    41      print (s);  -- feed test string up to this subchild's parent
+    42      stop;  -- exit subchild
+    43    end if;
+[1m    44    reada (fd, x);  -- try to READA into x from what subchild spews[0m
+[1m                     $[0m
+    45    close (fd);
+    46    return [type x, x];
+***
+***  Misplaced '+' or '-' in ".+" in READA input
+***
+***  Active routines:
+***
+***  U__unnamed_SETL_program.test_reada
+***  U__unnamed_SETL_program.try
+***  U__unnamed_SETL_program
+***  U__MAIN
+***
+***  This is version 3.5.8 of GNU SETL.
+***
+
+***
+***  Report from 'setl'  ***
+***
+***  Error in or near line 50 of -3:
+***
+    46    return [type x, x];
+    47  end proc;
+    48  
+    49  proc test_reads (s);
+[1m    50    reads (s, x);[0m
+[1m                    $[0m
+    51    return [type x, x];
+    52  end proc;
+***
+***  Misplaced '+' or '-' in ".+" in first arg to READS
+***
+***  Active routines:
+***
+***  U__unnamed_SETL_program.test_reads
+***  U__unnamed_SETL_program.try
+***  U__unnamed_SETL_program
+***  U__MAIN
+***
+***  This is version 3.5.8 of GNU SETL.
+***
+
+*
+
+[OM]
+
+***
+***  Report from 'setl'  ***
+***
+***  Error in or near line 82 of -3:
+***
+    78    return r;
+    79  end proc;
+    80  
+    81  proc test_read();
+[1m    82    read (x);[0m
+[1m                $[0m
+    83    return [type x, x];
+    84  end proc;
+***
+***  Misplaced '+' or '-' in ".+" in READ input
+***
+***  Active routines:
+***
+***  U__unnamed_SETL_program.test_read
+***  U__unnamed_SETL_program.try_read
+***  U__unnamed_SETL_program
+***  U__MAIN
+***
+***  This is version 3.5.8 of GNU SETL.
+***
+
+'.-7'
+***
+***  Report from 'setl'  ***
+***
+***  Error in or near line 34 of -3:
+***
+    30    return r;
+    31  end proc;
+    32  
+    33  proc test_unstr (s);
+[1m    34    x := unstr s;[0m
+[1m                     $[0m
+    35    return [type x, x];
+    36  end proc;
+***
+***  Misplaced '+' or '-' in ".-" in UNSTR operand
+***
+***  Active routines:
+***
+***  U__unnamed_SETL_program.test_unstr
+***  U__unnamed_SETL_program.try
+***  U__unnamed_SETL_program
+***  U__MAIN
+***
+***  This is version 3.5.8 of GNU SETL.
+***
+
+***
+***  Report from 'setl'  ***
+***
+***  Error in or near line 44 of -3:
+***
+    40    if fd = -1 then  -- subchild
+    41      print (s);  -- feed test string up to this subchild's parent
+    42      stop;  -- exit subchild
+    43    end if;
+[1m    44    reada (fd, x);  -- try to READA into x from what subchild spews[0m
+[1m                     $[0m
+    45    close (fd);
+    46    return [type x, x];
+***
+***  Misplaced '+' or '-' in ".-" in READA input
+***
+***  Active routines:
+***
+***  U__unnamed_SETL_program.test_reada
+***  U__unnamed_SETL_program.try
+***  U__unnamed_SETL_program
+***  U__MAIN
+***
+***  This is version 3.5.8 of GNU SETL.
+***
+
+***
+***  Report from 'setl'  ***
+***
+***  Error in or near line 50 of -3:
+***
+    46    return [type x, x];
+    47  end proc;
+    48  
+    49  proc test_reads (s);
+[1m    50    reads (s, x);[0m
+[1m                    $[0m
+    51    return [type x, x];
+    52  end proc;
+***
+***  Misplaced '+' or '-' in ".-" in first arg to READS
+***
+***  Active routines:
+***
+***  U__unnamed_SETL_program.test_reads
+***  U__unnamed_SETL_program.try
+***  U__unnamed_SETL_program
+***  U__MAIN
+***
+***  This is version 3.5.8 of GNU SETL.
+***
+
+*
+
+[OM]
+
+***
+***  Report from 'setl'  ***
+***
+***  Error in or near line 82 of -3:
+***
+    78    return r;
+    79  end proc;
+    80  
+    81  proc test_read();
+[1m    82    read (x);[0m
+[1m                $[0m
+    83    return [type x, x];
+    84  end proc;
+***
+***  Misplaced '+' or '-' in ".-" in READ input
+***
+***  Active routines:
+***
+***  U__unnamed_SETL_program.test_read
+***  U__unnamed_SETL_program.try_read
+***  U__unnamed_SETL_program
+***  U__MAIN
+***
+***  This is version 3.5.8 of GNU SETL.
+***
+
+'.e7'
+***
+***  Report from 'setl'  ***
+***
+***  Error in or near line 34 of -3:
+***
+    30    return r;
+    31  end proc;
+    32  
+    33  proc test_unstr (s);
+[1m    34    x := unstr s;[0m
+[1m                     $[0m
+    35    return [type x, x];
+    36  end proc;
+***
+***  Misplaced 'e' or 'E' in ".e" in UNSTR operand
+***
+***  Active routines:
+***
+***  U__unnamed_SETL_program.test_unstr
+***  U__unnamed_SETL_program.try
+***  U__unnamed_SETL_program
+***  U__MAIN
+***
+***  This is version 3.5.8 of GNU SETL.
+***
+
+***
+***  Report from 'setl'  ***
+***
+***  Error in or near line 44 of -3:
+***
+    40    if fd = -1 then  -- subchild
+    41      print (s);  -- feed test string up to this subchild's parent
+    42      stop;  -- exit subchild
+    43    end if;
+[1m    44    reada (fd, x);  -- try to READA into x from what subchild spews[0m
+[1m                     $[0m
+    45    close (fd);
+    46    return [type x, x];
+***
+***  Misplaced 'e' or 'E' in ".e" in READA input
+***
+***  Active routines:
+***
+***  U__unnamed_SETL_program.test_reada
+***  U__unnamed_SETL_program.try
+***  U__unnamed_SETL_program
+***  U__MAIN
+***
+***  This is version 3.5.8 of GNU SETL.
+***
+
+***
+***  Report from 'setl'  ***
+***
+***  Error in or near line 50 of -3:
+***
+    46    return [type x, x];
+    47  end proc;
+    48  
+    49  proc test_reads (s);
+[1m    50    reads (s, x);[0m
+[1m                    $[0m
+    51    return [type x, x];
+    52  end proc;
+***
+***  Misplaced 'e' or 'E' in ".e" in first arg to READS
+***
+***  Active routines:
+***
+***  U__unnamed_SETL_program.test_reads
+***  U__unnamed_SETL_program.try
+***  U__unnamed_SETL_program
+***  U__MAIN
+***
+***  This is version 3.5.8 of GNU SETL.
+***
+
+*
+
+[OM]
+
+***
+***  Report from 'setl'  ***
+***
+***  Error in or near line 82 of -3:
+***
+    78    return r;
+    79  end proc;
+    80  
+    81  proc test_read();
+[1m    82    read (x);[0m
+[1m                $[0m
+    83    return [type x, x];
+    84  end proc;
+***
+***  Misplaced 'e' or 'E' in ".e" in READ input
+***
+***  Active routines:
+***
+***  U__unnamed_SETL_program.test_read
+***  U__unnamed_SETL_program.try_read
+***  U__unnamed_SETL_program
+***  U__MAIN
+***
+***  This is version 3.5.8 of GNU SETL.
+***
+
+'+e7'
+***
+***  Report from 'setl'  ***
+***
+***  Error in or near line 34 of -3:
+***
+    30    return r;
+    31  end proc;
+    32  
+    33  proc test_unstr (s);
+[1m    34    x := unstr s;[0m
+[1m                     $[0m
+    35    return [type x, x];
+    36  end proc;
+***
+***  Misplaced 'e' or 'E' in "+e" in UNSTR operand
+***
+***  Active routines:
+***
+***  U__unnamed_SETL_program.test_unstr
+***  U__unnamed_SETL_program.try
+***  U__unnamed_SETL_program
+***  U__MAIN
+***
+***  This is version 3.5.8 of GNU SETL.
+***
+
+***
+***  Report from 'setl'  ***
+***
+***  Error in or near line 44 of -3:
+***
+    40    if fd = -1 then  -- subchild
+    41      print (s);  -- feed test string up to this subchild's parent
+    42      stop;  -- exit subchild
+    43    end if;
+[1m    44    reada (fd, x);  -- try to READA into x from what subchild spews[0m
+[1m                     $[0m
+    45    close (fd);
+    46    return [type x, x];
+***
+***  Misplaced 'e' or 'E' in "+e" in READA input
+***
+***  Active routines:
+***
+***  U__unnamed_SETL_program.test_reada
+***  U__unnamed_SETL_program.try
+***  U__unnamed_SETL_program
+***  U__MAIN
+***
+***  This is version 3.5.8 of GNU SETL.
+***
+
+***
+***  Report from 'setl'  ***
+***
+***  Error in or near line 50 of -3:
+***
+    46    return [type x, x];
+    47  end proc;
+    48  
+    49  proc test_reads (s);
+[1m    50    reads (s, x);[0m
+[1m                    $[0m
+    51    return [type x, x];
+    52  end proc;
+***
+***  Misplaced 'e' or 'E' in "+e" in first arg to READS
+***
+***  Active routines:
+***
+***  U__unnamed_SETL_program.test_reads
+***  U__unnamed_SETL_program.try
+***  U__unnamed_SETL_program
+***  U__MAIN
+***
+***  This is version 3.5.8 of GNU SETL.
+***
+
+*
+
+[OM]
+
+***
+***  Report from 'setl'  ***
+***
+***  Error in or near line 82 of -3:
+***
+    78    return r;
+    79  end proc;
+    80  
+    81  proc test_read();
+[1m    82    read (x);[0m
+[1m                $[0m
+    83    return [type x, x];
+    84  end proc;
+***
+***  Misplaced 'e' or 'E' in "+e" in READ input
+***
+***  Active routines:
+***
+***  U__unnamed_SETL_program.test_read
+***  U__unnamed_SETL_program.try_read
+***  U__unnamed_SETL_program
+***  U__MAIN
+***
+***  This is version 3.5.8 of GNU SETL.
+***
+
+'-e7'
+***
+***  Report from 'setl'  ***
+***
+***  Error in or near line 34 of -3:
+***
+    30    return r;
+    31  end proc;
+    32  
+    33  proc test_unstr (s);
+[1m    34    x := unstr s;[0m
+[1m                     $[0m
+    35    return [type x, x];
+    36  end proc;
+***
+***  Misplaced 'e' or 'E' in "-e" in UNSTR operand
+***
+***  Active routines:
+***
+***  U__unnamed_SETL_program.test_unstr
+***  U__unnamed_SETL_program.try
+***  U__unnamed_SETL_program
+***  U__MAIN
+***
+***  This is version 3.5.8 of GNU SETL.
+***
+
+***
+***  Report from 'setl'  ***
+***
+***  Error in or near line 44 of -3:
+***
+    40    if fd = -1 then  -- subchild
+    41      print (s);  -- feed test string up to this subchild's parent
+    42      stop;  -- exit subchild
+    43    end if;
+[1m    44    reada (fd, x);  -- try to READA into x from what subchild spews[0m
+[1m                     $[0m
+    45    close (fd);
+    46    return [type x, x];
+***
+***  Misplaced 'e' or 'E' in "-e" in READA input
+***
+***  Active routines:
+***
+***  U__unnamed_SETL_program.test_reada
+***  U__unnamed_SETL_program.try
+***  U__unnamed_SETL_program
+***  U__MAIN
+***
+***  This is version 3.5.8 of GNU SETL.
+***
+
+***
+***  Report from 'setl'  ***
+***
+***  Error in or near line 50 of -3:
+***
+    46    return [type x, x];
+    47  end proc;
+    48  
+    49  proc test_reads (s);
+[1m    50    reads (s, x);[0m
+[1m                    $[0m
+    51    return [type x, x];
+    52  end proc;
+***
+***  Misplaced 'e' or 'E' in "-e" in first arg to READS
+***
+***  Active routines:
+***
+***  U__unnamed_SETL_program.test_reads
+***  U__unnamed_SETL_program.try
+***  U__unnamed_SETL_program
+***  U__MAIN
+***
+***  This is version 3.5.8 of GNU SETL.
+***
+
+*
+
+[OM]
+
+***
+***  Report from 'setl'  ***
+***
+***  Error in or near line 82 of -3:
+***
+    78    return r;
+    79  end proc;
+    80  
+    81  proc test_read();
+[1m    82    read (x);[0m
+[1m                $[0m
+    83    return [type x, x];
+    84  end proc;
+***
+***  Misplaced 'e' or 'E' in "-e" in READ input
+***
+***  Active routines:
+***
+***  U__unnamed_SETL_program.test_read
+***  U__unnamed_SETL_program.try_read
+***  U__unnamed_SETL_program
+***  U__MAIN
+***
+***  This is version 3.5.8 of GNU SETL.
+***
+
+'+.e7'
+***
+***  Report from 'setl'  ***
+***
+***  Error in or near line 34 of -3:
+***
+    30    return r;
+    31  end proc;
+    32  
+    33  proc test_unstr (s);
+[1m    34    x := unstr s;[0m
+[1m                     $[0m
+    35    return [type x, x];
+    36  end proc;
+***
+***  Misplaced 'e' or 'E' in "+.e" in UNSTR operand
+***
+***  Active routines:
+***
+***  U__unnamed_SETL_program.test_unstr
+***  U__unnamed_SETL_program.try
+***  U__unnamed_SETL_program
+***  U__MAIN
+***
+***  This is version 3.5.8 of GNU SETL.
+***
+
+***
+***  Report from 'setl'  ***
+***
+***  Error in or near line 44 of -3:
+***
+    40    if fd = -1 then  -- subchild
+    41      print (s);  -- feed test string up to this subchild's parent
+    42      stop;  -- exit subchild
+    43    end if;
+[1m    44    reada (fd, x);  -- try to READA into x from what subchild spews[0m
+[1m                     $[0m
+    45    close (fd);
+    46    return [type x, x];
+***
+***  Misplaced 'e' or 'E' in "+.e" in READA input
+***
+***  Active routines:
+***
+***  U__unnamed_SETL_program.test_reada
+***  U__unnamed_SETL_program.try
+***  U__unnamed_SETL_program
+***  U__MAIN
+***
+***  This is version 3.5.8 of GNU SETL.
+***
+
+***
+***  Report from 'setl'  ***
+***
+***  Error in or near line 50 of -3:
+***
+    46    return [type x, x];
+    47  end proc;
+    48  
+    49  proc test_reads (s);
+[1m    50    reads (s, x);[0m
+[1m                    $[0m
+    51    return [type x, x];
+    52  end proc;
+***
+***  Misplaced 'e' or 'E' in "+.e" in first arg to READS
+***
+***  Active routines:
+***
+***  U__unnamed_SETL_program.test_reads
+***  U__unnamed_SETL_program.try
+***  U__unnamed_SETL_program
+***  U__MAIN
+***
+***  This is version 3.5.8 of GNU SETL.
+***
+
+*
+
+[OM]
+
+***
+***  Report from 'setl'  ***
+***
+***  Error in or near line 82 of -3:
+***
+    78    return r;
+    79  end proc;
+    80  
+    81  proc test_read();
+[1m    82    read (x);[0m
+[1m                $[0m
+    83    return [type x, x];
+    84  end proc;
+***
+***  Misplaced 'e' or 'E' in "+.e" in READ input
+***
+***  Active routines:
+***
+***  U__unnamed_SETL_program.test_read
+***  U__unnamed_SETL_program.try_read
+***  U__unnamed_SETL_program
+***  U__MAIN
+***
+***  This is version 3.5.8 of GNU SETL.
+***
+
+'-.e7'
+***
+***  Report from 'setl'  ***
+***
+***  Error in or near line 34 of -3:
+***
+    30    return r;
+    31  end proc;
+    32  
+    33  proc test_unstr (s);
+[1m    34    x := unstr s;[0m
+[1m                     $[0m
+    35    return [type x, x];
+    36  end proc;
+***
+***  Misplaced 'e' or 'E' in "-.e" in UNSTR operand
+***
+***  Active routines:
+***
+***  U__unnamed_SETL_program.test_unstr
+***  U__unnamed_SETL_program.try
+***  U__unnamed_SETL_program
+***  U__MAIN
+***
+***  This is version 3.5.8 of GNU SETL.
+***
+
+***
+***  Report from 'setl'  ***
+***
+***  Error in or near line 44 of -3:
+***
+    40    if fd = -1 then  -- subchild
+    41      print (s);  -- feed test string up to this subchild's parent
+    42      stop;  -- exit subchild
+    43    end if;
+[1m    44    reada (fd, x);  -- try to READA into x from what subchild spews[0m
+[1m                     $[0m
+    45    close (fd);
+    46    return [type x, x];
+***
+***  Misplaced 'e' or 'E' in "-.e" in READA input
+***
+***  Active routines:
+***
+***  U__unnamed_SETL_program.test_reada
+***  U__unnamed_SETL_program.try
+***  U__unnamed_SETL_program
+***  U__MAIN
+***
+***  This is version 3.5.8 of GNU SETL.
+***
+
+***
+***  Report from 'setl'  ***
+***
+***  Error in or near line 50 of -3:
+***
+    46    return [type x, x];
+    47  end proc;
+    48  
+    49  proc test_reads (s);
+[1m    50    reads (s, x);[0m
+[1m                    $[0m
+    51    return [type x, x];
+    52  end proc;
+***
+***  Misplaced 'e' or 'E' in "-.e" in first arg to READS
+***
+***  Active routines:
+***
+***  U__unnamed_SETL_program.test_reads
+***  U__unnamed_SETL_program.try
+***  U__unnamed_SETL_program
+***  U__MAIN
+***
+***  This is version 3.5.8 of GNU SETL.
+***
+
+*
+
+[OM]
+
+***
+***  Report from 'setl'  ***
+***
+***  Error in or near line 82 of -3:
+***
+    78    return r;
+    79  end proc;
+    80  
+    81  proc test_read();
+[1m    82    read (x);[0m
+[1m                $[0m
+    83    return [type x, x];
+    84  end proc;
+***
+***  Misplaced 'e' or 'E' in "-.e" in READ input
+***
+***  Active routines:
+***
+***  U__unnamed_SETL_program.test_read
+***  U__unnamed_SETL_program.try_read
+***  U__unnamed_SETL_program
+***  U__MAIN
+***
+***  This is version 3.5.8 of GNU SETL.
+***
+
+'.+e7'
+***
+***  Report from 'setl'  ***
+***
+***  Error in or near line 34 of -3:
+***
+    30    return r;
+    31  end proc;
+    32  
+    33  proc test_unstr (s);
+[1m    34    x := unstr s;[0m
+[1m                     $[0m
+    35    return [type x, x];
+    36  end proc;
+***
+***  Misplaced '+' or '-' in ".+" in UNSTR operand
+***
+***  Active routines:
+***
+***  U__unnamed_SETL_program.test_unstr
+***  U__unnamed_SETL_program.try
+***  U__unnamed_SETL_program
+***  U__MAIN
+***
+***  This is version 3.5.8 of GNU SETL.
+***
+
+***
+***  Report from 'setl'  ***
+***
+***  Error in or near line 44 of -3:
+***
+    40    if fd = -1 then  -- subchild
+    41      print (s);  -- feed test string up to this subchild's parent
+    42      stop;  -- exit subchild
+    43    end if;
+[1m    44    reada (fd, x);  -- try to READA into x from what subchild spews[0m
+[1m                     $[0m
+    45    close (fd);
+    46    return [type x, x];
+***
+***  Misplaced '+' or '-' in ".+" in READA input
+***
+***  Active routines:
+***
+***  U__unnamed_SETL_program.test_reada
+***  U__unnamed_SETL_program.try
+***  U__unnamed_SETL_program
+***  U__MAIN
+***
+***  This is version 3.5.8 of GNU SETL.
+***
+
+***
+***  Report from 'setl'  ***
+***
+***  Error in or near line 50 of -3:
+***
+    46    return [type x, x];
+    47  end proc;
+    48  
+    49  proc test_reads (s);
+[1m    50    reads (s, x);[0m
+[1m                    $[0m
+    51    return [type x, x];
+    52  end proc;
+***
+***  Misplaced '+' or '-' in ".+" in first arg to READS
+***
+***  Active routines:
+***
+***  U__unnamed_SETL_program.test_reads
+***  U__unnamed_SETL_program.try
+***  U__unnamed_SETL_program
+***  U__MAIN
+***
+***  This is version 3.5.8 of GNU SETL.
+***
+
+*
+
+[OM]
+
+***
+***  Report from 'setl'  ***
+***
+***  Error in or near line 82 of -3:
+***
+    78    return r;
+    79  end proc;
+    80  
+    81  proc test_read();
+[1m    82    read (x);[0m
+[1m                $[0m
+    83    return [type x, x];
+    84  end proc;
+***
+***  Misplaced '+' or '-' in ".+" in READ input
+***
+***  Active routines:
+***
+***  U__unnamed_SETL_program.test_read
+***  U__unnamed_SETL_program.try_read
+***  U__unnamed_SETL_program
+***  U__MAIN
+***
+***  This is version 3.5.8 of GNU SETL.
+***
+
+'.-e7'
+***
+***  Report from 'setl'  ***
+***
+***  Error in or near line 34 of -3:
+***
+    30    return r;
+    31  end proc;
+    32  
+    33  proc test_unstr (s);
+[1m    34    x := unstr s;[0m
+[1m                     $[0m
+    35    return [type x, x];
+    36  end proc;
+***
+***  Misplaced '+' or '-' in ".-" in UNSTR operand
+***
+***  Active routines:
+***
+***  U__unnamed_SETL_program.test_unstr
+***  U__unnamed_SETL_program.try
+***  U__unnamed_SETL_program
+***  U__MAIN
+***
+***  This is version 3.5.8 of GNU SETL.
+***
+
+***
+***  Report from 'setl'  ***
+***
+***  Error in or near line 44 of -3:
+***
+    40    if fd = -1 then  -- subchild
+    41      print (s);  -- feed test string up to this subchild's parent
+    42      stop;  -- exit subchild
+    43    end if;
+[1m    44    reada (fd, x);  -- try to READA into x from what subchild spews[0m
+[1m                     $[0m
+    45    close (fd);
+    46    return [type x, x];
+***
+***  Misplaced '+' or '-' in ".-" in READA input
+***
+***  Active routines:
+***
+***  U__unnamed_SETL_program.test_reada
+***  U__unnamed_SETL_program.try
+***  U__unnamed_SETL_program
+***  U__MAIN
+***
+***  This is version 3.5.8 of GNU SETL.
+***
+
+***
+***  Report from 'setl'  ***
+***
+***  Error in or near line 50 of -3:
+***
+    46    return [type x, x];
+    47  end proc;
+    48  
+    49  proc test_reads (s);
+[1m    50    reads (s, x);[0m
+[1m                    $[0m
+    51    return [type x, x];
+    52  end proc;
+***
+***  Misplaced '+' or '-' in ".-" in first arg to READS
+***
+***  Active routines:
+***
+***  U__unnamed_SETL_program.test_reads
+***  U__unnamed_SETL_program.try
+***  U__unnamed_SETL_program
+***  U__MAIN
+***
+***  This is version 3.5.8 of GNU SETL.
+***
+
+*
+
+[OM]
+
+***
+***  Report from 'setl'  ***
+***
+***  Error in or near line 82 of -3:
+***
+    78    return r;
+    79  end proc;
+    80  
+    81  proc test_read();
+[1m    82    read (x);[0m
+[1m                $[0m
+    83    return [type x, x];
+    84  end proc;
+***
+***  Misplaced '+' or '-' in ".-" in READ input
+***
+***  Active routines:
+***
+***  U__unnamed_SETL_program.test_read
+***  U__unnamed_SETL_program.try_read
+***  U__unnamed_SETL_program
+***  U__MAIN
+***
+***  This is version 3.5.8 of GNU SETL.
+***
+
+'5.'
+[REAL 5]
+
+[REAL 5]
+
+[REAL 5]
+
+REAL
+
+[REAL 5]
+
+[REAL 5]
+
+'5+'
+***
+***  Report from 'setl'  ***
+***
+***  Error in or near line 34 of -3:
+***
+    30    return r;
+    31  end proc;
+    32  
+    33  proc test_unstr (s);
+[1m    34    x := unstr s;[0m
+[1m                     $[0m
+    35    return [type x, x];
+    36  end proc;
+***
+***  Misplaced '+' or '-' in "5+" in UNSTR operand
+***
+***  Active routines:
+***
+***  U__unnamed_SETL_program.test_unstr
+***  U__unnamed_SETL_program.try
+***  U__unnamed_SETL_program
+***  U__MAIN
+***
+***  This is version 3.5.8 of GNU SETL.
+***
+
+***
+***  Report from 'setl'  ***
+***
+***  Error in or near line 44 of -3:
+***
+    40    if fd = -1 then  -- subchild
+    41      print (s);  -- feed test string up to this subchild's parent
+    42      stop;  -- exit subchild
+    43    end if;
+[1m    44    reada (fd, x);  -- try to READA into x from what subchild spews[0m
+[1m                     $[0m
+    45    close (fd);
+    46    return [type x, x];
+***
+***  Misplaced '+' or '-' in "5+" in READA input
+***
+***  Active routines:
+***
+***  U__unnamed_SETL_program.test_reada
+***  U__unnamed_SETL_program.try
+***  U__unnamed_SETL_program
+***  U__MAIN
+***
+***  This is version 3.5.8 of GNU SETL.
+***
+
+***
+***  Report from 'setl'  ***
+***
+***  Error in or near line 50 of -3:
+***
+    46    return [type x, x];
+    47  end proc;
+    48  
+    49  proc test_reads (s);
+[1m    50    reads (s, x);[0m
+[1m                    $[0m
+    51    return [type x, x];
+    52  end proc;
+***
+***  Misplaced '+' or '-' in "5+" in first arg to READS
+***
+***  Active routines:
+***
+***  U__unnamed_SETL_program.test_reads
+***  U__unnamed_SETL_program.try
+***  U__unnamed_SETL_program
+***  U__MAIN
+***
+***  This is version 3.5.8 of GNU SETL.
+***
+
+*
+
+[OM]
+
+***
+***  Report from 'setl'  ***
+***
+***  Error in or near line 82 of -3:
+***
+    78    return r;
+    79  end proc;
+    80  
+    81  proc test_read();
+[1m    82    read (x);[0m
+[1m                $[0m
+    83    return [type x, x];
+    84  end proc;
+***
+***  Misplaced '+' or '-' in "5+" in READ input
+***
+***  Active routines:
+***
+***  U__unnamed_SETL_program.test_read
+***  U__unnamed_SETL_program.try_read
+***  U__unnamed_SETL_program
+***  U__MAIN
+***
+***  This is version 3.5.8 of GNU SETL.
+***
+
+'5-'
+***
+***  Report from 'setl'  ***
+***
+***  Error in or near line 34 of -3:
+***
+    30    return r;
+    31  end proc;
+    32  
+    33  proc test_unstr (s);
+[1m    34    x := unstr s;[0m
+[1m                     $[0m
+    35    return [type x, x];
+    36  end proc;
+***
+***  Misplaced '+' or '-' in "5-" in UNSTR operand
+***
+***  Active routines:
+***
+***  U__unnamed_SETL_program.test_unstr
+***  U__unnamed_SETL_program.try
+***  U__unnamed_SETL_program
+***  U__MAIN
+***
+***  This is version 3.5.8 of GNU SETL.
+***
+
+***
+***  Report from 'setl'  ***
+***
+***  Error in or near line 44 of -3:
+***
+    40    if fd = -1 then  -- subchild
+    41      print (s);  -- feed test string up to this subchild's parent
+    42      stop;  -- exit subchild
+    43    end if;
+[1m    44    reada (fd, x);  -- try to READA into x from what subchild spews[0m
+[1m                     $[0m
+    45    close (fd);
+    46    return [type x, x];
+***
+***  Misplaced '+' or '-' in "5-" in READA input
+***
+***  Active routines:
+***
+***  U__unnamed_SETL_program.test_reada
+***  U__unnamed_SETL_program.try
+***  U__unnamed_SETL_program
+***  U__MAIN
+***
+***  This is version 3.5.8 of GNU SETL.
+***
+
+***
+***  Report from 'setl'  ***
+***
+***  Error in or near line 50 of -3:
+***
+    46    return [type x, x];
+    47  end proc;
+    48  
+    49  proc test_reads (s);
+[1m    50    reads (s, x);[0m
+[1m                    $[0m
+    51    return [type x, x];
+    52  end proc;
+***
+***  Misplaced '+' or '-' in "5-" in first arg to READS
+***
+***  Active routines:
+***
+***  U__unnamed_SETL_program.test_reads
+***  U__unnamed_SETL_program.try
+***  U__unnamed_SETL_program
+***  U__MAIN
+***
+***  This is version 3.5.8 of GNU SETL.
+***
+
+*
+
+[OM]
+
+***
+***  Report from 'setl'  ***
+***
+***  Error in or near line 82 of -3:
+***
+    78    return r;
+    79  end proc;
+    80  
+    81  proc test_read();
+[1m    82    read (x);[0m
+[1m                $[0m
+    83    return [type x, x];
+    84  end proc;
+***
+***  Misplaced '+' or '-' in "5-" in READ input
+***
+***  Active routines:
+***
+***  U__unnamed_SETL_program.test_read
+***  U__unnamed_SETL_program.try_read
+***  U__unnamed_SETL_program
+***  U__MAIN
+***
+***  This is version 3.5.8 of GNU SETL.
+***
+
+'5+.'
+***
+***  Report from 'setl'  ***
+***
+***  Error in or near line 34 of -3:
+***
+    30    return r;
+    31  end proc;
+    32  
+    33  proc test_unstr (s);
+[1m    34    x := unstr s;[0m
+[1m                     $[0m
+    35    return [type x, x];
+    36  end proc;
+***
+***  Misplaced '+' or '-' in "5+" in UNSTR operand
+***
+***  Active routines:
+***
+***  U__unnamed_SETL_program.test_unstr
+***  U__unnamed_SETL_program.try
+***  U__unnamed_SETL_program
+***  U__MAIN
+***
+***  This is version 3.5.8 of GNU SETL.
+***
+
+***
+***  Report from 'setl'  ***
+***
+***  Error in or near line 44 of -3:
+***
+    40    if fd = -1 then  -- subchild
+    41      print (s);  -- feed test string up to this subchild's parent
+    42      stop;  -- exit subchild
+    43    end if;
+[1m    44    reada (fd, x);  -- try to READA into x from what subchild spews[0m
+[1m                     $[0m
+    45    close (fd);
+    46    return [type x, x];
+***
+***  Misplaced '+' or '-' in "5+" in READA input
+***
+***  Active routines:
+***
+***  U__unnamed_SETL_program.test_reada
+***  U__unnamed_SETL_program.try
+***  U__unnamed_SETL_program
+***  U__MAIN
+***
+***  This is version 3.5.8 of GNU SETL.
+***
+
+***
+***  Report from 'setl'  ***
+***
+***  Error in or near line 50 of -3:
+***
+    46    return [type x, x];
+    47  end proc;
+    48  
+    49  proc test_reads (s);
+[1m    50    reads (s, x);[0m
+[1m                    $[0m
+    51    return [type x, x];
+    52  end proc;
+***
+***  Misplaced '+' or '-' in "5+" in first arg to READS
+***
+***  Active routines:
+***
+***  U__unnamed_SETL_program.test_reads
+***  U__unnamed_SETL_program.try
+***  U__unnamed_SETL_program
+***  U__MAIN
+***
+***  This is version 3.5.8 of GNU SETL.
+***
+
+*
+
+[OM]
+
+***
+***  Report from 'setl'  ***
+***
+***  Error in or near line 82 of -3:
+***
+    78    return r;
+    79  end proc;
+    80  
+    81  proc test_read();
+[1m    82    read (x);[0m
+[1m                $[0m
+    83    return [type x, x];
+    84  end proc;
+***
+***  Misplaced '+' or '-' in "5+" in READ input
+***
+***  Active routines:
+***
+***  U__unnamed_SETL_program.test_read
+***  U__unnamed_SETL_program.try_read
+***  U__unnamed_SETL_program
+***  U__MAIN
+***
+***  This is version 3.5.8 of GNU SETL.
+***
+
+'5-.'
+***
+***  Report from 'setl'  ***
+***
+***  Error in or near line 34 of -3:
+***
+    30    return r;
+    31  end proc;
+    32  
+    33  proc test_unstr (s);
+[1m    34    x := unstr s;[0m
+[1m                     $[0m
+    35    return [type x, x];
+    36  end proc;
+***
+***  Misplaced '+' or '-' in "5-" in UNSTR operand
+***
+***  Active routines:
+***
+***  U__unnamed_SETL_program.test_unstr
+***  U__unnamed_SETL_program.try
+***  U__unnamed_SETL_program
+***  U__MAIN
+***
+***  This is version 3.5.8 of GNU SETL.
+***
+
+***
+***  Report from 'setl'  ***
+***
+***  Error in or near line 44 of -3:
+***
+    40    if fd = -1 then  -- subchild
+    41      print (s);  -- feed test string up to this subchild's parent
+    42      stop;  -- exit subchild
+    43    end if;
+[1m    44    reada (fd, x);  -- try to READA into x from what subchild spews[0m
+[1m                     $[0m
+    45    close (fd);
+    46    return [type x, x];
+***
+***  Misplaced '+' or '-' in "5-" in READA input
+***
+***  Active routines:
+***
+***  U__unnamed_SETL_program.test_reada
+***  U__unnamed_SETL_program.try
+***  U__unnamed_SETL_program
+***  U__MAIN
+***
+***  This is version 3.5.8 of GNU SETL.
+***
+
+***
+***  Report from 'setl'  ***
+***
+***  Error in or near line 50 of -3:
+***
+    46    return [type x, x];
+    47  end proc;
+    48  
+    49  proc test_reads (s);
+[1m    50    reads (s, x);[0m
+[1m                    $[0m
+    51    return [type x, x];
+    52  end proc;
+***
+***  Misplaced '+' or '-' in "5-" in first arg to READS
+***
+***  Active routines:
+***
+***  U__unnamed_SETL_program.test_reads
+***  U__unnamed_SETL_program.try
+***  U__unnamed_SETL_program
+***  U__MAIN
+***
+***  This is version 3.5.8 of GNU SETL.
+***
+
+*
+
+[OM]
+
+***
+***  Report from 'setl'  ***
+***
+***  Error in or near line 82 of -3:
+***
+    78    return r;
+    79  end proc;
+    80  
+    81  proc test_read();
+[1m    82    read (x);[0m
+[1m                $[0m
+    83    return [type x, x];
+    84  end proc;
+***
+***  Misplaced '+' or '-' in "5-" in READ input
+***
+***  Active routines:
+***
+***  U__unnamed_SETL_program.test_read
+***  U__unnamed_SETL_program.try_read
+***  U__unnamed_SETL_program
+***  U__MAIN
+***
+***  This is version 3.5.8 of GNU SETL.
+***
+
+'5.+'
+***
+***  Report from 'setl'  ***
+***
+***  Error in or near line 34 of -3:
+***
+    30    return r;
+    31  end proc;
+    32  
+    33  proc test_unstr (s);
+[1m    34    x := unstr s;[0m
+[1m                     $[0m
+    35    return [type x, x];
+    36  end proc;
+***
+***  Misplaced '+' or '-' in "5.+" in UNSTR operand
+***
+***  Active routines:
+***
+***  U__unnamed_SETL_program.test_unstr
+***  U__unnamed_SETL_program.try
+***  U__unnamed_SETL_program
+***  U__MAIN
+***
+***  This is version 3.5.8 of GNU SETL.
+***
+
+***
+***  Report from 'setl'  ***
+***
+***  Error in or near line 44 of -3:
+***
+    40    if fd = -1 then  -- subchild
+    41      print (s);  -- feed test string up to this subchild's parent
+    42      stop;  -- exit subchild
+    43    end if;
+[1m    44    reada (fd, x);  -- try to READA into x from what subchild spews[0m
+[1m                     $[0m
+    45    close (fd);
+    46    return [type x, x];
+***
+***  Misplaced '+' or '-' in "5.+" in READA input
+***
+***  Active routines:
+***
+***  U__unnamed_SETL_program.test_reada
+***  U__unnamed_SETL_program.try
+***  U__unnamed_SETL_program
+***  U__MAIN
+***
+***  This is version 3.5.8 of GNU SETL.
+***
+
+***
+***  Report from 'setl'  ***
+***
+***  Error in or near line 50 of -3:
+***
+    46    return [type x, x];
+    47  end proc;
+    48  
+    49  proc test_reads (s);
+[1m    50    reads (s, x);[0m
+[1m                    $[0m
+    51    return [type x, x];
+    52  end proc;
+***
+***  Misplaced '+' or '-' in "5.+" in first arg to READS
+***
+***  Active routines:
+***
+***  U__unnamed_SETL_program.test_reads
+***  U__unnamed_SETL_program.try
+***  U__unnamed_SETL_program
+***  U__MAIN
+***
+***  This is version 3.5.8 of GNU SETL.
+***
+
+*
+
+[OM]
+
+***
+***  Report from 'setl'  ***
+***
+***  Error in or near line 82 of -3:
+***
+    78    return r;
+    79  end proc;
+    80  
+    81  proc test_read();
+[1m    82    read (x);[0m
+[1m                $[0m
+    83    return [type x, x];
+    84  end proc;
+***
+***  Misplaced '+' or '-' in "5.+" in READ input
+***
+***  Active routines:
+***
+***  U__unnamed_SETL_program.test_read
+***  U__unnamed_SETL_program.try_read
+***  U__unnamed_SETL_program
+***  U__MAIN
+***
+***  This is version 3.5.8 of GNU SETL.
+***
+
+'5.-'
+***
+***  Report from 'setl'  ***
+***
+***  Error in or near line 34 of -3:
+***
+    30    return r;
+    31  end proc;
+    32  
+    33  proc test_unstr (s);
+[1m    34    x := unstr s;[0m
+[1m                     $[0m
+    35    return [type x, x];
+    36  end proc;
+***
+***  Misplaced '+' or '-' in "5.-" in UNSTR operand
+***
+***  Active routines:
+***
+***  U__unnamed_SETL_program.test_unstr
+***  U__unnamed_SETL_program.try
+***  U__unnamed_SETL_program
+***  U__MAIN
+***
+***  This is version 3.5.8 of GNU SETL.
+***
+
+***
+***  Report from 'setl'  ***
+***
+***  Error in or near line 44 of -3:
+***
+    40    if fd = -1 then  -- subchild
+    41      print (s);  -- feed test string up to this subchild's parent
+    42      stop;  -- exit subchild
+    43    end if;
+[1m    44    reada (fd, x);  -- try to READA into x from what subchild spews[0m
+[1m                     $[0m
+    45    close (fd);
+    46    return [type x, x];
+***
+***  Misplaced '+' or '-' in "5.-" in READA input
+***
+***  Active routines:
+***
+***  U__unnamed_SETL_program.test_reada
+***  U__unnamed_SETL_program.try
+***  U__unnamed_SETL_program
+***  U__MAIN
+***
+***  This is version 3.5.8 of GNU SETL.
+***
+
+***
+***  Report from 'setl'  ***
+***
+***  Error in or near line 50 of -3:
+***
+    46    return [type x, x];
+    47  end proc;
+    48  
+    49  proc test_reads (s);
+[1m    50    reads (s, x);[0m
+[1m                    $[0m
+    51    return [type x, x];
+    52  end proc;
+***
+***  Misplaced '+' or '-' in "5.-" in first arg to READS
+***
+***  Active routines:
+***
+***  U__unnamed_SETL_program.test_reads
+***  U__unnamed_SETL_program.try
+***  U__unnamed_SETL_program
+***  U__MAIN
+***
+***  This is version 3.5.8 of GNU SETL.
+***
+
+*
+
+[OM]
+
+***
+***  Report from 'setl'  ***
+***
+***  Error in or near line 82 of -3:
+***
+    78    return r;
+    79  end proc;
+    80  
+    81  proc test_read();
+[1m    82    read (x);[0m
+[1m                $[0m
+    83    return [type x, x];
+    84  end proc;
+***
+***  Misplaced '+' or '-' in "5.-" in READ input
+***
+***  Active routines:
+***
+***  U__unnamed_SETL_program.test_read
+***  U__unnamed_SETL_program.try_read
+***  U__unnamed_SETL_program
+***  U__MAIN
+***
+***  This is version 3.5.8 of GNU SETL.
+***
+
+'5.e'
+***
+***  Report from 'setl'  ***
+***
+***  Error in or near line 34 of -3:
+***
+    30    return r;
+    31  end proc;
+    32  
+    33  proc test_unstr (s);
+[1m    34    x := unstr s;[0m
+[1m                     $[0m
+    35    return [type x, x];
+    36  end proc;
+***
+***  Missing digits after "5.e" in UNSTR operand
+***
+***  Active routines:
+***
+***  U__unnamed_SETL_program.test_unstr
+***  U__unnamed_SETL_program.try
+***  U__unnamed_SETL_program
+***  U__MAIN
+***
+***  This is version 3.5.8 of GNU SETL.
+***
+
+***
+***  Report from 'setl'  ***
+***
+***  Error in or near line 44 of -3:
+***
+    40    if fd = -1 then  -- subchild
+    41      print (s);  -- feed test string up to this subchild's parent
+    42      stop;  -- exit subchild
+    43    end if;
+[1m    44    reada (fd, x);  -- try to READA into x from what subchild spews[0m
+[1m                     $[0m
+    45    close (fd);
+    46    return [type x, x];
+***
+***  Missing digits after "5.e" in READA input
+***
+***  Active routines:
+***
+***  U__unnamed_SETL_program.test_reada
+***  U__unnamed_SETL_program.try
+***  U__unnamed_SETL_program
+***  U__MAIN
+***
+***  This is version 3.5.8 of GNU SETL.
+***
+
+***
+***  Report from 'setl'  ***
+***
+***  Error in or near line 50 of -3:
+***
+    46    return [type x, x];
+    47  end proc;
+    48  
+    49  proc test_reads (s);
+[1m    50    reads (s, x);[0m
+[1m                    $[0m
+    51    return [type x, x];
+    52  end proc;
+***
+***  Missing digits after "5.e" in first arg to READS
+***
+***  Active routines:
+***
+***  U__unnamed_SETL_program.test_reads
+***  U__unnamed_SETL_program.try
+***  U__unnamed_SETL_program
+***  U__MAIN
+***
+***  This is version 3.5.8 of GNU SETL.
+***
+
+*
+
+[OM]
+
+***
+***  Report from 'setl'  ***
+***
+***  Error in or near line 82 of -3:
+***
+    78    return r;
+    79  end proc;
+    80  
+    81  proc test_read();
+[1m    82    read (x);[0m
+[1m                $[0m
+    83    return [type x, x];
+    84  end proc;
+***
+***  Missing digits after "5.e" in READ input
+***
+***  Active routines:
+***
+***  U__unnamed_SETL_program.test_read
+***  U__unnamed_SETL_program.try_read
+***  U__unnamed_SETL_program
+***  U__MAIN
+***
+***  This is version 3.5.8 of GNU SETL.
+***
+
+'5+e'
+***
+***  Report from 'setl'  ***
+***
+***  Error in or near line 34 of -3:
+***
+    30    return r;
+    31  end proc;
+    32  
+    33  proc test_unstr (s);
+[1m    34    x := unstr s;[0m
+[1m                     $[0m
+    35    return [type x, x];
+    36  end proc;
+***
+***  Misplaced '+' or '-' in "5+" in UNSTR operand
+***
+***  Active routines:
+***
+***  U__unnamed_SETL_program.test_unstr
+***  U__unnamed_SETL_program.try
+***  U__unnamed_SETL_program
+***  U__MAIN
+***
+***  This is version 3.5.8 of GNU SETL.
+***
+
+***
+***  Report from 'setl'  ***
+***
+***  Error in or near line 44 of -3:
+***
+    40    if fd = -1 then  -- subchild
+    41      print (s);  -- feed test string up to this subchild's parent
+    42      stop;  -- exit subchild
+    43    end if;
+[1m    44    reada (fd, x);  -- try to READA into x from what subchild spews[0m
+[1m                     $[0m
+    45    close (fd);
+    46    return [type x, x];
+***
+***  Misplaced '+' or '-' in "5+" in READA input
+***
+***  Active routines:
+***
+***  U__unnamed_SETL_program.test_reada
+***  U__unnamed_SETL_program.try
+***  U__unnamed_SETL_program
+***  U__MAIN
+***
+***  This is version 3.5.8 of GNU SETL.
+***
+
+***
+***  Report from 'setl'  ***
+***
+***  Error in or near line 50 of -3:
+***
+    46    return [type x, x];
+    47  end proc;
+    48  
+    49  proc test_reads (s);
+[1m    50    reads (s, x);[0m
+[1m                    $[0m
+    51    return [type x, x];
+    52  end proc;
+***
+***  Misplaced '+' or '-' in "5+" in first arg to READS
+***
+***  Active routines:
+***
+***  U__unnamed_SETL_program.test_reads
+***  U__unnamed_SETL_program.try
+***  U__unnamed_SETL_program
+***  U__MAIN
+***
+***  This is version 3.5.8 of GNU SETL.
+***
+
+*
+
+[OM]
+
+***
+***  Report from 'setl'  ***
+***
+***  Error in or near line 82 of -3:
+***
+    78    return r;
+    79  end proc;
+    80  
+    81  proc test_read();
+[1m    82    read (x);[0m
+[1m                $[0m
+    83    return [type x, x];
+    84  end proc;
+***
+***  Misplaced '+' or '-' in "5+" in READ input
+***
+***  Active routines:
+***
+***  U__unnamed_SETL_program.test_read
+***  U__unnamed_SETL_program.try_read
+***  U__unnamed_SETL_program
+***  U__MAIN
+***
+***  This is version 3.5.8 of GNU SETL.
+***
+
+'5-e'
+***
+***  Report from 'setl'  ***
+***
+***  Error in or near line 34 of -3:
+***
+    30    return r;
+    31  end proc;
+    32  
+    33  proc test_unstr (s);
+[1m    34    x := unstr s;[0m
+[1m                     $[0m
+    35    return [type x, x];
+    36  end proc;
+***
+***  Misplaced '+' or '-' in "5-" in UNSTR operand
+***
+***  Active routines:
+***
+***  U__unnamed_SETL_program.test_unstr
+***  U__unnamed_SETL_program.try
+***  U__unnamed_SETL_program
+***  U__MAIN
+***
+***  This is version 3.5.8 of GNU SETL.
+***
+
+***
+***  Report from 'setl'  ***
+***
+***  Error in or near line 44 of -3:
+***
+    40    if fd = -1 then  -- subchild
+    41      print (s);  -- feed test string up to this subchild's parent
+    42      stop;  -- exit subchild
+    43    end if;
+[1m    44    reada (fd, x);  -- try to READA into x from what subchild spews[0m
+[1m                     $[0m
+    45    close (fd);
+    46    return [type x, x];
+***
+***  Misplaced '+' or '-' in "5-" in READA input
+***
+***  Active routines:
+***
+***  U__unnamed_SETL_program.test_reada
+***  U__unnamed_SETL_program.try
+***  U__unnamed_SETL_program
+***  U__MAIN
+***
+***  This is version 3.5.8 of GNU SETL.
+***
+
+***
+***  Report from 'setl'  ***
+***
+***  Error in or near line 50 of -3:
+***
+    46    return [type x, x];
+    47  end proc;
+    48  
+    49  proc test_reads (s);
+[1m    50    reads (s, x);[0m
+[1m                    $[0m
+    51    return [type x, x];
+    52  end proc;
+***
+***  Misplaced '+' or '-' in "5-" in first arg to READS
+***
+***  Active routines:
+***
+***  U__unnamed_SETL_program.test_reads
+***  U__unnamed_SETL_program.try
+***  U__unnamed_SETL_program
+***  U__MAIN
+***
+***  This is version 3.5.8 of GNU SETL.
+***
+
+*
+
+[OM]
+
+***
+***  Report from 'setl'  ***
+***
+***  Error in or near line 82 of -3:
+***
+    78    return r;
+    79  end proc;
+    80  
+    81  proc test_read();
+[1m    82    read (x);[0m
+[1m                $[0m
+    83    return [type x, x];
+    84  end proc;
+***
+***  Misplaced '+' or '-' in "5-" in READ input
+***
+***  Active routines:
+***
+***  U__unnamed_SETL_program.test_read
+***  U__unnamed_SETL_program.try_read
+***  U__unnamed_SETL_program
+***  U__MAIN
+***
+***  This is version 3.5.8 of GNU SETL.
+***
+
+'5+.e'
+***
+***  Report from 'setl'  ***
+***
+***  Error in or near line 34 of -3:
+***
+    30    return r;
+    31  end proc;
+    32  
+    33  proc test_unstr (s);
+[1m    34    x := unstr s;[0m
+[1m                     $[0m
+    35    return [type x, x];
+    36  end proc;
+***
+***  Misplaced '+' or '-' in "5+" in UNSTR operand
+***
+***  Active routines:
+***
+***  U__unnamed_SETL_program.test_unstr
+***  U__unnamed_SETL_program.try
+***  U__unnamed_SETL_program
+***  U__MAIN
+***
+***  This is version 3.5.8 of GNU SETL.
+***
+
+***
+***  Report from 'setl'  ***
+***
+***  Error in or near line 44 of -3:
+***
+    40    if fd = -1 then  -- subchild
+    41      print (s);  -- feed test string up to this subchild's parent
+    42      stop;  -- exit subchild
+    43    end if;
+[1m    44    reada (fd, x);  -- try to READA into x from what subchild spews[0m
+[1m                     $[0m
+    45    close (fd);
+    46    return [type x, x];
+***
+***  Misplaced '+' or '-' in "5+" in READA input
+***
+***  Active routines:
+***
+***  U__unnamed_SETL_program.test_reada
+***  U__unnamed_SETL_program.try
+***  U__unnamed_SETL_program
+***  U__MAIN
+***
+***  This is version 3.5.8 of GNU SETL.
+***
+
+***
+***  Report from 'setl'  ***
+***
+***  Error in or near line 50 of -3:
+***
+    46    return [type x, x];
+    47  end proc;
+    48  
+    49  proc test_reads (s);
+[1m    50    reads (s, x);[0m
+[1m                    $[0m
+    51    return [type x, x];
+    52  end proc;
+***
+***  Misplaced '+' or '-' in "5+" in first arg to READS
+***
+***  Active routines:
+***
+***  U__unnamed_SETL_program.test_reads
+***  U__unnamed_SETL_program.try
+***  U__unnamed_SETL_program
+***  U__MAIN
+***
+***  This is version 3.5.8 of GNU SETL.
+***
+
+*
+
+[OM]
+
+***
+***  Report from 'setl'  ***
+***
+***  Error in or near line 82 of -3:
+***
+    78    return r;
+    79  end proc;
+    80  
+    81  proc test_read();
+[1m    82    read (x);[0m
+[1m                $[0m
+    83    return [type x, x];
+    84  end proc;
+***
+***  Misplaced '+' or '-' in "5+" in READ input
+***
+***  Active routines:
+***
+***  U__unnamed_SETL_program.test_read
+***  U__unnamed_SETL_program.try_read
+***  U__unnamed_SETL_program
+***  U__MAIN
+***
+***  This is version 3.5.8 of GNU SETL.
+***
+
+'5-.e'
+***
+***  Report from 'setl'  ***
+***
+***  Error in or near line 34 of -3:
+***
+    30    return r;
+    31  end proc;
+    32  
+    33  proc test_unstr (s);
+[1m    34    x := unstr s;[0m
+[1m                     $[0m
+    35    return [type x, x];
+    36  end proc;
+***
+***  Misplaced '+' or '-' in "5-" in UNSTR operand
+***
+***  Active routines:
+***
+***  U__unnamed_SETL_program.test_unstr
+***  U__unnamed_SETL_program.try
+***  U__unnamed_SETL_program
+***  U__MAIN
+***
+***  This is version 3.5.8 of GNU SETL.
+***
+
+***
+***  Report from 'setl'  ***
+***
+***  Error in or near line 44 of -3:
+***
+    40    if fd = -1 then  -- subchild
+    41      print (s);  -- feed test string up to this subchild's parent
+    42      stop;  -- exit subchild
+    43    end if;
+[1m    44    reada (fd, x);  -- try to READA into x from what subchild spews[0m
+[1m                     $[0m
+    45    close (fd);
+    46    return [type x, x];
+***
+***  Misplaced '+' or '-' in "5-" in READA input
+***
+***  Active routines:
+***
+***  U__unnamed_SETL_program.test_reada
+***  U__unnamed_SETL_program.try
+***  U__unnamed_SETL_program
+***  U__MAIN
+***
+***  This is version 3.5.8 of GNU SETL.
+***
+
+***
+***  Report from 'setl'  ***
+***
+***  Error in or near line 50 of -3:
+***
+    46    return [type x, x];
+    47  end proc;
+    48  
+    49  proc test_reads (s);
+[1m    50    reads (s, x);[0m
+[1m                    $[0m
+    51    return [type x, x];
+    52  end proc;
+***
+***  Misplaced '+' or '-' in "5-" in first arg to READS
+***
+***  Active routines:
+***
+***  U__unnamed_SETL_program.test_reads
+***  U__unnamed_SETL_program.try
+***  U__unnamed_SETL_program
+***  U__MAIN
+***
+***  This is version 3.5.8 of GNU SETL.
+***
+
+*
+
+[OM]
+
+***
+***  Report from 'setl'  ***
+***
+***  Error in or near line 82 of -3:
+***
+    78    return r;
+    79  end proc;
+    80  
+    81  proc test_read();
+[1m    82    read (x);[0m
+[1m                $[0m
+    83    return [type x, x];
+    84  end proc;
+***
+***  Misplaced '+' or '-' in "5-" in READ input
+***
+***  Active routines:
+***
+***  U__unnamed_SETL_program.test_read
+***  U__unnamed_SETL_program.try_read
+***  U__unnamed_SETL_program
+***  U__MAIN
+***
+***  This is version 3.5.8 of GNU SETL.
+***
+
+'5.+e'
+***
+***  Report from 'setl'  ***
+***
+***  Error in or near line 34 of -3:
+***
+    30    return r;
+    31  end proc;
+    32  
+    33  proc test_unstr (s);
+[1m    34    x := unstr s;[0m
+[1m                     $[0m
+    35    return [type x, x];
+    36  end proc;
+***
+***  Misplaced '+' or '-' in "5.+" in UNSTR operand
+***
+***  Active routines:
+***
+***  U__unnamed_SETL_program.test_unstr
+***  U__unnamed_SETL_program.try
+***  U__unnamed_SETL_program
+***  U__MAIN
+***
+***  This is version 3.5.8 of GNU SETL.
+***
+
+***
+***  Report from 'setl'  ***
+***
+***  Error in or near line 44 of -3:
+***
+    40    if fd = -1 then  -- subchild
+    41      print (s);  -- feed test string up to this subchild's parent
+    42      stop;  -- exit subchild
+    43    end if;
+[1m    44    reada (fd, x);  -- try to READA into x from what subchild spews[0m
+[1m                     $[0m
+    45    close (fd);
+    46    return [type x, x];
+***
+***  Misplaced '+' or '-' in "5.+" in READA input
+***
+***  Active routines:
+***
+***  U__unnamed_SETL_program.test_reada
+***  U__unnamed_SETL_program.try
+***  U__unnamed_SETL_program
+***  U__MAIN
+***
+***  This is version 3.5.8 of GNU SETL.
+***
+
+***
+***  Report from 'setl'  ***
+***
+***  Error in or near line 50 of -3:
+***
+    46    return [type x, x];
+    47  end proc;
+    48  
+    49  proc test_reads (s);
+[1m    50    reads (s, x);[0m
+[1m                    $[0m
+    51    return [type x, x];
+    52  end proc;
+***
+***  Misplaced '+' or '-' in "5.+" in first arg to READS
+***
+***  Active routines:
+***
+***  U__unnamed_SETL_program.test_reads
+***  U__unnamed_SETL_program.try
+***  U__unnamed_SETL_program
+***  U__MAIN
+***
+***  This is version 3.5.8 of GNU SETL.
+***
+
+*
+
+[OM]
+
+***
+***  Report from 'setl'  ***
+***
+***  Error in or near line 82 of -3:
+***
+    78    return r;
+    79  end proc;
+    80  
+    81  proc test_read();
+[1m    82    read (x);[0m
+[1m                $[0m
+    83    return [type x, x];
+    84  end proc;
+***
+***  Misplaced '+' or '-' in "5.+" in READ input
+***
+***  Active routines:
+***
+***  U__unnamed_SETL_program.test_read
+***  U__unnamed_SETL_program.try_read
+***  U__unnamed_SETL_program
+***  U__MAIN
+***
+***  This is version 3.5.8 of GNU SETL.
+***
+
+'5.-e'
+***
+***  Report from 'setl'  ***
+***
+***  Error in or near line 34 of -3:
+***
+    30    return r;
+    31  end proc;
+    32  
+    33  proc test_unstr (s);
+[1m    34    x := unstr s;[0m
+[1m                     $[0m
+    35    return [type x, x];
+    36  end proc;
+***
+***  Misplaced '+' or '-' in "5.-" in UNSTR operand
+***
+***  Active routines:
+***
+***  U__unnamed_SETL_program.test_unstr
+***  U__unnamed_SETL_program.try
+***  U__unnamed_SETL_program
+***  U__MAIN
+***
+***  This is version 3.5.8 of GNU SETL.
+***
+
+***
+***  Report from 'setl'  ***
+***
+***  Error in or near line 44 of -3:
+***
+    40    if fd = -1 then  -- subchild
+    41      print (s);  -- feed test string up to this subchild's parent
+    42      stop;  -- exit subchild
+    43    end if;
+[1m    44    reada (fd, x);  -- try to READA into x from what subchild spews[0m
+[1m                     $[0m
+    45    close (fd);
+    46    return [type x, x];
+***
+***  Misplaced '+' or '-' in "5.-" in READA input
+***
+***  Active routines:
+***
+***  U__unnamed_SETL_program.test_reada
+***  U__unnamed_SETL_program.try
+***  U__unnamed_SETL_program
+***  U__MAIN
+***
+***  This is version 3.5.8 of GNU SETL.
+***
+
+***
+***  Report from 'setl'  ***
+***
+***  Error in or near line 50 of -3:
+***
+    46    return [type x, x];
+    47  end proc;
+    48  
+    49  proc test_reads (s);
+[1m    50    reads (s, x);[0m
+[1m                    $[0m
+    51    return [type x, x];
+    52  end proc;
+***
+***  Misplaced '+' or '-' in "5.-" in first arg to READS
+***
+***  Active routines:
+***
+***  U__unnamed_SETL_program.test_reads
+***  U__unnamed_SETL_program.try
+***  U__unnamed_SETL_program
+***  U__MAIN
+***
+***  This is version 3.5.8 of GNU SETL.
+***
+
+*
+
+[OM]
+
+***
+***  Report from 'setl'  ***
+***
+***  Error in or near line 82 of -3:
+***
+    78    return r;
+    79  end proc;
+    80  
+    81  proc test_read();
+[1m    82    read (x);[0m
+[1m                $[0m
+    83    return [type x, x];
+    84  end proc;
+***
+***  Misplaced '+' or '-' in "5.-" in READ input
+***
+***  Active routines:
+***
+***  U__unnamed_SETL_program.test_read
+***  U__unnamed_SETL_program.try_read
+***  U__unnamed_SETL_program
+***  U__MAIN
+***
+***  This is version 3.5.8 of GNU SETL.
+***
+
+'5.7'
+[REAL 5.7]
+
+[REAL 5.7]
+
+[REAL 5.7]
+
+REAL
+
+[REAL 5.7]
+
+[REAL 5.7]
+
+'5+7'
+***
+***  Report from 'setl'  ***
+***
+***  Error in or near line 34 of -3:
+***
+    30    return r;
+    31  end proc;
+    32  
+    33  proc test_unstr (s);
+[1m    34    x := unstr s;[0m
+[1m                     $[0m
+    35    return [type x, x];
+    36  end proc;
+***
+***  Misplaced '+' or '-' in "5+" in UNSTR operand
+***
+***  Active routines:
+***
+***  U__unnamed_SETL_program.test_unstr
+***  U__unnamed_SETL_program.try
+***  U__unnamed_SETL_program
+***  U__MAIN
+***
+***  This is version 3.5.8 of GNU SETL.
+***
+
+***
+***  Report from 'setl'  ***
+***
+***  Error in or near line 44 of -3:
+***
+    40    if fd = -1 then  -- subchild
+    41      print (s);  -- feed test string up to this subchild's parent
+    42      stop;  -- exit subchild
+    43    end if;
+[1m    44    reada (fd, x);  -- try to READA into x from what subchild spews[0m
+[1m                     $[0m
+    45    close (fd);
+    46    return [type x, x];
+***
+***  Misplaced '+' or '-' in "5+" in READA input
+***
+***  Active routines:
+***
+***  U__unnamed_SETL_program.test_reada
+***  U__unnamed_SETL_program.try
+***  U__unnamed_SETL_program
+***  U__MAIN
+***
+***  This is version 3.5.8 of GNU SETL.
+***
+
+***
+***  Report from 'setl'  ***
+***
+***  Error in or near line 50 of -3:
+***
+    46    return [type x, x];
+    47  end proc;
+    48  
+    49  proc test_reads (s);
+[1m    50    reads (s, x);[0m
+[1m                    $[0m
+    51    return [type x, x];
+    52  end proc;
+***
+***  Misplaced '+' or '-' in "5+" in first arg to READS
+***
+***  Active routines:
+***
+***  U__unnamed_SETL_program.test_reads
+***  U__unnamed_SETL_program.try
+***  U__unnamed_SETL_program
+***  U__MAIN
+***
+***  This is version 3.5.8 of GNU SETL.
+***
+
+*
+
+[OM]
+
+***
+***  Report from 'setl'  ***
+***
+***  Error in or near line 82 of -3:
+***
+    78    return r;
+    79  end proc;
+    80  
+    81  proc test_read();
+[1m    82    read (x);[0m
+[1m                $[0m
+    83    return [type x, x];
+    84  end proc;
+***
+***  Misplaced '+' or '-' in "5+" in READ input
+***
+***  Active routines:
+***
+***  U__unnamed_SETL_program.test_read
+***  U__unnamed_SETL_program.try_read
+***  U__unnamed_SETL_program
+***  U__MAIN
+***
+***  This is version 3.5.8 of GNU SETL.
+***
+
+'5-7'
+***
+***  Report from 'setl'  ***
+***
+***  Error in or near line 34 of -3:
+***
+    30    return r;
+    31  end proc;
+    32  
+    33  proc test_unstr (s);
+[1m    34    x := unstr s;[0m
+[1m                     $[0m
+    35    return [type x, x];
+    36  end proc;
+***
+***  Misplaced '+' or '-' in "5-" in UNSTR operand
+***
+***  Active routines:
+***
+***  U__unnamed_SETL_program.test_unstr
+***  U__unnamed_SETL_program.try
+***  U__unnamed_SETL_program
+***  U__MAIN
+***
+***  This is version 3.5.8 of GNU SETL.
+***
+
+***
+***  Report from 'setl'  ***
+***
+***  Error in or near line 44 of -3:
+***
+    40    if fd = -1 then  -- subchild
+    41      print (s);  -- feed test string up to this subchild's parent
+    42      stop;  -- exit subchild
+    43    end if;
+[1m    44    reada (fd, x);  -- try to READA into x from what subchild spews[0m
+[1m                     $[0m
+    45    close (fd);
+    46    return [type x, x];
+***
+***  Misplaced '+' or '-' in "5-" in READA input
+***
+***  Active routines:
+***
+***  U__unnamed_SETL_program.test_reada
+***  U__unnamed_SETL_program.try
+***  U__unnamed_SETL_program
+***  U__MAIN
+***
+***  This is version 3.5.8 of GNU SETL.
+***
+
+***
+***  Report from 'setl'  ***
+***
+***  Error in or near line 50 of -3:
+***
+    46    return [type x, x];
+    47  end proc;
+    48  
+    49  proc test_reads (s);
+[1m    50    reads (s, x);[0m
+[1m                    $[0m
+    51    return [type x, x];
+    52  end proc;
+***
+***  Misplaced '+' or '-' in "5-" in first arg to READS
+***
+***  Active routines:
+***
+***  U__unnamed_SETL_program.test_reads
+***  U__unnamed_SETL_program.try
+***  U__unnamed_SETL_program
+***  U__MAIN
+***
+***  This is version 3.5.8 of GNU SETL.
+***
+
+*
+
+[OM]
+
+***
+***  Report from 'setl'  ***
+***
+***  Error in or near line 82 of -3:
+***
+    78    return r;
+    79  end proc;
+    80  
+    81  proc test_read();
+[1m    82    read (x);[0m
+[1m                $[0m
+    83    return [type x, x];
+    84  end proc;
+***
+***  Misplaced '+' or '-' in "5-" in READ input
+***
+***  Active routines:
+***
+***  U__unnamed_SETL_program.test_read
+***  U__unnamed_SETL_program.try_read
+***  U__unnamed_SETL_program
+***  U__MAIN
+***
+***  This is version 3.5.8 of GNU SETL.
+***
+
+'5+.7'
+***
+***  Report from 'setl'  ***
+***
+***  Error in or near line 34 of -3:
+***
+    30    return r;
+    31  end proc;
+    32  
+    33  proc test_unstr (s);
+[1m    34    x := unstr s;[0m
+[1m                     $[0m
+    35    return [type x, x];
+    36  end proc;
+***
+***  Misplaced '+' or '-' in "5+" in UNSTR operand
+***
+***  Active routines:
+***
+***  U__unnamed_SETL_program.test_unstr
+***  U__unnamed_SETL_program.try
+***  U__unnamed_SETL_program
+***  U__MAIN
+***
+***  This is version 3.5.8 of GNU SETL.
+***
+
+***
+***  Report from 'setl'  ***
+***
+***  Error in or near line 44 of -3:
+***
+    40    if fd = -1 then  -- subchild
+    41      print (s);  -- feed test string up to this subchild's parent
+    42      stop;  -- exit subchild
+    43    end if;
+[1m    44    reada (fd, x);  -- try to READA into x from what subchild spews[0m
+[1m                     $[0m
+    45    close (fd);
+    46    return [type x, x];
+***
+***  Misplaced '+' or '-' in "5+" in READA input
+***
+***  Active routines:
+***
+***  U__unnamed_SETL_program.test_reada
+***  U__unnamed_SETL_program.try
+***  U__unnamed_SETL_program
+***  U__MAIN
+***
+***  This is version 3.5.8 of GNU SETL.
+***
+
+***
+***  Report from 'setl'  ***
+***
+***  Error in or near line 50 of -3:
+***
+    46    return [type x, x];
+    47  end proc;
+    48  
+    49  proc test_reads (s);
+[1m    50    reads (s, x);[0m
+[1m                    $[0m
+    51    return [type x, x];
+    52  end proc;
+***
+***  Misplaced '+' or '-' in "5+" in first arg to READS
+***
+***  Active routines:
+***
+***  U__unnamed_SETL_program.test_reads
+***  U__unnamed_SETL_program.try
+***  U__unnamed_SETL_program
+***  U__MAIN
+***
+***  This is version 3.5.8 of GNU SETL.
+***
+
+*
+
+[OM]
+
+***
+***  Report from 'setl'  ***
+***
+***  Error in or near line 82 of -3:
+***
+    78    return r;
+    79  end proc;
+    80  
+    81  proc test_read();
+[1m    82    read (x);[0m
+[1m                $[0m
+    83    return [type x, x];
+    84  end proc;
+***
+***  Misplaced '+' or '-' in "5+" in READ input
+***
+***  Active routines:
+***
+***  U__unnamed_SETL_program.test_read
+***  U__unnamed_SETL_program.try_read
+***  U__unnamed_SETL_program
+***  U__MAIN
+***
+***  This is version 3.5.8 of GNU SETL.
+***
+
+'5-.7'
+***
+***  Report from 'setl'  ***
+***
+***  Error in or near line 34 of -3:
+***
+    30    return r;
+    31  end proc;
+    32  
+    33  proc test_unstr (s);
+[1m    34    x := unstr s;[0m
+[1m                     $[0m
+    35    return [type x, x];
+    36  end proc;
+***
+***  Misplaced '+' or '-' in "5-" in UNSTR operand
+***
+***  Active routines:
+***
+***  U__unnamed_SETL_program.test_unstr
+***  U__unnamed_SETL_program.try
+***  U__unnamed_SETL_program
+***  U__MAIN
+***
+***  This is version 3.5.8 of GNU SETL.
+***
+
+***
+***  Report from 'setl'  ***
+***
+***  Error in or near line 44 of -3:
+***
+    40    if fd = -1 then  -- subchild
+    41      print (s);  -- feed test string up to this subchild's parent
+    42      stop;  -- exit subchild
+    43    end if;
+[1m    44    reada (fd, x);  -- try to READA into x from what subchild spews[0m
+[1m                     $[0m
+    45    close (fd);
+    46    return [type x, x];
+***
+***  Misplaced '+' or '-' in "5-" in READA input
+***
+***  Active routines:
+***
+***  U__unnamed_SETL_program.test_reada
+***  U__unnamed_SETL_program.try
+***  U__unnamed_SETL_program
+***  U__MAIN
+***
+***  This is version 3.5.8 of GNU SETL.
+***
+
+***
+***  Report from 'setl'  ***
+***
+***  Error in or near line 50 of -3:
+***
+    46    return [type x, x];
+    47  end proc;
+    48  
+    49  proc test_reads (s);
+[1m    50    reads (s, x);[0m
+[1m                    $[0m
+    51    return [type x, x];
+    52  end proc;
+***
+***  Misplaced '+' or '-' in "5-" in first arg to READS
+***
+***  Active routines:
+***
+***  U__unnamed_SETL_program.test_reads
+***  U__unnamed_SETL_program.try
+***  U__unnamed_SETL_program
+***  U__MAIN
+***
+***  This is version 3.5.8 of GNU SETL.
+***
+
+*
+
+[OM]
+
+***
+***  Report from 'setl'  ***
+***
+***  Error in or near line 82 of -3:
+***
+    78    return r;
+    79  end proc;
+    80  
+    81  proc test_read();
+[1m    82    read (x);[0m
+[1m                $[0m
+    83    return [type x, x];
+    84  end proc;
+***
+***  Misplaced '+' or '-' in "5-" in READ input
+***
+***  Active routines:
+***
+***  U__unnamed_SETL_program.test_read
+***  U__unnamed_SETL_program.try_read
+***  U__unnamed_SETL_program
+***  U__MAIN
+***
+***  This is version 3.5.8 of GNU SETL.
+***
+
+'5.+7'
+***
+***  Report from 'setl'  ***
+***
+***  Error in or near line 34 of -3:
+***
+    30    return r;
+    31  end proc;
+    32  
+    33  proc test_unstr (s);
+[1m    34    x := unstr s;[0m
+[1m                     $[0m
+    35    return [type x, x];
+    36  end proc;
+***
+***  Misplaced '+' or '-' in "5.+" in UNSTR operand
+***
+***  Active routines:
+***
+***  U__unnamed_SETL_program.test_unstr
+***  U__unnamed_SETL_program.try
+***  U__unnamed_SETL_program
+***  U__MAIN
+***
+***  This is version 3.5.8 of GNU SETL.
+***
+
+***
+***  Report from 'setl'  ***
+***
+***  Error in or near line 44 of -3:
+***
+    40    if fd = -1 then  -- subchild
+    41      print (s);  -- feed test string up to this subchild's parent
+    42      stop;  -- exit subchild
+    43    end if;
+[1m    44    reada (fd, x);  -- try to READA into x from what subchild spews[0m
+[1m                     $[0m
+    45    close (fd);
+    46    return [type x, x];
+***
+***  Misplaced '+' or '-' in "5.+" in READA input
+***
+***  Active routines:
+***
+***  U__unnamed_SETL_program.test_reada
+***  U__unnamed_SETL_program.try
+***  U__unnamed_SETL_program
+***  U__MAIN
+***
+***  This is version 3.5.8 of GNU SETL.
+***
+
+***
+***  Report from 'setl'  ***
+***
+***  Error in or near line 50 of -3:
+***
+    46    return [type x, x];
+    47  end proc;
+    48  
+    49  proc test_reads (s);
+[1m    50    reads (s, x);[0m
+[1m                    $[0m
+    51    return [type x, x];
+    52  end proc;
+***
+***  Misplaced '+' or '-' in "5.+" in first arg to READS
+***
+***  Active routines:
+***
+***  U__unnamed_SETL_program.test_reads
+***  U__unnamed_SETL_program.try
+***  U__unnamed_SETL_program
+***  U__MAIN
+***
+***  This is version 3.5.8 of GNU SETL.
+***
+
+*
+
+[OM]
+
+***
+***  Report from 'setl'  ***
+***
+***  Error in or near line 82 of -3:
+***
+    78    return r;
+    79  end proc;
+    80  
+    81  proc test_read();
+[1m    82    read (x);[0m
+[1m                $[0m
+    83    return [type x, x];
+    84  end proc;
+***
+***  Misplaced '+' or '-' in "5.+" in READ input
+***
+***  Active routines:
+***
+***  U__unnamed_SETL_program.test_read
+***  U__unnamed_SETL_program.try_read
+***  U__unnamed_SETL_program
+***  U__MAIN
+***
+***  This is version 3.5.8 of GNU SETL.
+***
+
+'5.-7'
+***
+***  Report from 'setl'  ***
+***
+***  Error in or near line 34 of -3:
+***
+    30    return r;
+    31  end proc;
+    32  
+    33  proc test_unstr (s);
+[1m    34    x := unstr s;[0m
+[1m                     $[0m
+    35    return [type x, x];
+    36  end proc;
+***
+***  Misplaced '+' or '-' in "5.-" in UNSTR operand
+***
+***  Active routines:
+***
+***  U__unnamed_SETL_program.test_unstr
+***  U__unnamed_SETL_program.try
+***  U__unnamed_SETL_program
+***  U__MAIN
+***
+***  This is version 3.5.8 of GNU SETL.
+***
+
+***
+***  Report from 'setl'  ***
+***
+***  Error in or near line 44 of -3:
+***
+    40    if fd = -1 then  -- subchild
+    41      print (s);  -- feed test string up to this subchild's parent
+    42      stop;  -- exit subchild
+    43    end if;
+[1m    44    reada (fd, x);  -- try to READA into x from what subchild spews[0m
+[1m                     $[0m
+    45    close (fd);
+    46    return [type x, x];
+***
+***  Misplaced '+' or '-' in "5.-" in READA input
+***
+***  Active routines:
+***
+***  U__unnamed_SETL_program.test_reada
+***  U__unnamed_SETL_program.try
+***  U__unnamed_SETL_program
+***  U__MAIN
+***
+***  This is version 3.5.8 of GNU SETL.
+***
+
+***
+***  Report from 'setl'  ***
+***
+***  Error in or near line 50 of -3:
+***
+    46    return [type x, x];
+    47  end proc;
+    48  
+    49  proc test_reads (s);
+[1m    50    reads (s, x);[0m
+[1m                    $[0m
+    51    return [type x, x];
+    52  end proc;
+***
+***  Misplaced '+' or '-' in "5.-" in first arg to READS
+***
+***  Active routines:
+***
+***  U__unnamed_SETL_program.test_reads
+***  U__unnamed_SETL_program.try
+***  U__unnamed_SETL_program
+***  U__MAIN
+***
+***  This is version 3.5.8 of GNU SETL.
+***
+
+*
+
+[OM]
+
+***
+***  Report from 'setl'  ***
+***
+***  Error in or near line 82 of -3:
+***
+    78    return r;
+    79  end proc;
+    80  
+    81  proc test_read();
+[1m    82    read (x);[0m
+[1m                $[0m
+    83    return [type x, x];
+    84  end proc;
+***
+***  Misplaced '+' or '-' in "5.-" in READ input
+***
+***  Active routines:
+***
+***  U__unnamed_SETL_program.test_read
+***  U__unnamed_SETL_program.try_read
+***  U__unnamed_SETL_program
+***  U__MAIN
+***
+***  This is version 3.5.8 of GNU SETL.
+***
+
+'5.e7'
+[REAL 50000000]
+
+[REAL 50000000]
+
+[REAL 50000000]
+
+REAL
+
+[REAL 50000000]
+
+[REAL 50000000]
+
+'5+e7'
+***
+***  Report from 'setl'  ***
+***
+***  Error in or near line 34 of -3:
+***
+    30    return r;
+    31  end proc;
+    32  
+    33  proc test_unstr (s);
+[1m    34    x := unstr s;[0m
+[1m                     $[0m
+    35    return [type x, x];
+    36  end proc;
+***
+***  Misplaced '+' or '-' in "5+" in UNSTR operand
+***
+***  Active routines:
+***
+***  U__unnamed_SETL_program.test_unstr
+***  U__unnamed_SETL_program.try
+***  U__unnamed_SETL_program
+***  U__MAIN
+***
+***  This is version 3.5.8 of GNU SETL.
+***
+
+***
+***  Report from 'setl'  ***
+***
+***  Error in or near line 44 of -3:
+***
+    40    if fd = -1 then  -- subchild
+    41      print (s);  -- feed test string up to this subchild's parent
+    42      stop;  -- exit subchild
+    43    end if;
+[1m    44    reada (fd, x);  -- try to READA into x from what subchild spews[0m
+[1m                     $[0m
+    45    close (fd);
+    46    return [type x, x];
+***
+***  Misplaced '+' or '-' in "5+" in READA input
+***
+***  Active routines:
+***
+***  U__unnamed_SETL_program.test_reada
+***  U__unnamed_SETL_program.try
+***  U__unnamed_SETL_program
+***  U__MAIN
+***
+***  This is version 3.5.8 of GNU SETL.
+***
+
+***
+***  Report from 'setl'  ***
+***
+***  Error in or near line 50 of -3:
+***
+    46    return [type x, x];
+    47  end proc;
+    48  
+    49  proc test_reads (s);
+[1m    50    reads (s, x);[0m
+[1m                    $[0m
+    51    return [type x, x];
+    52  end proc;
+***
+***  Misplaced '+' or '-' in "5+" in first arg to READS
+***
+***  Active routines:
+***
+***  U__unnamed_SETL_program.test_reads
+***  U__unnamed_SETL_program.try
+***  U__unnamed_SETL_program
+***  U__MAIN
+***
+***  This is version 3.5.8 of GNU SETL.
+***
+
+*
+
+[OM]
+
+***
+***  Report from 'setl'  ***
+***
+***  Error in or near line 82 of -3:
+***
+    78    return r;
+    79  end proc;
+    80  
+    81  proc test_read();
+[1m    82    read (x);[0m
+[1m                $[0m
+    83    return [type x, x];
+    84  end proc;
+***
+***  Misplaced '+' or '-' in "5+" in READ input
+***
+***  Active routines:
+***
+***  U__unnamed_SETL_program.test_read
+***  U__unnamed_SETL_program.try_read
+***  U__unnamed_SETL_program
+***  U__MAIN
+***
+***  This is version 3.5.8 of GNU SETL.
+***
+
+'5-e7'
+***
+***  Report from 'setl'  ***
+***
+***  Error in or near line 34 of -3:
+***
+    30    return r;
+    31  end proc;
+    32  
+    33  proc test_unstr (s);
+[1m    34    x := unstr s;[0m
+[1m                     $[0m
+    35    return [type x, x];
+    36  end proc;
+***
+***  Misplaced '+' or '-' in "5-" in UNSTR operand
+***
+***  Active routines:
+***
+***  U__unnamed_SETL_program.test_unstr
+***  U__unnamed_SETL_program.try
+***  U__unnamed_SETL_program
+***  U__MAIN
+***
+***  This is version 3.5.8 of GNU SETL.
+***
+
+***
+***  Report from 'setl'  ***
+***
+***  Error in or near line 44 of -3:
+***
+    40    if fd = -1 then  -- subchild
+    41      print (s);  -- feed test string up to this subchild's parent
+    42      stop;  -- exit subchild
+    43    end if;
+[1m    44    reada (fd, x);  -- try to READA into x from what subchild spews[0m
+[1m                     $[0m
+    45    close (fd);
+    46    return [type x, x];
+***
+***  Misplaced '+' or '-' in "5-" in READA input
+***
+***  Active routines:
+***
+***  U__unnamed_SETL_program.test_reada
+***  U__unnamed_SETL_program.try
+***  U__unnamed_SETL_program
+***  U__MAIN
+***
+***  This is version 3.5.8 of GNU SETL.
+***
+
+***
+***  Report from 'setl'  ***
+***
+***  Error in or near line 50 of -3:
+***
+    46    return [type x, x];
+    47  end proc;
+    48  
+    49  proc test_reads (s);
+[1m    50    reads (s, x);[0m
+[1m                    $[0m
+    51    return [type x, x];
+    52  end proc;
+***
+***  Misplaced '+' or '-' in "5-" in first arg to READS
+***
+***  Active routines:
+***
+***  U__unnamed_SETL_program.test_reads
+***  U__unnamed_SETL_program.try
+***  U__unnamed_SETL_program
+***  U__MAIN
+***
+***  This is version 3.5.8 of GNU SETL.
+***
+
+*
+
+[OM]
+
+***
+***  Report from 'setl'  ***
+***
+***  Error in or near line 82 of -3:
+***
+    78    return r;
+    79  end proc;
+    80  
+    81  proc test_read();
+[1m    82    read (x);[0m
+[1m                $[0m
+    83    return [type x, x];
+    84  end proc;
+***
+***  Misplaced '+' or '-' in "5-" in READ input
+***
+***  Active routines:
+***
+***  U__unnamed_SETL_program.test_read
+***  U__unnamed_SETL_program.try_read
+***  U__unnamed_SETL_program
+***  U__MAIN
+***
+***  This is version 3.5.8 of GNU SETL.
+***
+
+'5+.e7'
+***
+***  Report from 'setl'  ***
+***
+***  Error in or near line 34 of -3:
+***
+    30    return r;
+    31  end proc;
+    32  
+    33  proc test_unstr (s);
+[1m    34    x := unstr s;[0m
+[1m                     $[0m
+    35    return [type x, x];
+    36  end proc;
+***
+***  Misplaced '+' or '-' in "5+" in UNSTR operand
+***
+***  Active routines:
+***
+***  U__unnamed_SETL_program.test_unstr
+***  U__unnamed_SETL_program.try
+***  U__unnamed_SETL_program
+***  U__MAIN
+***
+***  This is version 3.5.8 of GNU SETL.
+***
+
+***
+***  Report from 'setl'  ***
+***
+***  Error in or near line 44 of -3:
+***
+    40    if fd = -1 then  -- subchild
+    41      print (s);  -- feed test string up to this subchild's parent
+    42      stop;  -- exit subchild
+    43    end if;
+[1m    44    reada (fd, x);  -- try to READA into x from what subchild spews[0m
+[1m                     $[0m
+    45    close (fd);
+    46    return [type x, x];
+***
+***  Misplaced '+' or '-' in "5+" in READA input
+***
+***  Active routines:
+***
+***  U__unnamed_SETL_program.test_reada
+***  U__unnamed_SETL_program.try
+***  U__unnamed_SETL_program
+***  U__MAIN
+***
+***  This is version 3.5.8 of GNU SETL.
+***
+
+***
+***  Report from 'setl'  ***
+***
+***  Error in or near line 50 of -3:
+***
+    46    return [type x, x];
+    47  end proc;
+    48  
+    49  proc test_reads (s);
+[1m    50    reads (s, x);[0m
+[1m                    $[0m
+    51    return [type x, x];
+    52  end proc;
+***
+***  Misplaced '+' or '-' in "5+" in first arg to READS
+***
+***  Active routines:
+***
+***  U__unnamed_SETL_program.test_reads
+***  U__unnamed_SETL_program.try
+***  U__unnamed_SETL_program
+***  U__MAIN
+***
+***  This is version 3.5.8 of GNU SETL.
+***
+
+*
+
+[OM]
+
+***
+***  Report from 'setl'  ***
+***
+***  Error in or near line 82 of -3:
+***
+    78    return r;
+    79  end proc;
+    80  
+    81  proc test_read();
+[1m    82    read (x);[0m
+[1m                $[0m
+    83    return [type x, x];
+    84  end proc;
+***
+***  Misplaced '+' or '-' in "5+" in READ input
+***
+***  Active routines:
+***
+***  U__unnamed_SETL_program.test_read
+***  U__unnamed_SETL_program.try_read
+***  U__unnamed_SETL_program
+***  U__MAIN
+***
+***  This is version 3.5.8 of GNU SETL.
+***
+
+'5-.e7'
+***
+***  Report from 'setl'  ***
+***
+***  Error in or near line 34 of -3:
+***
+    30    return r;
+    31  end proc;
+    32  
+    33  proc test_unstr (s);
+[1m    34    x := unstr s;[0m
+[1m                     $[0m
+    35    return [type x, x];
+    36  end proc;
+***
+***  Misplaced '+' or '-' in "5-" in UNSTR operand
+***
+***  Active routines:
+***
+***  U__unnamed_SETL_program.test_unstr
+***  U__unnamed_SETL_program.try
+***  U__unnamed_SETL_program
+***  U__MAIN
+***
+***  This is version 3.5.8 of GNU SETL.
+***
+
+***
+***  Report from 'setl'  ***
+***
+***  Error in or near line 44 of -3:
+***
+    40    if fd = -1 then  -- subchild
+    41      print (s);  -- feed test string up to this subchild's parent
+    42      stop;  -- exit subchild
+    43    end if;
+[1m    44    reada (fd, x);  -- try to READA into x from what subchild spews[0m
+[1m                     $[0m
+    45    close (fd);
+    46    return [type x, x];
+***
+***  Misplaced '+' or '-' in "5-" in READA input
+***
+***  Active routines:
+***
+***  U__unnamed_SETL_program.test_reada
+***  U__unnamed_SETL_program.try
+***  U__unnamed_SETL_program
+***  U__MAIN
+***
+***  This is version 3.5.8 of GNU SETL.
+***
+
+***
+***  Report from 'setl'  ***
+***
+***  Error in or near line 50 of -3:
+***
+    46    return [type x, x];
+    47  end proc;
+    48  
+    49  proc test_reads (s);
+[1m    50    reads (s, x);[0m
+[1m                    $[0m
+    51    return [type x, x];
+    52  end proc;
+***
+***  Misplaced '+' or '-' in "5-" in first arg to READS
+***
+***  Active routines:
+***
+***  U__unnamed_SETL_program.test_reads
+***  U__unnamed_SETL_program.try
+***  U__unnamed_SETL_program
+***  U__MAIN
+***
+***  This is version 3.5.8 of GNU SETL.
+***
+
+*
+
+[OM]
+
+***
+***  Report from 'setl'  ***
+***
+***  Error in or near line 82 of -3:
+***
+    78    return r;
+    79  end proc;
+    80  
+    81  proc test_read();
+[1m    82    read (x);[0m
+[1m                $[0m
+    83    return [type x, x];
+    84  end proc;
+***
+***  Misplaced '+' or '-' in "5-" in READ input
+***
+***  Active routines:
+***
+***  U__unnamed_SETL_program.test_read
+***  U__unnamed_SETL_program.try_read
+***  U__unnamed_SETL_program
+***  U__MAIN
+***
+***  This is version 3.5.8 of GNU SETL.
+***
+
+'5.+e7'
+***
+***  Report from 'setl'  ***
+***
+***  Error in or near line 34 of -3:
+***
+    30    return r;
+    31  end proc;
+    32  
+    33  proc test_unstr (s);
+[1m    34    x := unstr s;[0m
+[1m                     $[0m
+    35    return [type x, x];
+    36  end proc;
+***
+***  Misplaced '+' or '-' in "5.+" in UNSTR operand
+***
+***  Active routines:
+***
+***  U__unnamed_SETL_program.test_unstr
+***  U__unnamed_SETL_program.try
+***  U__unnamed_SETL_program
+***  U__MAIN
+***
+***  This is version 3.5.8 of GNU SETL.
+***
+
+***
+***  Report from 'setl'  ***
+***
+***  Error in or near line 44 of -3:
+***
+    40    if fd = -1 then  -- subchild
+    41      print (s);  -- feed test string up to this subchild's parent
+    42      stop;  -- exit subchild
+    43    end if;
+[1m    44    reada (fd, x);  -- try to READA into x from what subchild spews[0m
+[1m                     $[0m
+    45    close (fd);
+    46    return [type x, x];
+***
+***  Misplaced '+' or '-' in "5.+" in READA input
+***
+***  Active routines:
+***
+***  U__unnamed_SETL_program.test_reada
+***  U__unnamed_SETL_program.try
+***  U__unnamed_SETL_program
+***  U__MAIN
+***
+***  This is version 3.5.8 of GNU SETL.
+***
+
+***
+***  Report from 'setl'  ***
+***
+***  Error in or near line 50 of -3:
+***
+    46    return [type x, x];
+    47  end proc;
+    48  
+    49  proc test_reads (s);
+[1m    50    reads (s, x);[0m
+[1m                    $[0m
+    51    return [type x, x];
+    52  end proc;
+***
+***  Misplaced '+' or '-' in "5.+" in first arg to READS
+***
+***  Active routines:
+***
+***  U__unnamed_SETL_program.test_reads
+***  U__unnamed_SETL_program.try
+***  U__unnamed_SETL_program
+***  U__MAIN
+***
+***  This is version 3.5.8 of GNU SETL.
+***
+
+*
+
+[OM]
+
+***
+***  Report from 'setl'  ***
+***
+***  Error in or near line 82 of -3:
+***
+    78    return r;
+    79  end proc;
+    80  
+    81  proc test_read();
+[1m    82    read (x);[0m
+[1m                $[0m
+    83    return [type x, x];
+    84  end proc;
+***
+***  Misplaced '+' or '-' in "5.+" in READ input
+***
+***  Active routines:
+***
+***  U__unnamed_SETL_program.test_read
+***  U__unnamed_SETL_program.try_read
+***  U__unnamed_SETL_program
+***  U__MAIN
+***
+***  This is version 3.5.8 of GNU SETL.
+***
+
+'5.-e7'
+***
+***  Report from 'setl'  ***
+***
+***  Error in or near line 34 of -3:
+***
+    30    return r;
+    31  end proc;
+    32  
+    33  proc test_unstr (s);
+[1m    34    x := unstr s;[0m
+[1m                     $[0m
+    35    return [type x, x];
+    36  end proc;
+***
+***  Misplaced '+' or '-' in "5.-" in UNSTR operand
+***
+***  Active routines:
+***
+***  U__unnamed_SETL_program.test_unstr
+***  U__unnamed_SETL_program.try
+***  U__unnamed_SETL_program
+***  U__MAIN
+***
+***  This is version 3.5.8 of GNU SETL.
+***
+
+***
+***  Report from 'setl'  ***
+***
+***  Error in or near line 44 of -3:
+***
+    40    if fd = -1 then  -- subchild
+    41      print (s);  -- feed test string up to this subchild's parent
+    42      stop;  -- exit subchild
+    43    end if;
+[1m    44    reada (fd, x);  -- try to READA into x from what subchild spews[0m
+[1m                     $[0m
+    45    close (fd);
+    46    return [type x, x];
+***
+***  Misplaced '+' or '-' in "5.-" in READA input
+***
+***  Active routines:
+***
+***  U__unnamed_SETL_program.test_reada
+***  U__unnamed_SETL_program.try
+***  U__unnamed_SETL_program
+***  U__MAIN
+***
+***  This is version 3.5.8 of GNU SETL.
+***
+
+***
+***  Report from 'setl'  ***
+***
+***  Error in or near line 50 of -3:
+***
+    46    return [type x, x];
+    47  end proc;
+    48  
+    49  proc test_reads (s);
+[1m    50    reads (s, x);[0m
+[1m                    $[0m
+    51    return [type x, x];
+    52  end proc;
+***
+***  Misplaced '+' or '-' in "5.-" in first arg to READS
+***
+***  Active routines:
+***
+***  U__unnamed_SETL_program.test_reads
+***  U__unnamed_SETL_program.try
+***  U__unnamed_SETL_program
+***  U__MAIN
+***
+***  This is version 3.5.8 of GNU SETL.
+***
+
+*
+
+[OM]
+
+***
+***  Report from 'setl'  ***
+***
+***  Error in or near line 82 of -3:
+***
+    78    return r;
+    79  end proc;
+    80  
+    81  proc test_read();
+[1m    82    read (x);[0m
+[1m                $[0m
+    83    return [type x, x];
+    84  end proc;
+***
+***  Misplaced '+' or '-' in "5.-" in READ input
+***
+***  Active routines:
+***
+***  U__unnamed_SETL_program.test_read
+***  U__unnamed_SETL_program.try_read
+***  U__unnamed_SETL_program
+***  U__MAIN
+***
+***  This is version 3.5.8 of GNU SETL.
+***
+
+'5e7'
+[REAL 50000000]
+
+[REAL 50000000]
+
+[REAL 50000000]
+
+REAL
+
+[REAL 50000000]
+
+[REAL 50000000]
+
+'5e+7'
+[REAL 50000000]
+
+[REAL 50000000]
+
+[REAL 50000000]
+
+REAL
+
+[REAL 50000000]
+
+[REAL 50000000]
+
+'5e-7'
+[REAL 5e-07]
+
+[REAL 5e-07]
+
+[REAL 5e-07]
+
+REAL
+
+[REAL 5e-07]
+
+[REAL 5e-07]
+
+'5.1e7'
+[REAL 51000000]
+
+[REAL 51000000]
+
+[REAL 51000000]
+
+REAL
+
+[REAL 51000000]
+
+[REAL 51000000]
+
+'5.1e+7'
+[REAL 51000000]
+
+[REAL 51000000]
+
+[REAL 51000000]
+
+REAL
+
+[REAL 51000000]
+
+[REAL 51000000]
+
+'5.1e-7'
+[REAL 5.1e-07]
+
+[REAL 5.1e-07]
+
+[REAL 5.1e-07]
+
+REAL
+
+[REAL 5.1e-07]
+
+[REAL 5.1e-07]
+
+'5e7.2'
+***
+***  Report from 'setl'  ***
+***
+***  Error in or near line 34 of -3:
+***
+    30    return r;
+    31  end proc;
+    32  
+    33  proc test_unstr (s);
+[1m    34    x := unstr s;[0m
+[1m                     $[0m
+    35    return [type x, x];
+    36  end proc;
+***
+***  Misplaced dot in "5e7." in UNSTR operand
+***
+***  Active routines:
+***
+***  U__unnamed_SETL_program.test_unstr
+***  U__unnamed_SETL_program.try
+***  U__unnamed_SETL_program
+***  U__MAIN
+***
+***  This is version 3.5.8 of GNU SETL.
+***
+
+***
+***  Report from 'setl'  ***
+***
+***  Error in or near line 44 of -3:
+***
+    40    if fd = -1 then  -- subchild
+    41      print (s);  -- feed test string up to this subchild's parent
+    42      stop;  -- exit subchild
+    43    end if;
+[1m    44    reada (fd, x);  -- try to READA into x from what subchild spews[0m
+[1m                     $[0m
+    45    close (fd);
+    46    return [type x, x];
+***
+***  Misplaced dot in "5e7." in READA input
+***
+***  Active routines:
+***
+***  U__unnamed_SETL_program.test_reada
+***  U__unnamed_SETL_program.try
+***  U__unnamed_SETL_program
+***  U__MAIN
+***
+***  This is version 3.5.8 of GNU SETL.
+***
+
+***
+***  Report from 'setl'  ***
+***
+***  Error in or near line 50 of -3:
+***
+    46    return [type x, x];
+    47  end proc;
+    48  
+    49  proc test_reads (s);
+[1m    50    reads (s, x);[0m
+[1m                    $[0m
+    51    return [type x, x];
+    52  end proc;
+***
+***  Misplaced dot in "5e7." in first arg to READS
+***
+***  Active routines:
+***
+***  U__unnamed_SETL_program.test_reads
+***  U__unnamed_SETL_program.try
+***  U__unnamed_SETL_program
+***  U__MAIN
+***
+***  This is version 3.5.8 of GNU SETL.
+***
+
+*
+
+[OM]
+
+***
+***  Report from 'setl'  ***
+***
+***  Error in or near line 82 of -3:
+***
+    78    return r;
+    79  end proc;
+    80  
+    81  proc test_read();
+[1m    82    read (x);[0m
+[1m                $[0m
+    83    return [type x, x];
+    84  end proc;
+***
+***  Misplaced dot in "5e7." in READ input
+***
+***  Active routines:
+***
+***  U__unnamed_SETL_program.test_read
+***  U__unnamed_SETL_program.try_read
+***  U__unnamed_SETL_program
+***  U__MAIN
+***
+***  This is version 3.5.8 of GNU SETL.
+***
+
+'5e+7.2'
+***
+***  Report from 'setl'  ***
+***
+***  Error in or near line 34 of -3:
+***
+    30    return r;
+    31  end proc;
+    32  
+    33  proc test_unstr (s);
+[1m    34    x := unstr s;[0m
+[1m                     $[0m
+    35    return [type x, x];
+    36  end proc;
+***
+***  Misplaced dot in "5e+7." in UNSTR operand
+***
+***  Active routines:
+***
+***  U__unnamed_SETL_program.test_unstr
+***  U__unnamed_SETL_program.try
+***  U__unnamed_SETL_program
+***  U__MAIN
+***
+***  This is version 3.5.8 of GNU SETL.
+***
+
+***
+***  Report from 'setl'  ***
+***
+***  Error in or near line 44 of -3:
+***
+    40    if fd = -1 then  -- subchild
+    41      print (s);  -- feed test string up to this subchild's parent
+    42      stop;  -- exit subchild
+    43    end if;
+[1m    44    reada (fd, x);  -- try to READA into x from what subchild spews[0m
+[1m                     $[0m
+    45    close (fd);
+    46    return [type x, x];
+***
+***  Misplaced dot in "5e+7." in READA input
+***
+***  Active routines:
+***
+***  U__unnamed_SETL_program.test_reada
+***  U__unnamed_SETL_program.try
+***  U__unnamed_SETL_program
+***  U__MAIN
+***
+***  This is version 3.5.8 of GNU SETL.
+***
+
+***
+***  Report from 'setl'  ***
+***
+***  Error in or near line 50 of -3:
+***
+    46    return [type x, x];
+    47  end proc;
+    48  
+    49  proc test_reads (s);
+[1m    50    reads (s, x);[0m
+[1m                    $[0m
+    51    return [type x, x];
+    52  end proc;
+***
+***  Misplaced dot in "5e+7." in first arg to READS
+***
+***  Active routines:
+***
+***  U__unnamed_SETL_program.test_reads
+***  U__unnamed_SETL_program.try
+***  U__unnamed_SETL_program
+***  U__MAIN
+***
+***  This is version 3.5.8 of GNU SETL.
+***
+
+*
+
+[OM]
+
+***
+***  Report from 'setl'  ***
+***
+***  Error in or near line 82 of -3:
+***
+    78    return r;
+    79  end proc;
+    80  
+    81  proc test_read();
+[1m    82    read (x);[0m
+[1m                $[0m
+    83    return [type x, x];
+    84  end proc;
+***
+***  Misplaced dot in "5e+7." in READ input
+***
+***  Active routines:
+***
+***  U__unnamed_SETL_program.test_read
+***  U__unnamed_SETL_program.try_read
+***  U__unnamed_SETL_program
+***  U__MAIN
+***
+***  This is version 3.5.8 of GNU SETL.
+***
+
+'5e-7.2'
+***
+***  Report from 'setl'  ***
+***
+***  Error in or near line 34 of -3:
+***
+    30    return r;
+    31  end proc;
+    32  
+    33  proc test_unstr (s);
+[1m    34    x := unstr s;[0m
+[1m                     $[0m
+    35    return [type x, x];
+    36  end proc;
+***
+***  Misplaced dot in "5e-7." in UNSTR operand
+***
+***  Active routines:
+***
+***  U__unnamed_SETL_program.test_unstr
+***  U__unnamed_SETL_program.try
+***  U__unnamed_SETL_program
+***  U__MAIN
+***
+***  This is version 3.5.8 of GNU SETL.
+***
+
+***
+***  Report from 'setl'  ***
+***
+***  Error in or near line 44 of -3:
+***
+    40    if fd = -1 then  -- subchild
+    41      print (s);  -- feed test string up to this subchild's parent
+    42      stop;  -- exit subchild
+    43    end if;
+[1m    44    reada (fd, x);  -- try to READA into x from what subchild spews[0m
+[1m                     $[0m
+    45    close (fd);
+    46    return [type x, x];
+***
+***  Misplaced dot in "5e-7." in READA input
+***
+***  Active routines:
+***
+***  U__unnamed_SETL_program.test_reada
+***  U__unnamed_SETL_program.try
+***  U__unnamed_SETL_program
+***  U__MAIN
+***
+***  This is version 3.5.8 of GNU SETL.
+***
+
+***
+***  Report from 'setl'  ***
+***
+***  Error in or near line 50 of -3:
+***
+    46    return [type x, x];
+    47  end proc;
+    48  
+    49  proc test_reads (s);
+[1m    50    reads (s, x);[0m
+[1m                    $[0m
+    51    return [type x, x];
+    52  end proc;
+***
+***  Misplaced dot in "5e-7." in first arg to READS
+***
+***  Active routines:
+***
+***  U__unnamed_SETL_program.test_reads
+***  U__unnamed_SETL_program.try
+***  U__unnamed_SETL_program
+***  U__MAIN
+***
+***  This is version 3.5.8 of GNU SETL.
+***
+
+*
+
+[OM]
+
+***
+***  Report from 'setl'  ***
+***
+***  Error in or near line 82 of -3:
+***
+    78    return r;
+    79  end proc;
+    80  
+    81  proc test_read();
+[1m    82    read (x);[0m
+[1m                $[0m
+    83    return [type x, x];
+    84  end proc;
+***
+***  Misplaced dot in "5e-7." in READ input
+***
+***  Active routines:
+***
+***  U__unnamed_SETL_program.test_read
+***  U__unnamed_SETL_program.try_read
+***  U__unnamed_SETL_program
+***  U__MAIN
+***
+***  This is version 3.5.8 of GNU SETL.
+***
+
+'5.1e7.2'
+***
+***  Report from 'setl'  ***
+***
+***  Error in or near line 34 of -3:
+***
+    30    return r;
+    31  end proc;
+    32  
+    33  proc test_unstr (s);
+[1m    34    x := unstr s;[0m
+[1m                     $[0m
+    35    return [type x, x];
+    36  end proc;
+***
+***  Misplaced dot in "5.1e7." in UNSTR operand
+***
+***  Active routines:
+***
+***  U__unnamed_SETL_program.test_unstr
+***  U__unnamed_SETL_program.try
+***  U__unnamed_SETL_program
+***  U__MAIN
+***
+***  This is version 3.5.8 of GNU SETL.
+***
+
+***
+***  Report from 'setl'  ***
+***
+***  Error in or near line 44 of -3:
+***
+    40    if fd = -1 then  -- subchild
+    41      print (s);  -- feed test string up to this subchild's parent
+    42      stop;  -- exit subchild
+    43    end if;
+[1m    44    reada (fd, x);  -- try to READA into x from what subchild spews[0m
+[1m                     $[0m
+    45    close (fd);
+    46    return [type x, x];
+***
+***  Misplaced dot in "5.1e7." in READA input
+***
+***  Active routines:
+***
+***  U__unnamed_SETL_program.test_reada
+***  U__unnamed_SETL_program.try
+***  U__unnamed_SETL_program
+***  U__MAIN
+***
+***  This is version 3.5.8 of GNU SETL.
+***
+
+***
+***  Report from 'setl'  ***
+***
+***  Error in or near line 50 of -3:
+***
+    46    return [type x, x];
+    47  end proc;
+    48  
+    49  proc test_reads (s);
+[1m    50    reads (s, x);[0m
+[1m                    $[0m
+    51    return [type x, x];
+    52  end proc;
+***
+***  Misplaced dot in "5.1e7." in first arg to READS
+***
+***  Active routines:
+***
+***  U__unnamed_SETL_program.test_reads
+***  U__unnamed_SETL_program.try
+***  U__unnamed_SETL_program
+***  U__MAIN
+***
+***  This is version 3.5.8 of GNU SETL.
+***
+
+*
+
+[OM]
+
+***
+***  Report from 'setl'  ***
+***
+***  Error in or near line 82 of -3:
+***
+    78    return r;
+    79  end proc;
+    80  
+    81  proc test_read();
+[1m    82    read (x);[0m
+[1m                $[0m
+    83    return [type x, x];
+    84  end proc;
+***
+***  Misplaced dot in "5.1e7." in READ input
+***
+***  Active routines:
+***
+***  U__unnamed_SETL_program.test_read
+***  U__unnamed_SETL_program.try_read
+***  U__unnamed_SETL_program
+***  U__MAIN
+***
+***  This is version 3.5.8 of GNU SETL.
+***
+
+'5.1e+7.2'
+***
+***  Report from 'setl'  ***
+***
+***  Error in or near line 34 of -3:
+***
+    30    return r;
+    31  end proc;
+    32  
+    33  proc test_unstr (s);
+[1m    34    x := unstr s;[0m
+[1m                     $[0m
+    35    return [type x, x];
+    36  end proc;
+***
+***  Misplaced dot in "5.1e+7." in UNSTR operand
+***
+***  Active routines:
+***
+***  U__unnamed_SETL_program.test_unstr
+***  U__unnamed_SETL_program.try
+***  U__unnamed_SETL_program
+***  U__MAIN
+***
+***  This is version 3.5.8 of GNU SETL.
+***
+
+***
+***  Report from 'setl'  ***
+***
+***  Error in or near line 44 of -3:
+***
+    40    if fd = -1 then  -- subchild
+    41      print (s);  -- feed test string up to this subchild's parent
+    42      stop;  -- exit subchild
+    43    end if;
+[1m    44    reada (fd, x);  -- try to READA into x from what subchild spews[0m
+[1m                     $[0m
+    45    close (fd);
+    46    return [type x, x];
+***
+***  Misplaced dot in "5.1e+7." in READA input
+***
+***  Active routines:
+***
+***  U__unnamed_SETL_program.test_reada
+***  U__unnamed_SETL_program.try
+***  U__unnamed_SETL_program
+***  U__MAIN
+***
+***  This is version 3.5.8 of GNU SETL.
+***
+
+***
+***  Report from 'setl'  ***
+***
+***  Error in or near line 50 of -3:
+***
+    46    return [type x, x];
+    47  end proc;
+    48  
+    49  proc test_reads (s);
+[1m    50    reads (s, x);[0m
+[1m                    $[0m
+    51    return [type x, x];
+    52  end proc;
+***
+***  Misplaced dot in "5.1e+7." in first arg to READS
+***
+***  Active routines:
+***
+***  U__unnamed_SETL_program.test_reads
+***  U__unnamed_SETL_program.try
+***  U__unnamed_SETL_program
+***  U__MAIN
+***
+***  This is version 3.5.8 of GNU SETL.
+***
+
+*
+
+[OM]
+
+***
+***  Report from 'setl'  ***
+***
+***  Error in or near line 82 of -3:
+***
+    78    return r;
+    79  end proc;
+    80  
+    81  proc test_read();
+[1m    82    read (x);[0m
+[1m                $[0m
+    83    return [type x, x];
+    84  end proc;
+***
+***  Misplaced dot in "5.1e+7." in READ input
+***
+***  Active routines:
+***
+***  U__unnamed_SETL_program.test_read
+***  U__unnamed_SETL_program.try_read
+***  U__unnamed_SETL_program
+***  U__MAIN
+***
+***  This is version 3.5.8 of GNU SETL.
+***
+
+'5.1e-7.2'
+***
+***  Report from 'setl'  ***
+***
+***  Error in or near line 34 of -3:
+***
+    30    return r;
+    31  end proc;
+    32  
+    33  proc test_unstr (s);
+[1m    34    x := unstr s;[0m
+[1m                     $[0m
+    35    return [type x, x];
+    36  end proc;
+***
+***  Misplaced dot in "5.1e-7." in UNSTR operand
+***
+***  Active routines:
+***
+***  U__unnamed_SETL_program.test_unstr
+***  U__unnamed_SETL_program.try
+***  U__unnamed_SETL_program
+***  U__MAIN
+***
+***  This is version 3.5.8 of GNU SETL.
+***
+
+***
+***  Report from 'setl'  ***
+***
+***  Error in or near line 44 of -3:
+***
+    40    if fd = -1 then  -- subchild
+    41      print (s);  -- feed test string up to this subchild's parent
+    42      stop;  -- exit subchild
+    43    end if;
+[1m    44    reada (fd, x);  -- try to READA into x from what subchild spews[0m
+[1m                     $[0m
+    45    close (fd);
+    46    return [type x, x];
+***
+***  Misplaced dot in "5.1e-7." in READA input
+***
+***  Active routines:
+***
+***  U__unnamed_SETL_program.test_reada
+***  U__unnamed_SETL_program.try
+***  U__unnamed_SETL_program
+***  U__MAIN
+***
+***  This is version 3.5.8 of GNU SETL.
+***
+
+***
+***  Report from 'setl'  ***
+***
+***  Error in or near line 50 of -3:
+***
+    46    return [type x, x];
+    47  end proc;
+    48  
+    49  proc test_reads (s);
+[1m    50    reads (s, x);[0m
+[1m                    $[0m
+    51    return [type x, x];
+    52  end proc;
+***
+***  Misplaced dot in "5.1e-7." in first arg to READS
+***
+***  Active routines:
+***
+***  U__unnamed_SETL_program.test_reads
+***  U__unnamed_SETL_program.try
+***  U__unnamed_SETL_program
+***  U__MAIN
+***
+***  This is version 3.5.8 of GNU SETL.
+***
+
+*
+
+[OM]
+
+***
+***  Report from 'setl'  ***
+***
+***  Error in or near line 82 of -3:
+***
+    78    return r;
+    79  end proc;
+    80  
+    81  proc test_read();
+[1m    82    read (x);[0m
+[1m                $[0m
+    83    return [type x, x];
+    84  end proc;
+***
+***  Misplaced dot in "5.1e-7." in READ input
+***
+***  Active routines:
+***
+***  U__unnamed_SETL_program.test_read
+***  U__unnamed_SETL_program.try_read
+***  U__unnamed_SETL_program
+***  U__MAIN
+***
+***  This is version 3.5.8 of GNU SETL.
+***
+
+'5e++7'
+***
+***  Report from 'setl'  ***
+***
+***  Error in or near line 34 of -3:
+***
+    30    return r;
+    31  end proc;
+    32  
+    33  proc test_unstr (s);
+[1m    34    x := unstr s;[0m
+[1m                     $[0m
+    35    return [type x, x];
+    36  end proc;
+***
+***  Misplaced '+' or '-' in "5e++" in UNSTR operand
+***
+***  Active routines:
+***
+***  U__unnamed_SETL_program.test_unstr
+***  U__unnamed_SETL_program.try
+***  U__unnamed_SETL_program
+***  U__MAIN
+***
+***  This is version 3.5.8 of GNU SETL.
+***
+
+***
+***  Report from 'setl'  ***
+***
+***  Error in or near line 44 of -3:
+***
+    40    if fd = -1 then  -- subchild
+    41      print (s);  -- feed test string up to this subchild's parent
+    42      stop;  -- exit subchild
+    43    end if;
+[1m    44    reada (fd, x);  -- try to READA into x from what subchild spews[0m
+[1m                     $[0m
+    45    close (fd);
+    46    return [type x, x];
+***
+***  Misplaced '+' or '-' in "5e++" in READA input
+***
+***  Active routines:
+***
+***  U__unnamed_SETL_program.test_reada
+***  U__unnamed_SETL_program.try
+***  U__unnamed_SETL_program
+***  U__MAIN
+***
+***  This is version 3.5.8 of GNU SETL.
+***
+
+***
+***  Report from 'setl'  ***
+***
+***  Error in or near line 50 of -3:
+***
+    46    return [type x, x];
+    47  end proc;
+    48  
+    49  proc test_reads (s);
+[1m    50    reads (s, x);[0m
+[1m                    $[0m
+    51    return [type x, x];
+    52  end proc;
+***
+***  Misplaced '+' or '-' in "5e++" in first arg to READS
+***
+***  Active routines:
+***
+***  U__unnamed_SETL_program.test_reads
+***  U__unnamed_SETL_program.try
+***  U__unnamed_SETL_program
+***  U__MAIN
+***
+***  This is version 3.5.8 of GNU SETL.
+***
+
+*
+
+[OM]
+
+***
+***  Report from 'setl'  ***
+***
+***  Error in or near line 82 of -3:
+***
+    78    return r;
+    79  end proc;
+    80  
+    81  proc test_read();
+[1m    82    read (x);[0m
+[1m                $[0m
+    83    return [type x, x];
+    84  end proc;
+***
+***  Misplaced '+' or '-' in "5e++" in READ input
+***
+***  Active routines:
+***
+***  U__unnamed_SETL_program.test_read
+***  U__unnamed_SETL_program.try_read
+***  U__unnamed_SETL_program
+***  U__MAIN
+***
+***  This is version 3.5.8 of GNU SETL.
+***
+
+'5e--7'
+***
+***  Report from 'setl'  ***
+***
+***  Error in or near line 34 of -3:
+***
+    30    return r;
+    31  end proc;
+    32  
+    33  proc test_unstr (s);
+[1m    34    x := unstr s;[0m
+[1m                     $[0m
+    35    return [type x, x];
+    36  end proc;
+***
+***  Misplaced '+' or '-' in "5e--" in UNSTR operand
+***
+***  Active routines:
+***
+***  U__unnamed_SETL_program.test_unstr
+***  U__unnamed_SETL_program.try
+***  U__unnamed_SETL_program
+***  U__MAIN
+***
+***  This is version 3.5.8 of GNU SETL.
+***
+
+***
+***  Report from 'setl'  ***
+***
+***  Error in or near line 44 of -3:
+***
+    40    if fd = -1 then  -- subchild
+    41      print (s);  -- feed test string up to this subchild's parent
+    42      stop;  -- exit subchild
+    43    end if;
+[1m    44    reada (fd, x);  -- try to READA into x from what subchild spews[0m
+[1m                     $[0m
+    45    close (fd);
+    46    return [type x, x];
+***
+***  Misplaced '+' or '-' in "5e--" in READA input
+***
+***  Active routines:
+***
+***  U__unnamed_SETL_program.test_reada
+***  U__unnamed_SETL_program.try
+***  U__unnamed_SETL_program
+***  U__MAIN
+***
+***  This is version 3.5.8 of GNU SETL.
+***
+
+***
+***  Report from 'setl'  ***
+***
+***  Error in or near line 50 of -3:
+***
+    46    return [type x, x];
+    47  end proc;
+    48  
+    49  proc test_reads (s);
+[1m    50    reads (s, x);[0m
+[1m                    $[0m
+    51    return [type x, x];
+    52  end proc;
+***
+***  Misplaced '+' or '-' in "5e--" in first arg to READS
+***
+***  Active routines:
+***
+***  U__unnamed_SETL_program.test_reads
+***  U__unnamed_SETL_program.try
+***  U__unnamed_SETL_program
+***  U__MAIN
+***
+***  This is version 3.5.8 of GNU SETL.
+***
+
+*
+
+[OM]
+
+***
+***  Report from 'setl'  ***
+***
+***  Error in or near line 82 of -3:
+***
+    78    return r;
+    79  end proc;
+    80  
+    81  proc test_read();
+[1m    82    read (x);[0m
+[1m                $[0m
+    83    return [type x, x];
+    84  end proc;
+***
+***  Misplaced '+' or '-' in "5e--" in READ input
+***
+***  Active routines:
+***
+***  U__unnamed_SETL_program.test_read
+***  U__unnamed_SETL_program.try_read
+***  U__unnamed_SETL_program
+***  U__MAIN
+***
+***  This is version 3.5.8 of GNU SETL.
+***
+
+'5e+-7'
+***
+***  Report from 'setl'  ***
+***
+***  Error in or near line 34 of -3:
+***
+    30    return r;
+    31  end proc;
+    32  
+    33  proc test_unstr (s);
+[1m    34    x := unstr s;[0m
+[1m                     $[0m
+    35    return [type x, x];
+    36  end proc;
+***
+***  Misplaced '+' or '-' in "5e+-" in UNSTR operand
+***
+***  Active routines:
+***
+***  U__unnamed_SETL_program.test_unstr
+***  U__unnamed_SETL_program.try
+***  U__unnamed_SETL_program
+***  U__MAIN
+***
+***  This is version 3.5.8 of GNU SETL.
+***
+
+***
+***  Report from 'setl'  ***
+***
+***  Error in or near line 44 of -3:
+***
+    40    if fd = -1 then  -- subchild
+    41      print (s);  -- feed test string up to this subchild's parent
+    42      stop;  -- exit subchild
+    43    end if;
+[1m    44    reada (fd, x);  -- try to READA into x from what subchild spews[0m
+[1m                     $[0m
+    45    close (fd);
+    46    return [type x, x];
+***
+***  Misplaced '+' or '-' in "5e+-" in READA input
+***
+***  Active routines:
+***
+***  U__unnamed_SETL_program.test_reada
+***  U__unnamed_SETL_program.try
+***  U__unnamed_SETL_program
+***  U__MAIN
+***
+***  This is version 3.5.8 of GNU SETL.
+***
+
+***
+***  Report from 'setl'  ***
+***
+***  Error in or near line 50 of -3:
+***
+    46    return [type x, x];
+    47  end proc;
+    48  
+    49  proc test_reads (s);
+[1m    50    reads (s, x);[0m
+[1m                    $[0m
+    51    return [type x, x];
+    52  end proc;
+***
+***  Misplaced '+' or '-' in "5e+-" in first arg to READS
+***
+***  Active routines:
+***
+***  U__unnamed_SETL_program.test_reads
+***  U__unnamed_SETL_program.try
+***  U__unnamed_SETL_program
+***  U__MAIN
+***
+***  This is version 3.5.8 of GNU SETL.
+***
+
+*
+
+[OM]
+
+***
+***  Report from 'setl'  ***
+***
+***  Error in or near line 82 of -3:
+***
+    78    return r;
+    79  end proc;
+    80  
+    81  proc test_read();
+[1m    82    read (x);[0m
+[1m                $[0m
+    83    return [type x, x];
+    84  end proc;
+***
+***  Misplaced '+' or '-' in "5e+-" in READ input
+***
+***  Active routines:
+***
+***  U__unnamed_SETL_program.test_read
+***  U__unnamed_SETL_program.try_read
+***  U__unnamed_SETL_program
+***  U__MAIN
+***
+***  This is version 3.5.8 of GNU SETL.
+***
+
+'5e-+7'
+***
+***  Report from 'setl'  ***
+***
+***  Error in or near line 34 of -3:
+***
+    30    return r;
+    31  end proc;
+    32  
+    33  proc test_unstr (s);
+[1m    34    x := unstr s;[0m
+[1m                     $[0m
+    35    return [type x, x];
+    36  end proc;
+***
+***  Misplaced '+' or '-' in "5e-+" in UNSTR operand
+***
+***  Active routines:
+***
+***  U__unnamed_SETL_program.test_unstr
+***  U__unnamed_SETL_program.try
+***  U__unnamed_SETL_program
+***  U__MAIN
+***
+***  This is version 3.5.8 of GNU SETL.
+***
+
+***
+***  Report from 'setl'  ***
+***
+***  Error in or near line 44 of -3:
+***
+    40    if fd = -1 then  -- subchild
+    41      print (s);  -- feed test string up to this subchild's parent
+    42      stop;  -- exit subchild
+    43    end if;
+[1m    44    reada (fd, x);  -- try to READA into x from what subchild spews[0m
+[1m                     $[0m
+    45    close (fd);
+    46    return [type x, x];
+***
+***  Misplaced '+' or '-' in "5e-+" in READA input
+***
+***  Active routines:
+***
+***  U__unnamed_SETL_program.test_reada
+***  U__unnamed_SETL_program.try
+***  U__unnamed_SETL_program
+***  U__MAIN
+***
+***  This is version 3.5.8 of GNU SETL.
+***
+
+***
+***  Report from 'setl'  ***
+***
+***  Error in or near line 50 of -3:
+***
+    46    return [type x, x];
+    47  end proc;
+    48  
+    49  proc test_reads (s);
+[1m    50    reads (s, x);[0m
+[1m                    $[0m
+    51    return [type x, x];
+    52  end proc;
+***
+***  Misplaced '+' or '-' in "5e-+" in first arg to READS
+***
+***  Active routines:
+***
+***  U__unnamed_SETL_program.test_reads
+***  U__unnamed_SETL_program.try
+***  U__unnamed_SETL_program
+***  U__MAIN
+***
+***  This is version 3.5.8 of GNU SETL.
+***
+
+*
+
+[OM]
+
+***
+***  Report from 'setl'  ***
+***
+***  Error in or near line 82 of -3:
+***
+    78    return r;
+    79  end proc;
+    80  
+    81  proc test_read();
+[1m    82    read (x);[0m
+[1m                $[0m
+    83    return [type x, x];
+    84  end proc;
+***
+***  Misplaced '+' or '-' in "5e-+" in READ input
+***
+***  Active routines:
+***
+***  U__unnamed_SETL_program.test_read
+***  U__unnamed_SETL_program.try_read
+***  U__unnamed_SETL_program
+***  U__MAIN
+***
+***  This is version 3.5.8 of GNU SETL.
+***
+
+'1 2'
+***
+***  Report from 'setl'  ***
+***
+***  Error in or near line 34 of -3:
+***
+    30    return r;
+    31  end proc;
+    32  
+    33  proc test_unstr (s);
+[1m    34    x := unstr s;[0m
+[1m                     $[0m
+    35    return [type x, x];
+    36  end proc;
+***
+***  Junk after initial denotation in "1 2" in UNSTR operand
+***
+***  Active routines:
+***
+***  U__unnamed_SETL_program.test_unstr
+***  U__unnamed_SETL_program.try
+***  U__unnamed_SETL_program
+***  U__MAIN
+***
+***  This is version 3.5.8 of GNU SETL.
+***
+
+[INTEGER 1]
+
+[INTEGER 1]
+
+*
+
+***
+***  Report from 'setl'  ***
+***
+***  Error in or near line 59 of -3:
+***
+    55    return denotype s;
+    56  end proc;
+    57  
+    58  proc test_val (s);
+[1m    59    x := val s;[0m
+[1m                   $[0m
+    60    return [type x, x];
+    61  end proc;
+***
+***  Junk after initial denotation in "1 2" in VAL operand
+***
+***  Active routines:
+***
+***  U__unnamed_SETL_program.test_val
+***  U__unnamed_SETL_program.try
+***  U__unnamed_SETL_program
+***  U__MAIN
+***
+***  This is version 3.5.8 of GNU SETL.
+***
+
+[INTEGER 1]
+
+'1 +'
+***
+***  Report from 'setl'  ***
+***
+***  Error in or near line 34 of -3:
+***
+    30    return r;
+    31  end proc;
+    32  
+    33  proc test_unstr (s);
+[1m    34    x := unstr s;[0m
+[1m                     $[0m
+    35    return [type x, x];
+    36  end proc;
+***
+***  Junk after initial denotation in "1 +" in UNSTR operand
+***
+***  Active routines:
+***
+***  U__unnamed_SETL_program.test_unstr
+***  U__unnamed_SETL_program.try
+***  U__unnamed_SETL_program
+***  U__MAIN
+***
+***  This is version 3.5.8 of GNU SETL.
+***
+
+[INTEGER 1]
+
+[INTEGER 1]
+
+*
+
+***
+***  Report from 'setl'  ***
+***
+***  Error in or near line 59 of -3:
+***
+    55    return denotype s;
+    56  end proc;
+    57  
+    58  proc test_val (s);
+[1m    59    x := val s;[0m
+[1m                   $[0m
+    60    return [type x, x];
+    61  end proc;
+***
+***  Junk after initial denotation in "1 +" in VAL operand
+***
+***  Active routines:
+***
+***  U__unnamed_SETL_program.test_val
+***  U__unnamed_SETL_program.try
+***  U__unnamed_SETL_program
+***  U__MAIN
+***
+***  This is version 3.5.8 of GNU SETL.
+***
+
+[INTEGER 1]
+
+'1 '
+[INTEGER 1]
+
+[INTEGER 1]
+
+[INTEGER 1]
+
+INTEGER
+
+[INTEGER 1]
+
+[INTEGER 1]
+
+'1 2 '
+***
+***  Report from 'setl'  ***
+***
+***  Error in or near line 34 of -3:
+***
+    30    return r;
+    31  end proc;
+    32  
+    33  proc test_unstr (s);
+[1m    34    x := unstr s;[0m
+[1m                     $[0m
+    35    return [type x, x];
+    36  end proc;
+***
+***  Junk after initial denotation in "1 2 " in UNSTR operand
+***
+***  Active routines:
+***
+***  U__unnamed_SETL_program.test_unstr
+***  U__unnamed_SETL_program.try
+***  U__unnamed_SETL_program
+***  U__MAIN
+***
+***  This is version 3.5.8 of GNU SETL.
+***
+
+[INTEGER 1]
+
+[INTEGER 1]
+
+*
+
+***
+***  Report from 'setl'  ***
+***
+***  Error in or near line 59 of -3:
+***
+    55    return denotype s;
+    56  end proc;
+    57  
+    58  proc test_val (s);
+[1m    59    x := val s;[0m
+[1m                   $[0m
+    60    return [type x, x];
+    61  end proc;
+***
+***  Junk after initial denotation in "1 2 " in VAL operand
+***
+***  Active routines:
+***
+***  U__unnamed_SETL_program.test_val
+***  U__unnamed_SETL_program.try
+***  U__unnamed_SETL_program
+***  U__MAIN
+***
+***  This is version 3.5.8 of GNU SETL.
+***
+
+[INTEGER 1]
+
+''''''
+[STRING '']
+
+[STRING '']
+
+[STRING '']
+
+STRING
+
+[OM]
+
+[STRING '']
+
+'""'
+[STRING '']
+
+[STRING '']
+
+[STRING '']
+
+STRING
+
+[OM]
+
+[STRING '']
+
+'''"'''
+[STRING '"']
+
+[STRING '"']
+
+[STRING '"']
+
+STRING
+
+[OM]
+
+[STRING '"']
+
+'"''"'
+[STRING '''']
+
+[STRING '''']
+
+[STRING '''']
+
+STRING
+
+[OM]
+
+[STRING '''']
+
+''''''''''
+[STRING '''']
+
+[STRING '''']
+
+[STRING '''']
+
+STRING
+
+[OM]
+
+[STRING '''']
+
+'""""'
+[STRING '"']
+
+[STRING '"']
+
+[STRING '"']
+
+STRING
+
+[OM]
+
+[STRING '"']
+
+'''\\"'''
+[STRING '\"']
+
+[STRING '\"']
+
+[STRING '\"']
+
+STRING
+
+[OM]
+
+[STRING '\"']
+
+'"\\''"'
+[STRING '\''']
+
+[STRING '\''']
+
+[STRING '\''']
+
+STRING
+
+[OM]
+
+[STRING '\''']
+
+'''\\007'''
+[STRING '\007']
+
+[STRING '\007']
+
+[STRING '\007']
+
+STRING
+
+[OM]
+
+[STRING '\007']
+
+'''\\x07'''
+[STRING '\x07']
+
+[STRING '\x07']
+
+[STRING '\x07']
+
+STRING
+
+[OM]
+
+[STRING '\x07']
+
+'''\a'''
+[STRING '']
+
+[STRING '']
+
+[STRING '']
+
+STRING
+
+[OM]
+
+[STRING '']
+
+''''
+***
+***  Report from 'setl'  ***
+***
+***  Error in or near line 34 of -3:
+***
+    30    return r;
+    31  end proc;
+    32  
+    33  proc test_unstr (s);
+[1m    34    x := unstr s;[0m
+[1m                     $[0m
+    35    return [type x, x];
+    36  end proc;
+***
+***  Unterminated quoted string ' in UNSTR operand
+***
+***  Active routines:
+***
+***  U__unnamed_SETL_program.test_unstr
+***  U__unnamed_SETL_program.try
+***  U__unnamed_SETL_program
+***  U__MAIN
+***
+***  This is version 3.5.8 of GNU SETL.
+***
+
+***
+***  Report from 'setl'  ***
+***
+***  Error in or near line 44 of -3:
+***
+    40    if fd = -1 then  -- subchild
+    41      print (s);  -- feed test string up to this subchild's parent
+    42      stop;  -- exit subchild
+    43    end if;
+[1m    44    reada (fd, x);  -- try to READA into x from what subchild spews[0m
+[1m                     $[0m
+    45    close (fd);
+    46    return [type x, x];
+***
+***  Unterminated quoted string '? in READA input
+***
+***  Active routines:
+***
+***  U__unnamed_SETL_program.test_reada
+***  U__unnamed_SETL_program.try
+***  U__unnamed_SETL_program
+***  U__MAIN
+***
+***  This is version 3.5.8 of GNU SETL.
+***
+
+***
+***  Report from 'setl'  ***
+***
+***  Error in or near line 50 of -3:
+***
+    46    return [type x, x];
+    47  end proc;
+    48  
+    49  proc test_reads (s);
+[1m    50    reads (s, x);[0m
+[1m                    $[0m
+    51    return [type x, x];
+    52  end proc;
+***
+***  Unterminated quoted string ' in first arg to READS
+***
+***  Active routines:
+***
+***  U__unnamed_SETL_program.test_reads
+***  U__unnamed_SETL_program.try
+***  U__unnamed_SETL_program
+***  U__MAIN
+***
+***  This is version 3.5.8 of GNU SETL.
+***
+
+*
+
+[OM]
+
+***
+***  Report from 'setl'  ***
+***
+***  Error in or near line 82 of -3:
+***
+    78    return r;
+    79  end proc;
+    80  
+    81  proc test_read();
+[1m    82    read (x);[0m
+[1m                $[0m
+    83    return [type x, x];
+    84  end proc;
+***
+***  Unterminated quoted string '? in READ input
+***
+***  Active routines:
+***
+***  U__unnamed_SETL_program.test_read
+***  U__unnamed_SETL_program.try_read
+***  U__unnamed_SETL_program
+***  U__MAIN
+***
+***  This is version 3.5.8 of GNU SETL.
+***
+
+'"'
+***
+***  Report from 'setl'  ***
+***
+***  Error in or near line 34 of -3:
+***
+    30    return r;
+    31  end proc;
+    32  
+    33  proc test_unstr (s);
+[1m    34    x := unstr s;[0m
+[1m                     $[0m
+    35    return [type x, x];
+    36  end proc;
+***
+***  Unterminated quoted string " in UNSTR operand
+***
+***  Active routines:
+***
+***  U__unnamed_SETL_program.test_unstr
+***  U__unnamed_SETL_program.try
+***  U__unnamed_SETL_program
+***  U__MAIN
+***
+***  This is version 3.5.8 of GNU SETL.
+***
+
+***
+***  Report from 'setl'  ***
+***
+***  Error in or near line 44 of -3:
+***
+    40    if fd = -1 then  -- subchild
+    41      print (s);  -- feed test string up to this subchild's parent
+    42      stop;  -- exit subchild
+    43    end if;
+[1m    44    reada (fd, x);  -- try to READA into x from what subchild spews[0m
+[1m                     $[0m
+    45    close (fd);
+    46    return [type x, x];
+***
+***  Unterminated quoted string "? in READA input
+***
+***  Active routines:
+***
+***  U__unnamed_SETL_program.test_reada
+***  U__unnamed_SETL_program.try
+***  U__unnamed_SETL_program
+***  U__MAIN
+***
+***  This is version 3.5.8 of GNU SETL.
+***
+
+***
+***  Report from 'setl'  ***
+***
+***  Error in or near line 50 of -3:
+***
+    46    return [type x, x];
+    47  end proc;
+    48  
+    49  proc test_reads (s);
+[1m    50    reads (s, x);[0m
+[1m                    $[0m
+    51    return [type x, x];
+    52  end proc;
+***
+***  Unterminated quoted string " in first arg to READS
+***
+***  Active routines:
+***
+***  U__unnamed_SETL_program.test_reads
+***  U__unnamed_SETL_program.try
+***  U__unnamed_SETL_program
+***  U__MAIN
+***
+***  This is version 3.5.8 of GNU SETL.
+***
+
+*
+
+[OM]
+
+***
+***  Report from 'setl'  ***
+***
+***  Error in or near line 82 of -3:
+***
+    78    return r;
+    79  end proc;
+    80  
+    81  proc test_read();
+[1m    82    read (x);[0m
+[1m                $[0m
+    83    return [type x, x];
+    84  end proc;
+***
+***  Unterminated quoted string "? in READ input
+***
+***  Active routines:
+***
+***  U__unnamed_SETL_program.test_read
+***  U__unnamed_SETL_program.try_read
+***  U__unnamed_SETL_program
+***  U__MAIN
+***
+***  This is version 3.5.8 of GNU SETL.
+***
+
+'''\\'''''
+***
+***  Report from 'setl'  ***
+***
+***  Error in or near line 34 of -3:
+***
+    30    return r;
+    31  end proc;
+    32  
+    33  proc test_unstr (s);
+[1m    34    x := unstr s;[0m
+[1m                     $[0m
+    35    return [type x, x];
+    36  end proc;
+***
+***  Unterminated quoted string '\'' in UNSTR operand
+***
+***  Active routines:
+***
+***  U__unnamed_SETL_program.test_unstr
+***  U__unnamed_SETL_program.try
+***  U__unnamed_SETL_program
+***  U__MAIN
+***
+***  This is version 3.5.8 of GNU SETL.
+***
+
+***
+***  Report from 'setl'  ***
+***
+***  Error in or near line 44 of -3:
+***
+    40    if fd = -1 then  -- subchild
+    41      print (s);  -- feed test string up to this subchild's parent
+    42      stop;  -- exit subchild
+    43    end if;
+[1m    44    reada (fd, x);  -- try to READA into x from what subchild spews[0m
+[1m                     $[0m
+    45    close (fd);
+    46    return [type x, x];
+***
+***  Unterminated quoted string '\''? in READA input
+***
+***  Active routines:
+***
+***  U__unnamed_SETL_program.test_reada
+***  U__unnamed_SETL_program.try
+***  U__unnamed_SETL_program
+***  U__MAIN
+***
+***  This is version 3.5.8 of GNU SETL.
+***
+
+***
+***  Report from 'setl'  ***
+***
+***  Error in or near line 50 of -3:
+***
+    46    return [type x, x];
+    47  end proc;
+    48  
+    49  proc test_reads (s);
+[1m    50    reads (s, x);[0m
+[1m                    $[0m
+    51    return [type x, x];
+    52  end proc;
+***
+***  Unterminated quoted string '\'' in first arg to READS
+***
+***  Active routines:
+***
+***  U__unnamed_SETL_program.test_reads
+***  U__unnamed_SETL_program.try
+***  U__unnamed_SETL_program
+***  U__MAIN
+***
+***  This is version 3.5.8 of GNU SETL.
+***
+
+*
+
+[OM]
+
+***
+***  Report from 'setl'  ***
+***
+***  Error in or near line 82 of -3:
+***
+    78    return r;
+    79  end proc;
+    80  
+    81  proc test_read();
+[1m    82    read (x);[0m
+[1m                $[0m
+    83    return [type x, x];
+    84  end proc;
+***
+***  Unterminated quoted string '\''? in READ input
+***
+***  Active routines:
+***
+***  U__unnamed_SETL_program.test_read
+***  U__unnamed_SETL_program.try_read
+***  U__unnamed_SETL_program
+***  U__MAIN
+***
+***  This is version 3.5.8 of GNU SETL.
+***
+
+'"\\""'
+***
+***  Report from 'setl'  ***
+***
+***  Error in or near line 34 of -3:
+***
+    30    return r;
+    31  end proc;
+    32  
+    33  proc test_unstr (s);
+[1m    34    x := unstr s;[0m
+[1m                     $[0m
+    35    return [type x, x];
+    36  end proc;
+***
+***  Unterminated quoted string "\"" in UNSTR operand
+***
+***  Active routines:
+***
+***  U__unnamed_SETL_program.test_unstr
+***  U__unnamed_SETL_program.try
+***  U__unnamed_SETL_program
+***  U__MAIN
+***
+***  This is version 3.5.8 of GNU SETL.
+***
+
+***
+***  Report from 'setl'  ***
+***
+***  Error in or near line 44 of -3:
+***
+    40    if fd = -1 then  -- subchild
+    41      print (s);  -- feed test string up to this subchild's parent
+    42      stop;  -- exit subchild
+    43    end if;
+[1m    44    reada (fd, x);  -- try to READA into x from what subchild spews[0m
+[1m                     $[0m
+    45    close (fd);
+    46    return [type x, x];
+***
+***  Unterminated quoted string "\""? in READA input
+***
+***  Active routines:
+***
+***  U__unnamed_SETL_program.test_reada
+***  U__unnamed_SETL_program.try
+***  U__unnamed_SETL_program
+***  U__MAIN
+***
+***  This is version 3.5.8 of GNU SETL.
+***
+
+***
+***  Report from 'setl'  ***
+***
+***  Error in or near line 50 of -3:
+***
+    46    return [type x, x];
+    47  end proc;
+    48  
+    49  proc test_reads (s);
+[1m    50    reads (s, x);[0m
+[1m                    $[0m
+    51    return [type x, x];
+    52  end proc;
+***
+***  Unterminated quoted string "\"" in first arg to READS
+***
+***  Active routines:
+***
+***  U__unnamed_SETL_program.test_reads
+***  U__unnamed_SETL_program.try
+***  U__unnamed_SETL_program
+***  U__MAIN
+***
+***  This is version 3.5.8 of GNU SETL.
+***
+
+*
+
+[OM]
+
+***
+***  Report from 'setl'  ***
+***
+***  Error in or near line 82 of -3:
+***
+    78    return r;
+    79  end proc;
+    80  
+    81  proc test_read();
+[1m    82    read (x);[0m
+[1m                $[0m
+    83    return [type x, x];
+    84  end proc;
+***
+***  Unterminated quoted string "\""? in READ input
+***
+***  Active routines:
+***
+***  U__unnamed_SETL_program.test_read
+***  U__unnamed_SETL_program.try_read
+***  U__unnamed_SETL_program
+***  U__MAIN
+***
+***  This is version 3.5.8 of GNU SETL.
+***
+
+'[]'
+[TUPLE []]
+
+[TUPLE []]
+
+[TUPLE []]
+
+TUPLE
+
+[OM]
+
+[TUPLE []]
+
+'[a ''b'']'
+[TUPLE [a b]]
+
+[TUPLE [a b]]
+
+[TUPLE [a b]]
+
+TUPLE
+
+[OM]
+
+[TUPLE [a b]]
+
+'[''a'' b]'
+[TUPLE [a b]]
+
+[TUPLE [a b]]
+
+[TUPLE [a b]]
+
+TUPLE
+
+[OM]
+
+[TUPLE [a b]]
+
+'[''a'' b ]'
+[TUPLE [a b]]
+
+[TUPLE [a b]]
+
+[TUPLE [a b]]
+
+TUPLE
+
+[OM]
+
+[TUPLE [a b]]
+
+'[a ''b'' ]'
+[TUPLE [a b]]
+
+[TUPLE [a b]]
+
+[TUPLE [a b]]
+
+TUPLE
+
+[OM]
+
+[TUPLE [a b]]
+
+'{}'
+[SET {}]
+
+[SET {}]
+
+[SET {}]
+
+SET
+
+[OM]
+
+[SET {}]
+
+'{a ''b''}'
+[SET {a b}]
+
+[SET {a b}]
+
+[SET {a b}]
+
+SET
+
+[OM]
+
+[SET {a b}]
+
+'{''a'' b}'
+[SET {a b}]
+
+[SET {a b}]
+
+[SET {a b}]
+
+SET
+
+[OM]
+
+[SET {a b}]
+
+'{''a'' b }'
+[SET {a b}]
+
+[SET {a b}]
+
+[SET {a b}]
+
+SET
+
+[OM]
+
+[SET {a b}]
+
+'{a ''b'' }'
+[SET {a b}]
+
+[SET {a b}]
+
+[SET {a b}]
+
+SET
+
+[OM]
+
+[SET {a b}]
+
+'#t'
+[BOOLEAN #T]
+
+[BOOLEAN #T]
+
+[BOOLEAN #T]
+
+BOOLEAN
+
+[OM]
+
+[BOOLEAN #T]
+
+'#f'
+[BOOLEAN #F]
+
+[BOOLEAN #F]
+
+[BOOLEAN #F]
+
+BOOLEAN
+
+[OM]
+
+[BOOLEAN #F]
+
+'#T'
+[BOOLEAN #T]
+
+[BOOLEAN #T]
+
+[BOOLEAN #T]
+
+BOOLEAN
+
+[OM]
+
+[BOOLEAN #T]
+
+'#F'
+[BOOLEAN #F]
+
+[BOOLEAN #F]
+
+[BOOLEAN #F]
+
+BOOLEAN
+
+[OM]
+
+[BOOLEAN #F]
+
+'#99'
+***
+***  Report from 'setl'  ***
+***
+***  Error in or near line 34 of -3:
+***
+    30    return r;
+    31  end proc;
+    32  
+    33  proc test_unstr (s);
+[1m    34    x := unstr s;[0m
+[1m                     $[0m
+    35    return [type x, x];
+    36  end proc;
+***
+***  Invalid attempt to create specific atom in UNSTR operand
+***
+***  Active routines:
+***
+***  U__unnamed_SETL_program.test_unstr
+***  U__unnamed_SETL_program.try
+***  U__unnamed_SETL_program
+***  U__MAIN
+***
+***  This is version 3.5.8 of GNU SETL.
+***
+
+***
+***  Report from 'setl'  ***
+***
+***  Error in or near line 44 of -3:
+***
+    40    if fd = -1 then  -- subchild
+    41      print (s);  -- feed test string up to this subchild's parent
+    42      stop;  -- exit subchild
+    43    end if;
+[1m    44    reada (fd, x);  -- try to READA into x from what subchild spews[0m
+[1m                     $[0m
+    45    close (fd);
+    46    return [type x, x];
+***
+***  Invalid attempt to create specific atom in READA input
+***
+***  Active routines:
+***
+***  U__unnamed_SETL_program.test_reada
+***  U__unnamed_SETL_program.try
+***  U__unnamed_SETL_program
+***  U__MAIN
+***
+***  This is version 3.5.8 of GNU SETL.
+***
+
+***
+***  Report from 'setl'  ***
+***
+***  Error in or near line 50 of -3:
+***
+    46    return [type x, x];
+    47  end proc;
+    48  
+    49  proc test_reads (s);
+[1m    50    reads (s, x);[0m
+[1m                    $[0m
+    51    return [type x, x];
+    52  end proc;
+***
+***  Invalid attempt to create specific atom in first arg to READS
+***
+***  Active routines:
+***
+***  U__unnamed_SETL_program.test_reads
+***  U__unnamed_SETL_program.try
+***  U__unnamed_SETL_program
+***  U__MAIN
+***
+***  This is version 3.5.8 of GNU SETL.
+***
+
+*
+
+[OM]
+
+***
+***  Report from 'setl'  ***
+***
+***  Error in or near line 82 of -3:
+***
+    78    return r;
+    79  end proc;
+    80  
+    81  proc test_read();
+[1m    82    read (x);[0m
+[1m                $[0m
+    83    return [type x, x];
+    84  end proc;
+***
+***  Invalid attempt to create specific atom in READ input
+***
+***  Active routines:
+***
+***  U__unnamed_SETL_program.test_read
+***  U__unnamed_SETL_program.try_read
+***  U__unnamed_SETL_program
+***  U__MAIN
+***
+***  This is version 3.5.8 of GNU SETL.
+***
+
+'#'
+***
+***  Report from 'setl'  ***
+***
+***  Error in or near line 34 of -3:
+***
+    30    return r;
+    31  end proc;
+    32  
+    33  proc test_unstr (s);
+[1m    34    x := unstr s;[0m
+[1m                     $[0m
+    35    return [type x, x];
+    36  end proc;
+***
+***  Nothing after initial '#' in UNSTR operand
+***
+***  Active routines:
+***
+***  U__unnamed_SETL_program.test_unstr
+***  U__unnamed_SETL_program.try
+***  U__unnamed_SETL_program
+***  U__MAIN
+***
+***  This is version 3.5.8 of GNU SETL.
+***
+
+***
+***  Report from 'setl'  ***
+***
+***  Error in or near line 44 of -3:
+***
+    40    if fd = -1 then  -- subchild
+    41      print (s);  -- feed test string up to this subchild's parent
+    42      stop;  -- exit subchild
+    43    end if;
+[1m    44    reada (fd, x);  -- try to READA into x from what subchild spews[0m
+[1m                     $[0m
+    45    close (fd);
+    46    return [type x, x];
+***
+***  Junk after initial '#' in READA input
+***
+***  Active routines:
+***
+***  U__unnamed_SETL_program.test_reada
+***  U__unnamed_SETL_program.try
+***  U__unnamed_SETL_program
+***  U__MAIN
+***
+***  This is version 3.5.8 of GNU SETL.
+***
+
+***
+***  Report from 'setl'  ***
+***
+***  Error in or near line 50 of -3:
+***
+    46    return [type x, x];
+    47  end proc;
+    48  
+    49  proc test_reads (s);
+[1m    50    reads (s, x);[0m
+[1m                    $[0m
+    51    return [type x, x];
+    52  end proc;
+***
+***  Nothing after initial '#' in first arg to READS
+***
+***  Active routines:
+***
+***  U__unnamed_SETL_program.test_reads
+***  U__unnamed_SETL_program.try
+***  U__unnamed_SETL_program
+***  U__MAIN
+***
+***  This is version 3.5.8 of GNU SETL.
+***
+
+*
+
+[OM]
+
+***
+***  Report from 'setl'  ***
+***
+***  Error in or near line 82 of -3:
+***
+    78    return r;
+    79  end proc;
+    80  
+    81  proc test_read();
+[1m    82    read (x);[0m
+[1m                $[0m
+    83    return [type x, x];
+    84  end proc;
+***
+***  Junk after initial '#' in READ input
+***
+***  Active routines:
+***
+***  U__unnamed_SETL_program.test_read
+***  U__unnamed_SETL_program.try_read
+***  U__unnamed_SETL_program
+***  U__MAIN
+***
+***  This is version 3.5.8 of GNU SETL.
+***
+
+'#.'
+***
+***  Report from 'setl'  ***
+***
+***  Error in or near line 34 of -3:
+***
+    30    return r;
+    31  end proc;
+    32  
+    33  proc test_unstr (s);
+[1m    34    x := unstr s;[0m
+[1m                     $[0m
+    35    return [type x, x];
+    36  end proc;
+***
+***  Junk after initial '#' in UNSTR operand
+***
+***  Active routines:
+***
+***  U__unnamed_SETL_program.test_unstr
+***  U__unnamed_SETL_program.try
+***  U__unnamed_SETL_program
+***  U__MAIN
+***
+***  This is version 3.5.8 of GNU SETL.
+***
+
+***
+***  Report from 'setl'  ***
+***
+***  Error in or near line 44 of -3:
+***
+    40    if fd = -1 then  -- subchild
+    41      print (s);  -- feed test string up to this subchild's parent
+    42      stop;  -- exit subchild
+    43    end if;
+[1m    44    reada (fd, x);  -- try to READA into x from what subchild spews[0m
+[1m                     $[0m
+    45    close (fd);
+    46    return [type x, x];
+***
+***  Junk after initial '#' in READA input
+***
+***  Active routines:
+***
+***  U__unnamed_SETL_program.test_reada
+***  U__unnamed_SETL_program.try
+***  U__unnamed_SETL_program
+***  U__MAIN
+***
+***  This is version 3.5.8 of GNU SETL.
+***
+
+***
+***  Report from 'setl'  ***
+***
+***  Error in or near line 50 of -3:
+***
+    46    return [type x, x];
+    47  end proc;
+    48  
+    49  proc test_reads (s);
+[1m    50    reads (s, x);[0m
+[1m                    $[0m
+    51    return [type x, x];
+    52  end proc;
+***
+***  Junk after initial '#' in first arg to READS
+***
+***  Active routines:
+***
+***  U__unnamed_SETL_program.test_reads
+***  U__unnamed_SETL_program.try
+***  U__unnamed_SETL_program
+***  U__MAIN
+***
+***  This is version 3.5.8 of GNU SETL.
+***
+
+*
+
+[OM]
+
+***
+***  Report from 'setl'  ***
+***
+***  Error in or near line 82 of -3:
+***
+    78    return r;
+    79  end proc;
+    80  
+    81  proc test_read();
+[1m    82    read (x);[0m
+[1m                $[0m
+    83    return [type x, x];
+    84  end proc;
+***
+***  Junk after initial '#' in READ input
+***
+***  Active routines:
+***
+***  U__unnamed_SETL_program.test_read
+***  U__unnamed_SETL_program.try_read
+***  U__unnamed_SETL_program
+***  U__MAIN
+***
+***  This is version 3.5.8 of GNU SETL.
+***
+
+'1#0'
+***
+***  Report from 'setl'  ***
+***
+***  Error in or near line 34 of -3:
+***
+    30    return r;
+    31  end proc;
+    32  
+    33  proc test_unstr (s);
+[1m    34    x := unstr s;[0m
+[1m                     $[0m
+    35    return [type x, x];
+    36  end proc;
+***
+***  Radix in "1#" in UNSTR operand is out of range 2..36
+***
+***  Active routines:
+***
+***  U__unnamed_SETL_program.test_unstr
+***  U__unnamed_SETL_program.try
+***  U__unnamed_SETL_program
+***  U__MAIN
+***
+***  This is version 3.5.8 of GNU SETL.
+***
+
+***
+***  Report from 'setl'  ***
+***
+***  Error in or near line 44 of -3:
+***
+    40    if fd = -1 then  -- subchild
+    41      print (s);  -- feed test string up to this subchild's parent
+    42      stop;  -- exit subchild
+    43    end if;
+[1m    44    reada (fd, x);  -- try to READA into x from what subchild spews[0m
+[1m                     $[0m
+    45    close (fd);
+    46    return [type x, x];
+***
+***  Radix in "1#" in READA input is out of range 2..36
+***
+***  Active routines:
+***
+***  U__unnamed_SETL_program.test_reada
+***  U__unnamed_SETL_program.try
+***  U__unnamed_SETL_program
+***  U__MAIN
+***
+***  This is version 3.5.8 of GNU SETL.
+***
+
+***
+***  Report from 'setl'  ***
+***
+***  Error in or near line 50 of -3:
+***
+    46    return [type x, x];
+    47  end proc;
+    48  
+    49  proc test_reads (s);
+[1m    50    reads (s, x);[0m
+[1m                    $[0m
+    51    return [type x, x];
+    52  end proc;
+***
+***  Radix in "1#" in first arg to READS is out of range 2..36
+***
+***  Active routines:
+***
+***  U__unnamed_SETL_program.test_reads
+***  U__unnamed_SETL_program.try
+***  U__unnamed_SETL_program
+***  U__MAIN
+***
+***  This is version 3.5.8 of GNU SETL.
+***
+
+*
+
+[OM]
+
+***
+***  Report from 'setl'  ***
+***
+***  Error in or near line 82 of -3:
+***
+    78    return r;
+    79  end proc;
+    80  
+    81  proc test_read();
+[1m    82    read (x);[0m
+[1m                $[0m
+    83    return [type x, x];
+    84  end proc;
+***
+***  Radix in "1#" in READ input is out of range 2..36
+***
+***  Active routines:
+***
+***  U__unnamed_SETL_program.test_read
+***  U__unnamed_SETL_program.try_read
+***  U__unnamed_SETL_program
+***  U__MAIN
+***
+***  This is version 3.5.8 of GNU SETL.
+***
+
+'bad!'
+***
+***  Report from 'setl'  ***
+***
+***  Error in or near line 34 of -3:
+***
+    30    return r;
+    31  end proc;
+    32  
+    33  proc test_unstr (s);
+[1m    34    x := unstr s;[0m
+[1m                     $[0m
+    35    return [type x, x];
+    36  end proc;
+***
+***  Junk after unquoted string "bad" in UNSTR operand
+***
+***  Active routines:
+***
+***  U__unnamed_SETL_program.test_unstr
+***  U__unnamed_SETL_program.try
+***  U__unnamed_SETL_program
+***  U__MAIN
+***
+***  This is version 3.5.8 of GNU SETL.
+***
+
+***
+***  Report from 'setl'  ***
+***
+***  Error in or near line 44 of -3:
+***
+    40    if fd = -1 then  -- subchild
+    41      print (s);  -- feed test string up to this subchild's parent
+    42      stop;  -- exit subchild
+    43    end if;
+[1m    44    reada (fd, x);  -- try to READA into x from what subchild spews[0m
+[1m                     $[0m
+    45    close (fd);
+    46    return [type x, x];
+***
+***  Junk after unquoted string "bad" in READA input
+***
+***  Active routines:
+***
+***  U__unnamed_SETL_program.test_reada
+***  U__unnamed_SETL_program.try
+***  U__unnamed_SETL_program
+***  U__MAIN
+***
+***  This is version 3.5.8 of GNU SETL.
+***
+
+***
+***  Report from 'setl'  ***
+***
+***  Error in or near line 50 of -3:
+***
+    46    return [type x, x];
+    47  end proc;
+    48  
+    49  proc test_reads (s);
+[1m    50    reads (s, x);[0m
+[1m                    $[0m
+    51    return [type x, x];
+    52  end proc;
+***
+***  Junk after unquoted string "bad" in first arg to READS
+***
+***  Active routines:
+***
+***  U__unnamed_SETL_program.test_reads
+***  U__unnamed_SETL_program.try
+***  U__unnamed_SETL_program
+***  U__MAIN
+***
+***  This is version 3.5.8 of GNU SETL.
+***
+
+*
+
+[OM]
+
+***
+***  Report from 'setl'  ***
+***
+***  Error in or near line 82 of -3:
+***
+    78    return r;
+    79  end proc;
+    80  
+    81  proc test_read();
+[1m    82    read (x);[0m
+[1m                $[0m
+    83    return [type x, x];
+    84  end proc;
+***
+***  Junk after unquoted string "bad" in READ input
+***
+***  Active routines:
+***
+***  U__unnamed_SETL_program.test_read
+***  U__unnamed_SETL_program.try_read
+***  U__unnamed_SETL_program
+***  U__MAIN
+***
+***  This is version 3.5.8 of GNU SETL.
+***
+
+'"a\nb"'
+[STRING 'a
+b']
+
+[STRING 'a
+b']
+
+[STRING 'a
+b']
+
+STRING
+
+[OM]
+
+[STRING 'a
+b']
+
+'''a\nb'''
+[STRING 'a
+b']
+
+[STRING 'a
+b']
+
+[STRING 'a
+b']
+
+STRING
+
+[OM]
+
+[STRING 'a
+b']
+
+'"ab\000cd"'
+[STRING 'ab cd']
+
+[STRING 'ab cd']
+
+[STRING 'ab cd']
+
+STRING
+
+[OM]
+
+[STRING 'ab cd']
+

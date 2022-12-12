@@ -1,0 +1,60 @@
+$Id: README,v 1.10 2022/03/04 00:32:25 setlorg Exp $
+
+Free software (c) dB - see file COPYING for license (GPL).
+
+
+This dirty great hack generates a GLUT/Mesa customization package,
+given an appropriate <GL/freeglut.h> and libglut already installed.
+
+*** Update:  A FreeGLUT implementation (see src/run/freeglut-setl/) is
+now included with GNU SETL and built automatically.  The name mesa for
+this package is now inappropriate, as the OpenGL support is now just
+whatever your system provides (be it Mesa or otherwise).  Probably it
+should be freeglut.
+
+
+As a sanity check,
+
+  make gears-demo
+
+in the build directory corresponding to this one ({build}/src/opt/mesa/)
+should give a demo familiar to GLUT users.
+
+Alternatively, if a setl interpreter customized with this package is
+already installed, the command
+
+  setl -I{build}/src/opt/mesa/ gears.setl
+
+or
+
+  SETL_INCLUDE_PATH={build}/src/opt/mesa/ setl gears.setl
+
+when executed in this directory should do the same thing.
+
+Note that gears.setl has an #include of "custom.setl", which would
+normally be better renamed and moved to some standardish location for
+SETL #include files.
+
+
+The collation of scripts and programs that comprise this customization
+package generator evolved in part from previous hacks, so things are
+far from being as direct or elegant as they could be.
+
+The essential approach to the generation of the required custom.* files
+into {build}/src/opt/mesa/ is to apply the C preprocessor to
+
+  #include <GL/freeglut.h>
+  #include "auxi.h"
+
+and then munge the output to extract such things as typedefs, #defines,
+and function prototypes.  These are collected into the file "tuples",
+which is then fed into gen.setl to produce the custom.* files.
+
+Apart from custom.setl, which is meant for user programs to #include,
+the custom.* files are automatically collected by mechanisms above the
+level of this directory, and incorporated into the GNU SETL translator
+and run-time where they are needed.
+
+
+It may someday be worth looking at whether something like SWIG would
+make this all easier and better disciplined.

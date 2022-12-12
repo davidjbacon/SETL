@@ -1,0 +1,157 @@
+--- texinfo.tex.orig	2022-11-17 07:00:44.296671487 -0800
++++ texinfo.tex	2022-11-17 07:36:12.188419551 -0800
+@@ -8653,18 +8653,114 @@
+ \gdef\ignorenodebyedef{\egroup(`Top' node ignored)\bye}}
+ % The redefinition of \bye here is because it is declared \outer
+ 
+ \let\lastnode=\empty
+ 
++% What I want is to have \donoderef look for any extra things like
++% \lastnode (preferably some kind of array of them though I could
++% probably live with as few as 3 of them), and do a similar \setref
++% for each of those as it does for \lastnode.  This is to implement
++% node "aliases", so that I can have alternative references to
++% @section headers.  (Without these node aliases, you are down to
++% using @anchor, which goes either before or after the @section,
++% neither of which place is correct.)
++%
++% So now we have @naI, @naII, etc., and it is of course easy to add
++% more if required.  I don't know TeX well enough to do this more
++% elegantly, but at least I can be imitative...
++
++% Like the \let\lastnode=\empty above:
++\let\nI=\empty
++\let\nII=\empty
++\let\nIII=\empty
++\let\nIV=\empty
++\let\nV=\empty
++\let\nVI=\empty
++\let\nVII=\empty
++\let\nVIII=\empty
++\let\nIX=\empty
++\let\nX=\empty
++\let\nXI=\empty
++\let\nXII=\empty
++\let\nXIII=\empty
++
++% Sort of like the \gdef in \def\dodonode above, but presumably
++% not as well defended against weird uses of spaces and commas:
++\def\naI#1{\gdef\nI{#1}}
++\def\naII#1{\gdef\nII{#1}}
++\def\naIII#1{\gdef\nIII{#1}}
++\def\naIV#1{\gdef\nIV{#1}}
++\def\naV#1{\gdef\nV{#1}}
++\def\naVI#1{\gdef\nVI{#1}}
++\def\naVII#1{\gdef\nVII{#1}}
++\def\naVIII#1{\gdef\nVIII{#1}}
++\def\naIX#1{\gdef\nIX{#1}}
++\def\naX#1{\gdef\nX{#1}}
++\def\naXI#1{\gdef\nXI{#1}}
++\def\naXII#1{\gdef\nXII{#1}}
++\def\naXIII#1{\gdef\nXIII{#1}}
++
+ % Write a cross-reference definition for the current node.  #1 is the
+ % type (Ynumbered, Yappendix, Ynothing).
+ %
+ \def\donoderef#1{%
+   \ifx\lastnode\empty\else
+     \setref{\lastnode}{#1}%
+     \global\let\lastnode=\empty
+   \fi
++  \ifx\nI\empty\else
++    \setref{\nI}{#1}%
++    \global\let\nI=\empty
++  \fi
++  \ifx\nII\empty\else
++    \setref{\nII}{#1}%
++    \global\let\nII=\empty
++  \fi
++  \ifx\nIII\empty\else
++    \setref{\nIII}{#1}%
++    \global\let\nIII=\empty
++  \fi
++  \ifx\nIV\empty\else
++    \setref{\nIV}{#1}%
++    \global\let\nIV=\empty
++  \fi
++  \ifx\nV\empty\else
++    \setref{\nV}{#1}%
++    \global\let\nV=\empty
++  \fi
++  \ifx\nVI\empty\else
++    \setref{\nVI}{#1}%
++    \global\let\nVI=\empty
++  \fi
++  \ifx\nVII\empty\else
++    \setref{\nVII}{#1}%
++    \global\let\nVII=\empty
++  \fi
++  \ifx\nVIII\empty\else
++    \setref{\nVIII}{#1}%
++    \global\let\nVIII=\empty
++  \fi
++  \ifx\nIX\empty\else
++    \setref{\nIX}{#1}%
++    \global\let\nIX=\empty
++  \fi
++  \ifx\nX\empty\else
++    \setref{\nX}{#1}%
++    \global\let\nX=\empty
++  \fi
++  \ifx\nXI\empty\else
++    \setref{\nXI}{#1}%
++    \global\let\nXI=\empty
++  \fi
++  \ifx\nXII\empty\else
++    \setref{\nXII}{#1}%
++    \global\let\nXII=\empty
++  \fi
++  \ifx\nXIII\empty\else
++    \setref{\nXIII}{#1}%
++    \global\let\nXIII=\empty
++  \fi
+ }
+ 
+ % @anchor{NAME} -- define xref target at arbitrary point.
+ %
+ \newcount\savesfregister
+@@ -8737,10 +8833,11 @@
+ 
+ \def\xrefXX#1{\def\xrefXXarg{#1}\futurelet\tokenafterxref\xrefXXX}
+ \def\xrefXXX{\expandafter\xrefX\expandafter[\xrefXXarg,,,,,,,]}
+ %
+ \newbox\toprefbox
++\newbox\hyperjumpbox
+ \newbox\printedrefnamebox
+ \newbox\infofilenamebox
+ \newbox\printedmanualbox
+ %
+ \def\xrefX[#1,#2,#3,#4,#5,#6]{\begingroup
+@@ -8887,11 +8984,26 @@
+     % again, so it is as if TeX is seeing it for the first time.
+     % 
+     \ifdim \wd\printedmanualbox > 0pt
+       % Cross-manual reference with a printed manual name.
+       % 
+-      \crossmanualxref{\cite{\printedmanual\unskip}}%
++      % But first, a special hack for uncluttered xrefs for use in both
++      % the cross-manual case and internally to a manual:
++      %
++      % We imitate the example in \crossmanualxref, but look for the
++      % keyword 'hyperjump' as the 5th arg, and use the short form
++      % (\printedrefname) if found.
++      %
++      \setbox\hyperjumpbox = \hbox{hyperjump\kern7sp}%
++      \setbox2 = \hbox{\ignorespaces \printedmanual \unskip \kern7sp}%
++      \ifdim \wd2 > 7sp  % nonempty?
++        \ifdim \wd2 = \wd\hyperjumpbox  % same width as 'hyperjump'?
++          \printedrefname%
++        \else
++          \crossmanualxref{\cite{\printedmanual\unskip}}%
++        \fi
++      \fi
+     %
+     \else\ifdim \wd\infofilenamebox > 0pt
+       % Cross-manual reference with only an info filename (arg 4), no
+       % printed manual name (arg 5).  This is essentially the same as
+       % the case above; we output the filename, since we have nothing else.

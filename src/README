@@ -1,0 +1,22 @@
+$Id: README,v 1.11 2022/12/10 23:35:26 setlorg Exp $
+
+Free software (c) dB - see file COPYING for license (GPL).
+
+This file is part of GNU SETL.
+
+
+All the usual "make" requests for configuring, building, checking,
+installing, cleaning, and distributing GNU SETL can be done from the
+top build dir, including many "src"-specific ones (see ../main.mk).
+
+You can also go into src and below in the build tree and use the
+Makefiles created by config.  You might do this for local rebuilds
+during code development.
+
+See also ../README and ../INSTALL.
+
+INSTALL (here) is an automatically planted generic default.
+
+If you publish a new version of GNU SETL, please remember to update
+../VERSION_NUMBER, and check that you can still do a "make distcheck"
+from the top build dir.  Thanks!

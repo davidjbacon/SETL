@@ -1,0 +1,178 @@
+const time_limit = 1000;  -- time limit in ms, inclusive
+
+-- parms are [[period, initial], ...]  (bkwds from OPEN's convention!!)
+const timer_parms = [[10, 0], [15, 0], [25, 0]];
+$const child_parms = [[10, 5], [15, 5], [25, 5]];
+$const child_parms = [[10, 0], [15, 0], [25, 0]];
+$const child_parms = [[2, 0], [3, 0], [5, 0]];
+const child_parms = [[4, 0], [6, 0], [10, 0]];
+const server_parms = [[6, 2], [9, 2], [15, 2]];
+
+const top_pid = pid;
+
+var sources := {};  -- filled in as a side-effect of these inits:
+var timers  := {timer(parm)  : parm in timer_parms};
+var kids    := {child(parm)  : parm in child_parms};
+var servers := {server(parm) : parm in server_parms};
+
+hist := {};  -- how often fds went ready
+t0 := clock;
+loop
+  fds := domain sources;
+  [ready] := select([fds]);
+  t := clock;
+  if t - t0 > time_limit then
+    quit loop;
+  end if;
+  -- every domain element of hist will be a singleton since the switch
+  -- to one-at-a-time delivery of fds by SELECT
+  hist(ready) +:= 1;
+  for fd in ready loop
+    sources(fd).count +:= 1;
+    reada(fd);  -- read the empty line signifying an event
+  end loop;
+  n +:= 1;  -- number of SELECT wakeups
+  nr +:= #ready;  -- cumulative number of fds gone ready
+end loop;
+printa(stderr, n, nr);  -- =
+printa(stderr, sources);  -- raw data including counts
+printa(stderr, [[f.period ? f.parm, f.count] : f = sources(fd)]);
+printa(stderr, hist);
+-- Note that this is not the same as +/range hist, which is an
+-- uninteresting number:
+n2  := +/[       count : count = hist(ready)];  -- # SELECT wakeups
+nr2 := +/[#ready*count : count = hist(ready)];  -- cum # fds gone ready
+printa(stderr, n2, nr2);  -- =
+assert n2 = n;
+assert nr2 = nr;
+-- This funny mapping gives uniqueness in the range elements by
+-- pairing each count with the ready set it applies to:
+--- no longer of interest now that #ready = 1 forall ready
+$m := {[#ready, [ready, count]] : count = hist(ready)};  -- mmap
+-- Anagram of hist, this bins ready set sizes:
+$hits := {[n_ready, +/[count : count = pairs(ready)]] : pairs = m{n_ready}};
+$printa(stderr, hits);  -- oh tish!
+$n := +/[count : count = hits(n_ready)];
+$printa(stderr, n);  -- sith that we are here
+
+close_sources;  -- redundant; we are done; itsh getting late...
+
+-- but wait, there's more!  since that test has cleaned up after itself
+-- so nicely, let us add another, to verify that the SETL
+-- SELECT can handle sets of fds going right up to the limit.
+-- this one could also serve as prototype for a configure-time program
+-- to check that the flexible fd_sets are acceptable to the local
+-- implems of select() and pselect().  doing it here, after the fact,
+-- then becomes just a second line of defence.
+fd := pump();
+if fd >= 0 then  -- parent
+  fds := {fd};
+  while (fd2 := dup fd) /= om loop
+    fds +:= {open(fd2, 'r')};
+  end loop;
+  printa(stderr, '#fds = ', #fds);
+  [ready] := select([fds]);
+  printa(stderr, '#ready = ', #ready);
+  printa(stderr, 'got', pretty getline fd, 'from child', pid(fd));
+  [ready] := select([fds],0);
+  printa(stderr, '#ready = ', #ready);
+  printa(stderr, 'reaped child', waitpid(pid(fd)));
+  printa(stderr, 'exit status', status);
+  print('Done.');
+  stop;
+end if;
+-- child
+print('a line');
+stop;
+
+proc timer(parm);  -- local non-slipping timer
+  [period, initial] := parm;  -- N.B. bkwd from what OPEN takes!!
+  fd := fileno open([initial, period], 'real-ms');
+  assert filename fd = [initial, period];  -- against a certain regression
+  r := [fd, fd_rec('timer', period, initial)];
+  sources with:= r;
+  return r;
+end proc;
+
+proc child(parm);  -- slippy timer implemented by child process
+  [period, initial] := parm;
+  fd := pipe_from_child();  -- a Unix-domain socket
+  if fd >= 0 then
+    -- parent
+    r := [fd, fd_rec('child', period, initial)];
+    sources with:= r;
+    return r;
+  end if;
+  -- child
+  slippy_timer(stdout, period, initial);
+end proc;
+
+proc server(parm);
+  [period, initial] := parm;
+--- shouldn't actually assume IPv6 is supported
+  listening_fd := fileno open(['::1',0], 'server-socket');  -- TCP/IPv6
+  port_num := port listening_fd;  -- find assigned port num
+  p := fork();
+  if p > 0 then
+    -- parent, also client
+    close(listening_fd);  -- the child keeps this
+--- shouldn't actually assume IPv6 is supported
+    fd := fileno open(['::1',port_num], 'client-socket');  -- TCP/IPv6
+    r := [fd, fd_rec('server', period, initial)];
+    sources with:= r;
+    return r;
+  end if;
+  if p = om then
+    printa(stderr, 'could not FORK ??');
+    stop 1;
+  end if;
+  -- child, also server
+  close_sources;
+  -- stdin, stdout, stderr, and listening_fd are still open here
+  close(stdin);
+  close(stdout);
+  fd := fileno accept(listening_fd);
+  close(listening_fd);
+  slippy_timer(fd, period, initial);
+end proc;
+
+proc close_sources;
+printa(stderr,pid);
+printa(stderr,domain timers);
+printa(stderr,domain sources);
+printa(stderr,domain sources - domain timers);
+  for fd in domain kids loop
+    if pid = top_pid then  -- in parent
+      kill(pid(fd));
+    end if;
+    close(fd);
+  end loop;
+  -- servers is OM in a child formed before it was initialized
+  for fd in domain (servers ? {}) loop
+    close(fd);
+  end loop;
+  for fd in domain timers loop
+    if pid = top_pid then
+      close(fd);
+    else
+      assert not is_open fd;
+    end if;
+  end loop;
+end proc;
+
+proc slippy_timer(fd, period, initial);
+  select(om, initial);  -- wait initial interval
+  printa(fd); flush(fd);  -- send newline
+  loop  -- until we get killed by a SIGPIPE
+    select(om, period);  -- wait a(nother) period
+    printa(fd); flush(fd);  -- send newline
+  end loop;
+end proc;
+
+proc fd_rec(kind, period, initial);  -- a record to pair with an fd
+  r := {};
+  r.kind := kind;  -- 'child', 'server', etc.
+  r.parm := [period, initial];
+  r.count := 0;
+  return r;
+end proc;

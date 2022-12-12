@@ -1,0 +1,439 @@
+*** include/GL/glut.h.orig	Wed Oct 15 21:09:40 1997
+--- include/GL/glut.h	Mon Jan 26 00:27:41 1998
+***************
+*** 335,340 ****
+--- 335,341 ----
+  extern void APIENTRY glutInitWindowPosition(int x, int y);
+  extern void APIENTRY glutInitWindowSize(int width, int height);
+  extern void APIENTRY glutMainLoop(void);
++ extern void APIENTRY glutEventWait(void);
+  
+  /* GLUT window sub-API. */
+  extern int APIENTRY glutCreateWindow(const char *title);
+***************
+*** 393,398 ****
+--- 394,402 ----
+  extern void APIENTRY glutVisibilityFunc(void (*)(int state));
+  extern void APIENTRY glutIdleFunc(void (*)(void));
+  extern void APIENTRY glutTimerFunc(unsigned int millis, void (*)(int value), int value);
++ extern void APIENTRY glutFileInputFunc(int fd, void (*)(int fd));
++ extern void APIENTRY glutFileOutputFunc(int fd, void (*)(int fd));
++ extern void APIENTRY glutFileExceptionFunc(int fd, void (*)(int fd));
+  extern void APIENTRY glutMenuStateFunc(void (*)(int state));
+  #if (GLUT_API_VERSION >= 2)
+  extern void APIENTRY glutSpecialFunc(void (*)(int key, int x, int y));
+*** src-glut/glutint.h.orig	Wed Nov 19 18:06:39 1997
+--- src-glut/glutint.h	Mon Jan 26 00:35:51 1998
+***************
+*** 197,203 ****
+  typedef void (*GLUTwindowStatusCB) (int);
+  typedef void (*GLUTidleCB) (void);
+  typedef void (*GLUTtimerCB) (int);
+! typedef void (*GLUTmenuStateCB) (int);  /* DEPRICATED. 
+                                                     */
+  typedef void (*GLUTmenuStatusCB) (int, int, int);
+  typedef void (*GLUTselectCB) (int);
+--- 197,204 ----
+  typedef void (*GLUTwindowStatusCB) (int);
+  typedef void (*GLUTidleCB) (void);
+  typedef void (*GLUTtimerCB) (int);
+! typedef void (*GLUTfileCB) (int);
+! typedef void (*GLUTmenuStateCB) (int);  /* DEPRICATED.  <- deprEcated!
+                                                     */
+  typedef void (*GLUTmenuStatusCB) (int, int, int);
+  typedef void (*GLUTselectCB) (int);
+***************
+*** 222,227 ****
+--- 223,229 ----
+  typedef void (*GLUTwindowStatusFCB) (int *);
+  typedef void (*GLUTidleFCB) (void);
+  typedef void (*GLUTtimerFCB) (int *);
++ typedef void (*GLUTfileFCB) (int *);
+  typedef void (*GLUTmenuStateFCB) (int *);  /* DEPRICATED. */
+  typedef void (*GLUTmenuStatusFCB) (int *, int *, int *);
+  typedef void (*GLUTselectFCB) (int *);
+***************
+*** 453,458 ****
+--- 455,470 ----
+    int value;            /*  return value */
+  #ifdef SUPPORT_FORTRAN
+    GLUTtimerFCB ffunc;   /* Fortran timer  */
++ #endif
++ };
++ 
++ typedef struct _GLUTfile GLUTfile;
++ struct _GLUTfile {
++   GLUTfile *next;       /* list of files */
++   GLUTfileCB func;      /* "fd ready" handler */
++   int fd;               /* the file descriptor of interest */
++ #ifdef SUPPORT_FORTRAN
++   GLUTfileFCB ffunc;    /* Fortran "fd ready" handler */
+  #endif
+  };
+  
+*** src-glut/glut_init.c.orig	Mon Oct 13 21:48:13 1997
+--- src-glut/glut_init.c	Sun Jan 25 22:38:12 1998
+***************
+*** 243,249 ****
+        removeArgs(argcp, &argv[1], 1);
+      } else if (!strcmp(__glutArgv[i], "-sync")) {
+  #if defined(WIN32)
+!       __glutWarning("-indirect option invalid for win32 glut.");
+  #endif /* WIN32 */
+        synchronize = GL_TRUE;
+        removeArgs(argcp, &argv[1], 1);
+--- 243,249 ----
+        removeArgs(argcp, &argv[1], 1);
+      } else if (!strcmp(__glutArgv[i], "-sync")) {
+  #if defined(WIN32)
+!       __glutWarning("-sync option invalid for win32 glut.");
+  #endif /* WIN32 */
+        synchronize = GL_TRUE;
+        removeArgs(argcp, &argv[1], 1);
+*** src-glut/glut_event.c.orig	Wed Nov 19 18:06:37 1997
+--- src-glut/glut_event.c	Mon Jan 26 01:57:20 1998
+***************
+*** 56,61 ****
+--- 56,67 ----
+  #ifdef SUPPORT_FORTRAN
+  GLUTtimer *__glutNewTimer;
+  #endif
++ 
++ static GLUTfile *freeFileList = NULL;
++ GLUTfile *__glutInputFileList = NULL;
++ GLUTfile *__glutOutputFileList = NULL;
++ GLUTfile *__glutExceptionFileList = NULL;
++ 
+  GLUTwindow *__glutWindowWorkList = NULL;
+  void (*__glutUpdateInputDeviceMaskFunc) (GLUTwindow *);
+  Atom __glutMotifHints = None;
+***************
+*** 113,118 ****
+--- 119,189 ----
+    *prevptr = timer;
+  }
+  
++ static void
++ registerFileFunc(int fd, GLUTfileCB func, GLUTfile **list)
++ {
++   if (fd == __glutConnectionFD)
++     __glutWarning("%d is the X connection file descriptor", fd);
++   if (func) {
++     GLUTfile *p;
++     for (p = *list; p; p = p->next) {
++       if (p->fd == fd) {
++         /* -- replace func associated with fd -- */
++         p->func = func;
++         return;
++       }
++     }
++     /* -- insert -- */
++     if (freeFileList) {
++       p = freeFileList;
++       freeFileList = freeFileList->next;
++     } else {
++       p = (GLUTfile *) malloc(sizeof(GLUTfile));
++       if (!p)
++         __glutFatalError("out of memory.");
++     }
++     p->next = *list;
++     p->fd = fd;
++     p->func = func;
++     *list = p;
++   } else {  /* func is NULL */
++     /* -- remove -- */
++     GLUTfile *p, *q;
++     for (p = *list; p; p = p->next) {
++       if (p->fd == fd) {
++         if (p == *list) {
++           *list = p->next;
++         } else {
++           q->next = p->next;
++         }
++         p->next = freeFileList;
++         freeFileList = p;
++         return;
++       }
++       q = p;
++     }
++     __glutWarning("No currently registered file descriptor %d", fd);
++   }
++ }
++ 
++ void APIENTRY
++ glutFileInputFunc(int fd, GLUTfileCB func)
++ {
++   registerFileFunc(fd, func, &__glutInputFileList);
++ }
++ 
++ void APIENTRY
++ glutFileOutputFunc(int fd, GLUTfileCB func)
++ {
++   registerFileFunc(fd, func, &__glutOutputFileList);
++ }
++ 
++ void APIENTRY
++ glutFileExceptionFunc(int fd, GLUTfileCB func)
++ {
++   registerFileFunc(fd, func, &__glutExceptionFileList);
++ }
++ 
+  void
+  handleTimeouts(void)
+  {
+***************
+*** 227,232 ****
+--- 298,370 ----
+  
+  #if !defined(WIN32)
+  
++ /* This is a local utility to call select(2) and treat interruption
++    by signal the same as unblocking by timeout.  As a side-effect,
++    registered "file" I/O callback handlers will be called for ready
++    file descriptors.  These will not be reflected in the return code,
++    which is always 0 (timeout, signal, or user callback called for the
++    X connection fd) or 1 (input available on the X connection fd).  */
++ static int
++ awaitSelect(struct timeval *t)
++ {
++   GLUTfile *p;
++   fd_set readfds, writefds, exceptfds;
++   int n;
++   int rc;
++ 
++   FD_ZERO(&readfds);
++   FD_SET(__glutConnectionFD, &readfds);
++   n = __glutConnectionFD;
++   for (p = __glutInputFileList; p; p = p->next) {
++     FD_SET(p->fd, &readfds);
++     if (p->fd > n) n = p->fd;
++   }
++   if (__glutOutputFileList) {
++     FD_ZERO(&writefds);
++     for (p = __glutOutputFileList; p; p = p->next) {
++       FD_SET(p->fd, &writefds);
++       if (p->fd > n) n = p->fd;
++     }
++   }
++   if (__glutExceptionFileList) {
++     FD_ZERO(&exceptfds);
++     for (p = __glutExceptionFileList; p; p = p->next) {
++       FD_SET(p->fd, &exceptfds);
++       if (p->fd > n) n = p->fd;
++     }
++   }
++   rc = select(n + 1,
++               &readfds,
++               __glutOutputFileList ? &writefds : NULL,
++               __glutExceptionFileList ? &exceptfds : NULL,
++               t);
++   if (rc < 0) {
++     if (errno == EINTR)
++       return 0;
++     else
++       __glutFatalError("select error.");
++   }
++   for (p = __glutInputFileList; p; p = p->next) {
++     if (FD_ISSET(p->fd, &readfds)) {
++       p->func(p->fd);
++       rc--;
++     }
++   }
++   for (p = __glutOutputFileList; p; p = p->next) {
++     if (FD_ISSET(p->fd, &writefds)) {
++       p->func(p->fd);
++       rc--;
++     }
++   }
++   for (p = __glutExceptionFileList; p; p = p->next) {
++     if (FD_ISSET(p->fd, &exceptfds)) {
++       p->func(p->fd);
++       rc--;
++     }
++   }
++   return rc;
++ }
++ 
+  /* Unlike XNextEvent, if a signal arrives,
+     interruptibleXNextEvent will return (with a zero return
+     value).  This helps GLUT drop out of XNextEvent if a signal
+***************
+*** 238,244 ****
+  static int
+  interruptibleXNextEvent(Display * dpy, XEvent * event)
+  {
+-   fd_set fds;
+    int rc;
+  
+    /* Flush X protocol since XPending does not do this
+--- 376,381 ----
+***************
+*** 249,265 ****
+        XNextEvent(dpy, event);
+        return 1;
+      }
+!     FD_ZERO(&fds);
+!     FD_SET(__glutConnectionFD, &fds);
+!     rc = select(__glutConnectionFD + 1, &fds,
+!       NULL, NULL, NULL);
+!     if (rc < 0) {
+!       if (errno == EINTR) {
+!         return 0;
+!       } else {
+!         __glutFatalError("select error.");
+!       }
+!     }
+    }
+  }
+  
+--- 386,394 ----
+        XNextEvent(dpy, event);
+        return 1;
+      }
+!     rc = awaitSelect(NULL);
+!     if (rc == 0)
+!       return 0;
+    }
+  }
+  
+***************
+*** 740,752 ****
+    unsigned int timer_efn;
+  #define timer_id 'glut' /* random :-) number */
+    unsigned int wait_mask;
+  #else
+    static struct timeval zerotime =
+    {0, 0};
+-   fd_set fds;
+  #endif
+    struct timeval now, timeout, waittime;
+-   int rc;
+  
+    /* Flush X protocol since XPending does not do this
+       implicitly. */
+--- 869,880 ----
+    unsigned int timer_efn;
+  #define timer_id 'glut' /* random :-) number */
+    unsigned int wait_mask;
++   int rc;
+  #else
+    static struct timeval zerotime =
+    {0, 0};
+  #endif
+    struct timeval now, timeout, waittime;
+  
+    /* Flush X protocol since XPending does not do this
+       implicitly. */
+***************
+*** 789,798 ****
+    /* XXX There does not seem to be checking of "rc" in the code
+       above.  Can any of the SYS$ routines above fail? */
+  #else /* not vms */
+- #if !defined(WIN32)
+-   FD_ZERO(&fds);
+-   FD_SET(__glutConnectionFD, &fds);
+- #endif
+    timeout = __glutTimerList->timeout;
+    GETTIMEOFDAY(&now);
+    if (IS_AFTER(now, timeout)) {
+--- 917,922 ----
+***************
+*** 801,810 ****
+      waittime = zerotime;
+    }
+  #if !defined(WIN32)
+!   rc = select(__glutConnectionFD + 1, &fds,
+!     NULL, NULL, &waittime);
+!   if (rc < 0 && errno != EINTR)
+!     __glutFatalError("select error.");
+  #else
+    /* set up a timer to fire in at least a millisecond, then wait for
+       the message.  This should act like a select. */
+--- 925,931 ----
+      waittime = zerotime;
+    }
+  #if !defined(WIN32)
+!   (void) awaitSelect(&waittime);
+  #else
+    /* set up a timer to fire in at least a millisecond, then wait for
+       the message.  This should act like a select. */
+***************
+*** 839,844 ****
+--- 960,971 ----
+    } else {
+      if (__glutTimerList)
+        handleTimeouts();
++     if (__glutInputFileList ||
++         __glutOutputFileList ||
++         __glutExceptionFileList) {
++       struct timeval zerotime = {0, 0};
++       (void) awaitSelect(&zerotime);
++     }
+    }
+    /* Make sure idle func still exists! */
+    if (__glutIdleFunc)
+***************
+*** 1213,1219 ****
+  {
+  #if !defined(WIN32)
+    if (!__glutDisplay)
+!     __glutFatalUsage("main loop entered with out proper initialization.");
+  #endif
+    if (!__glutWindowListSize)
+      __glutFatalUsage(
+--- 1340,1346 ----
+  {
+  #if !defined(WIN32)
+    if (!__glutDisplay)
+!     __glutFatalUsage("main loop entered without proper initialization.");
+  #endif
+    if (!__glutWindowListSize)
+      __glutFatalUsage(
+***************
+*** 1244,1246 ****
+--- 1371,1415 ----
+    }
+  }
+  /* ENDCENTRY */
++ 
++ /* The body of the following routine is just a copy of that of
++    glutMainLoop, with the "for (;;)" commented out, so if glutEventWait
++    is adopted permanently, glutMainLoop should probably be re-coded as
++    simply an infinite loop of calls to glutEventWait(): */
++ 
++ /* CENTRY */
++ void APIENTRY
++ glutEventWait(void)
++ {
++ #if !defined(WIN32)
++   if (!__glutDisplay)
++     __glutFatalUsage("event-wait entered without proper initialization.");
++ #endif
++   if (!__glutWindowListSize)
++     __glutFatalUsage(
++       "event-wait entered with no windows created.");
++   /* for (;;) */ {  /* cf. glutMainLoop */
++     if (__glutWindowWorkList) {
++       GLUTwindow *remainder, *work;
++ 
++       work = __glutWindowWorkList;
++       __glutWindowWorkList = NULL;
++       if (work) {
++         remainder = processWindowWorkList(work);
++         if (remainder) {
++           *beforeEnd = __glutWindowWorkList;
++           __glutWindowWorkList = remainder;
++         }
++       }
++     }
++     if (__glutIdleFunc || __glutWindowWorkList) {
++       idleWait();
++     } else {
++       if (__glutTimerList) {
++         waitForSomething();
++       } else {
++         processEventsAndTimeouts();
++       }
++     }
++   }
++ }

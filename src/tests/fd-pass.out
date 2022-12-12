@@ -1,0 +1,58 @@
+<< fd-pass.setl >>
+-- Test the passing of file descriptors from a subprocess to a parent.
+--
+-- We run the parent ("main") program, passing it 3 filenames.
+--
+-- The SETL_LINEBUF_STDERR=1 envt var setting only matters if lines of
+-- debug output are sent to stderr by both the parent and child, and
+-- you don't want the characters in those lines to be intermingled.
+--
+-- This program itself could just as easily (and a little more
+-- concisely) have been a shell script, except that we want it to be a
+-- SETL program for the particular test environment we are using.
+
+-- Defaults for envt vars srcdir and top_srcdir:
+setenv ('srcdir', getenv 'srcdir' ? '.');
+setenv ('top_srcdir', getenv 'top_srcdir' ? '..');
+
+system ('SETL_LINEBUF_STDERR=1 "$top_srcdir"/run-setl "$srcdir"/fd-pass-main.setl "$srcdir"/fd-pass.setl "$srcdir"/fd-pass-main.setl "$srcdir"/fd-pass-pump.setl');
+
+<< fd-pass-main.setl >>
+-- Parent program.  Start by opening the child as a "pumping" subprocess:
+pd := fileno open('"$top_srcdir"/run-setl "$srcdir"/fd-pass-pump.setl', 'pump');
+for a in command_line loop  -- loop over our cmd line args
+  print ('<<', basename a, '>>');  -- report the cmd line arg filename
+  printa (pd, a);  -- send the filename to the pump
+  fd := recv_fd pd;  -- get the fd of the opened file from the pump
+  print (getfile fd);  -- read and echo the file's contents
+  close (fd);  -- close the fd of the file
+end loop;
+close (pd);  -- for neatness, close the pump fd
+
+$op basename (f);
+$  return split(filter('basename '+f))(1);
+$end op;
+#include "basename.setl"
+
+<< fd-pass-pump.setl >>
+-- Child program.
+--
+-- For each line on stdin from the parent, open the file named on
+-- that line and pass the fd (file descriptor for reading the file)
+-- up to the parent on stdout.
+--
+-- So this is a "pump" only in that we read on stdin and reply on
+-- stdout.  We don't send any data on stdout, only file descriptors.
+--
+$tie (stdin, stdout);  -- auto-flush stdout whenever stdin is read
+fd := om;  -- for emphasis (fd is om at this point anyway)
+while (s := getline stdin) /= om loop  -- loop over input lines
+  close (fd);  -- close previously opened fd if any
+  fd := fileno open(s, 'r');  -- open the file named in the input line
+  send_fd (stdout, fd);  -- send its fd up to the parent
+  -- Note that we do not close the fd until we are sure the parent has
+  -- received it, which is indicated by its sending us another line or
+  -- "closing" us (which we see as an eof on stdin).
+end loop;
+close (fd);  -- for neatness
+

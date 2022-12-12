@@ -1,0 +1,18 @@
+$Id: README,v 1.4 2009/02/14 08:40:04 setlorg Exp $
+
+Free software (c) dB - see file COPYING for license (GPL).
+
+
+This is based on the cpplib-based version of the GNU C Preprocessor (CPP)
+distributed with GCC 2.7.2.1.  It removes the undocumented "-lang-chill"
+support, which was manifestly broken, fixes a minor bug in the C++
+support, and adds "-lang-setl" in such a way that it should be compatible
+with pretty well every other option within reason.
+
+A coeval snapshot of the monolithic cpp (cccp.c) is included here but is
+not used.  It could be patched after the fashion of cpplib.c if someone
+wanted to give it a -lang-setl option.  This is the version the GCC
+distribution itself uses by default, and is what the cpplib version
+appears to have been hacked from originally.
+
+   dB

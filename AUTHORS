@@ -1,0 +1,25 @@
+$Id: AUTHORS,v 1.15 2022/12/11 17:09:26 setlorg Exp $
+
+Free software (c) dB - see file COPYING for license (GPL).
+
+
+GNU SETL authors
+----------------
+
+David Bacon (dB)  <David.Bacon@nyu.edu>  https://setl.org/
+
+
+Other authors
+-------------
+
+The GNU SETL preprocessor (sources in src/cpp/) was derived from the
+version of the GNU C Preprocessor in cpp-2.7.2.1.tgz.  Although there
+is no AUTHORS file in that tarball, comments in the source code
+indicate authorship by Paul Rubin, Richard Stallman, and Per Bothner.
+
+The authors of the GNU MP distribution in gmp-6.1.2.tgz (or successor)
+upon which GNU SETL's large-integer support is based are listed in the
+gmp archive's AUTHORS files.
+
+The authors of freeglut (see freeglut-2.0.1.tgz for the original
+package) are listed in src/run/freeglut-setl/AUTHORS.

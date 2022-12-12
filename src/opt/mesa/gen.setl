@@ -1,0 +1,965 @@
+--  $Id: gen.setl,v 1.18 2022/12/11 17:09:27 setlorg Exp $
+--
+--  Generate the custom.* files connecting GNU SETL to GLUT/Mesa.
+--
+--  The input (conventionally a file called 'tuples') consists of one
+--  tuple t per line, where t(1) is an ordered pair [x,y] such that:
+--
+--   x = '#include'  =>
+--      y       =  "..." or <...>               (string)
+--
+--   x = 'enum'  =>
+--      y       =  enumeration name             (string)
+--
+--   x = 'const'  =>
+--      y       =  name of the constant         (string)
+--      t(2)    =  its value                    (string)
+--
+--   x = 'typedef'  =>
+--      y       =  type alias name              (string)
+--      t(2)    =  type expression              (string)
+--
+--   x = 'struct' or 'union'  =>
+--      y       =  struct or union name         (string)
+--      t(2..)  =  [[typexpr, fieldname], ...]  (tuple)
+--
+--   x = function return typexpr (as string)  =>
+--      y       =  function name                (string)
+--      t(2..)  =  [[typexpr, argname], ...]    (tuple)
+--
+--  Don't forget to provide an argname where your original C headers
+--  only declare the formal type (e.g. int instead of int x).
+--
+--  Types in the input are C types, but the values in 'const' lines
+--  should already be in SETL form (and given their origin, should
+--  generally represent numbers or, if internally quoted, strings).
+--
+--  Enumerands should be presented as 'const' lines.  Enumeration types
+--  themselves (legitimizing type expressions of the form 'enum spam')
+--  should be presented using 'enum' lines.
+--
+--  The presence of a 'struct', 'union', or 'enum' line in this version
+--  does not automatically create a typedef, but you can have, for
+--  example,
+--
+--   [['enum', 'spam']]
+--   [['typedef', 'spam'], 'enum spam']
+--
+--  to handle interfaces where 'spam' and 'enum spam' might both be
+--  used.  Without the typedef, only 'enum spam' (not 'spam' alone)
+--  would be recognized as a type expression.  With only the typedef,
+--  'spam' (and not 'enum spam') would be recognized.
+
+
+const generator_name = 'mesa/gen.setl';
+
+const pkg_prefix = 'Mesa_';
+const const_prefix = '';
+const proc_prefix = '';
+const srcdir_prefix = command_line(1) ? '';
+const custom_prefix = 'custom.';
+
+const integral_types = {
+ 'char',
+ 'short',
+ 'short int',
+ 'int',
+ 'long',
+ 'long int',
+ 'signed char',
+ 'signed short',
+ 'signed short int',
+ 'signed int',
+ 'signed long',
+ 'signed long int',
+ 'unsigned char',
+ 'unsigned short',
+ 'unsigned short int',
+ 'unsigned',
+ 'unsigned int',
+ 'unsigned long',
+ 'unsigned long int'
+};
+
+const floating_types = {
+ 'float',
+ 'double',
+ 'long double'
+};
+
+const default_values = {
+ ['char',        0],
+ ['short',       0],
+ ['int',         0],
+ ['long',        0],
+ ['float',       0.0],
+ ['double',      0.0],
+ ['long_double', 0.0],
+ ['string',      '']
+};
+
+var typedef_map;
+var struct_map;
+var union_map;
+
+
+includes := [];
+enums    := [];
+consts   := [];
+typedefs := [];
+structs  := [];
+unions   := [];
+routines := [];
+loop doing
+  read(t);
+while not eof do
+  case t(1)(1) of
+  ('#include'):  includes with:= t;
+  ('enum'):      enums    with:= t;
+  ('const'):     consts   with:= t;
+  ('typedef'):   typedefs with:= t;
+  ('struct'):    structs  with:= t;
+  ('union'):     unions   with:= t;
+  else           routines with:= t;
+  end case;
+end loop;
+
+printa(stderr);
+printa(stderr, '#includes =',#includes);
+printa(stderr, '#enums    =',#enums);
+printa(stderr, '#consts   =',#consts);
+printa(stderr, '#typedefs =',#typedefs);
+printa(stderr, '#structs  =',#structs);
+printa(stderr, '#unions   =',#unions);
+printa(stderr, '#routines =',#routines);
+
+include_set := {y : [[-,y]] in includes};
+include_tup := [y : [[-,y]] in includes];  -- maintain input order
+
+enum_set := {y : [[-,y]] in enums};
+enum_tup := sort enum_set;
+
+-- map from name of const to its value:
+const_map := {[name,value] : [[-,name],value] in consts};
+const_tup := sort const_map;
+
+typedef_map := {[name,typexpr] : [[-,name],typexpr] in typedefs};
+typedef_tup := sort typedef_map;
+
+-- map from name of struct to tuple of [type,name] members:
+struct_map := {[t(1)(2), t(2..)] : t in structs};  -- name->tuple map
+struct_tup := sort struct_map;
+
+-- map from name of union to tuple of [type,name] members:
+union_map := {[t(1)(2), t(2..)] : t in unions};  -- name->tuple map
+union_tup := sort union_map;
+
+-- map from name of routine to [yieldtype, [[type,name], ...] ]:
+routine_map := {[t(1)(2), [t(1)(1), t(2..)]] : t in routines};
+routine_tup := sort routine_map;
+
+yield_types := {yield_type : [yield_type,-] in range routine_map};
+
+formal_types := {formal_type : [-,formals] in range routine_map,
+                               [formal_type,-] in formals};
+
+vt := integral_types + floating_types
+ + {'enum '+name : name in enum_set}
+ + {'struct '+name : name in domain struct_map}
+ + {'union '+name : name in domain union_map}
+ + {field_type : fields in range struct_map, [field_type,-] in fields}
+ + {field_type : fields in range union_map, [field_type,-] in fields}
+ + yield_types + formal_types;
+vt +:= {} +/ {bounded_array_prefixes(typexpr) : typexpr in vt};
+vt +:= {} +/ {aliases(typexpr) : typexpr in vt};
+
+-- things "sizeof" might validly be asked about:
+sizeable_set := vt - {typexpr in vt | '[ ]' in typexpr} - {'void'};
+sizeable_tup := sort sizeable_set;
+
+-- spew custom.lexicon
+lexicon := open(custom_prefix+'lexicon', 'w');
+for [name,-] in routine_tup loop
+  printa(lexicon, to_upper(proc_prefix+name)+' Sysproc custom');
+end loop;
+printa(lexicon, to_upper(pkg_prefix+'GET_SIZEOF')+' Sysproc custom');
+printa(lexicon, to_upper(pkg_prefix+'GET_OFFSET')+' Sysproc custom');
+close(lexicon);
+
+-- spew custom.sysrots
+sysrots := open(custom_prefix+'sysrots', 'w');
+for [routine_name, [yield_type, formals]] in routine_tup loop
+  printa(sysrots, to_upper
+                   yield_info(routine_name, yield_type).setl_type,
+                  to_upper
+                   (proc_prefix+routine_name),
+                  '('+comma_separated( [to_upper
+                   formal_info(routine_name, formals, j).setl_mode :
+                    j in [1..#formals]] )+')');
+end loop;
+printa(sysrots, 'INTEGER', to_upper(pkg_prefix+'GET_SIZEOF')+' (RD)');
+printa(sysrots, 'INTEGER', to_upper(pkg_prefix+'GET_OFFSET')+' (RD,RD)');
+close(sysrots);
+
+-- pieces of auxi.setl:
+aux := getfile (srcdir_prefix + 'auxi.setl');
+aux_pub_data := aux('--  Public data declarations'..'--  Public routine declarations');
+aux_pub_data('--  Public routine declarations') := '';
+aux_pub_proc := aux('--  Public routine declarations'..'end Mesa_aux;');
+aux_pub_proc('end Mesa_aux;') := '';
+aux_priv_data := aux('--  Private data declarations'..'--  Routine definitions');
+aux_priv_data('--  Routine definitions') := '';
+aux_proc_def := aux('--  Routine definitions'..'end Mesa_aux;');
+aux_proc_def('end Mesa_aux;') := '';
+
+-- spew custom.setl
+pkg := open(custom_prefix+'setl', 'w');
+package_name := pkg_prefix+'pak';
+printa(pkg, '--  Package for use with the GNU SETL GLUT/Mesa interface  --');
+printa(pkg);
+printa(pkg, '--  Free software (c) dB - see file COPYING for license (GPL).');
+printa(pkg);
+printa(pkg, '--  The code in this file was generated by '+generator_name);
+printa(pkg);
+printa(pkg, 'PACKAGE '+package_name+';  -- spec');
+printa(pkg);
+printa(pkg, aux_pub_data);
+printa(pkg, 'VAR '+pkg_prefix+'size_map := {};  -- memoized by "'+pkg_prefix+'sizeof" calls');
+printa(pkg);
+printa(pkg, 'VAR '+pkg_prefix+'field_map := {};  -- memoized by "'+pkg_prefix+'offset" calls');
+printa(pkg);
+printa(pkg, 'CONST '+pkg_prefix+'type_nums = {');
+for typexpr = sizeable_tup(i) loop
+  printa(pkg, ' ['''+typexpr+''', '+str i+'],');
+end loop;
+printa(pkg, ' OM};');
+printa(pkg);
+printa(pkg, 'CONST '+pkg_prefix+'struct_maps := {');
+for [struct_name, fields] = struct_tup(i) loop
+  printa(pkg, ' ['''+struct_name+''', [ {');
+  for [field_type, field_name] = fields(j) loop
+    printa(pkg, '   ['''+field_name+''', ['''+field_type+''', '+str j+']],');
+  end loop;
+  printa(pkg, '   OM}, '+str i+'] ],');
+end loop;
+printa(pkg, ' OM};');
+printa(pkg);
+for [name,value] in const_tup loop
+  printa(pkg, 'CONST '+const_prefix+name+' = '+value+';');
+end loop;
+printa(pkg);
+printa(pkg, aux_pub_proc);
+printa(pkg, 'PROC '+pkg_prefix+'sizeof(typexpr);');
+printa(pkg, 'PROC '+pkg_prefix+'offset(struct_name, field_name);');
+printa(pkg, 'PROC '+pkg_prefix+'memo_offsets(struct_name);');
+printa(pkg);
+printa(pkg, 'END '+package_name+';  -- end of package spec');
+printa(pkg);
+printa(pkg);
+printa(pkg, 'PACKAGE BODY '+package_name+';');
+printa(pkg);
+printa(pkg, aux_priv_data);
+printa(pkg, aux_proc_def);
+printa(pkg, 'PROC '+pkg_prefix+'sizeof(typexpr);');
+printa(pkg, '  ASSERT IS_STRING typexpr;');
+printa(pkg, '  -- Use memoized version if available');
+printa(pkg, '  IF (nbytes := '+pkg_prefix+'size_map(typexpr)) /= OM THEN');
+printa(pkg, '    RETURN nbytes;');
+printa(pkg, '  ELSEIF (type_num := '+pkg_prefix+'type_nums(typexpr)) /= OM THEN');
+printa(pkg, '    -- Memoize and return looked-up value');
+printa(pkg, '    RETURN '+pkg_prefix+'size_map(typexpr) := '+to_upper pkg_prefix+'GET_SIZEOF(type_num);');
+printa(pkg, '  ELSE');
+printa(pkg, "    PRINTA(STDERR, '*** Error - "+pkg_prefix+"sizeof('+STR typexpr+') is not defined.');");
+printa(pkg, '    RETURN OM;');
+printa(pkg, '  END IF;');
+printa(pkg, 'END '+pkg_prefix+'sizeof;');
+printa(pkg);
+-- These are not terribly useful for GLUT/Mesa, as there are no
+-- non-opaque structs in its interface:
+printa(pkg, 'PROC '+pkg_prefix+'offset(struct_name, field_name);');
+printa(pkg, '  ASSERT IS_STRING struct_name;');
+printa(pkg, '  ASSERT IS_STRING field_name;');
+printa(pkg, '  -- Use memoized version if available');
+printa(pkg, '  IF (m := '+pkg_prefix+'field_map(struct_name)) /= OM THEN');
+printa(pkg, '    IF (r := m(field_name)) /= OM THEN');
+printa(pkg, '      RETURN r(1);');
+printa(pkg, '    ELSE');
+printa(pkg, '      IF (t := '+pkg_prefix+'struct_maps(struct_name)) = OM THEN');
+printa(pkg, "        PRINTA(STDERR, '*** Error - "+pkg_prefix+"offset('+STR struct_name+', '+STR field_name+') has unrecognized first (struct_name) argument.');");
+printa(pkg, '        RETURN OM;');
+printa(pkg, '      END IF;');
+printa(pkg, '      [field_name_map, struct_num] := t;');
+printa(pkg, '      IF (p := field_name_map(field_name)) = OM THEN');
+printa(pkg, "        PRINTA(STDERR, '*** Error - "+pkg_prefix+"offset('+STR struct_name+', '+STR field_name+') has unrecognized second (field_name) argument.');");
+printa(pkg, '        RETURN OM;');
+printa(pkg, '      END IF;');
+printa(pkg, '      [field_type, field_num] := p;');
+printa(pkg, '      -- Memoize the field name and recurse to yield result');
+printa(pkg, '      '+pkg_prefix+'field_map(struct_name)(field_name) := ['+to_upper pkg_prefix+'GET_OFFSET(struct_num, field_num), '+pkg_prefix+'sizeof(field_type)];');
+printa(pkg, '      RETURN '+pkg_prefix+'offset(struct_name, field_name);');
+printa(pkg, '    END IF;');
+printa(pkg, '  ELSE');
+printa(pkg, '    -- Memoize the struct name and recurse to yield result');
+printa(pkg, '    '+pkg_prefix+'field_map(struct_name) := {};');
+printa(pkg, '    RETURN '+pkg_prefix+'offset(struct_name, field_name);');
+printa(pkg, '  END IF;');
+printa(pkg, 'END '+pkg_prefix+'offset;');
+printa(pkg);
+printa(pkg, 'PROC '+pkg_prefix+'memo_offsets(struct_name);');
+printa(pkg, '  ASSERT IS_STRING struct_name;');
+printa(pkg, '  IF '+pkg_prefix+'field_map(struct_name) /= OM THEN RETURN; END IF;');
+printa(pkg, '  IF (t := '+pkg_prefix+'struct_maps(struct_name)) = OM THEN');
+printa(pkg, "    PRINTA(STDERR, '*** Error - "+pkg_prefix+"memo_offsets('+STR struct_name+') type argument unrecognized.');");
+printa(pkg, '  ELSE');
+printa(pkg, '    [field_name_map, -] := t;');
+printa(pkg, '    FOR field_name IN DOMAIN field_name_map | IS_STRING field_name LOOP');
+printa(pkg, '      -- Ignore the result of '+pkg_prefix+'offset, but memoize as a side-effect');
+printa(pkg, '      '+pkg_prefix+'offset(struct_name, field_name);');
+printa(pkg, '    END LOOP;');
+printa(pkg, '  END IF;');
+printa(pkg, 'END '+pkg_prefix+'memo_offsets;');
+printa(pkg);
+printa(pkg, 'END '+package_name+';  -- end of package body');
+close(pkg);
+
+-- spew custom.dispatch
+dispatch := open(custom_prefix+'dispatch', 'w');
+for [routine_name, [yield_type, formals]] IN routine_tup loop
+  printa(dispatch);
+  printa(dispatch, '  case S_'+to_upper(proc_prefix+routine_name)+':');
+  infos := [formal_info(routine_name, formals, j) : j in [1..#formals]];
+  setl_parms := [[info.setl_mode,
+                  info.setl_type,
+                  info.setl_name] : info in infos];
+  printa(dispatch, '    taut (ip->nopnd == '+str(#setl_parms+2)+');');
+  for [setl_mode, -, -] = setl_parms(j) loop
+    if setl_mode = 'wr' then
+      printa(dispatch, '    p'+str j+' = NULL;');
+    elseif setl_mode = 'rw' then
+      printa(dispatch, '    p'+str j+' = arg('+str j+');');
+    end if;
+  end loop;
+  -- The intermediate "void *" cast here is to avoid the warning
+  -- "dereferencing type-punned pointer will break strict-aliasing rules"
+  -- that would otherwise occur with some versions of GCC (such as 4.1.2):
+  l_list := comma_separated([
+   if setl_mode in {'wr','rw'} then ' ('+setl_type+' **)(void *)&p'+str j
+                               else ' ('+setl_type+' *)arg('+str j+')'
+   end if : [setl_mode, setl_type, -] = setl_parms(j)]);
+  l_list('^ ') := '';
+  l_call := 'l_'+proc_prefix+routine_name+'('+l_list+')';
+  if yield_info(routine_name, yield_type).setl_type = 'om' then
+  -- ossia:  if resolve(yield_type) = 'void' then
+    printa(dispatch, '    '+l_call+';');
+  else
+    printa(dispatch, '    let (arg('+str(#setl_parms+1)+'), (block *)'+l_call+');');
+  end if;
+  for [setl_mode, -, -] = setl_parms(j) | setl_mode in {'wr','rw'} loop
+    printa(dispatch, '    arg('+str j+') = p'+str j+'; p'+str j+' = NULL;');
+  end loop;
+  printa(dispatch, '    break;');
+end loop;
+printa(dispatch);
+printa(dispatch, '  case S_'+to_upper pkg_prefix+'GET_SIZEOF:');
+printa(dispatch, '    unary (l_'+pkg_prefix+'get_sizeof, integer *);');
+printa(dispatch, '    break;');
+printa(dispatch);
+printa(dispatch, '  case S_'+to_upper pkg_prefix+'GET_OFFSET:');
+printa(dispatch, '    rd_rd (l_'+pkg_prefix+'get_offset, integer *, integer *);');
+printa(dispatch, '    break;');
+close(dispatch);
+
+-- spew custom.h
+h_file := open(custom_prefix+'h', 'w');
+printa(h_file, '/*  ===  Declarations for the GNU SETL GLUT/Mesa interface  ========  */');
+printa(h_file);
+printa(h_file, '/*  Free software (c) dB - see file COPYING for license (GPL).  */');
+printa(h_file);
+printa(h_file, '/*  The code in this file was generated by '+generator_name+'  */');
+printa(h_file);
+printa(h_file, '/*  Clients of this header file must #include "setlrun.h" first  */');
+printa(h_file);
+c_sigs := [];
+for [routine_name, [yield_type, formals]] in routine_tup loop
+  setl_yield := yield_info(routine_name, yield_type).setl_type;
+  l_head := if setl_yield = 'om' then 'void ' else setl_yield+' *' end +
+             'l_'+proc_prefix+routine_name;
+  infos := [formal_info(routine_name, formals, j) : j in [1..#formals]];
+  setl_parms := [[info.setl_mode,
+                  info.setl_type,
+                  info.setl_name] : info in infos];
+  l_parms := comma_separated([' ' +
+   setl_type + if setl_mode in {'wr','rw'} then ' **' else ' *' end +
+   setl_name : [setl_mode, setl_type, setl_name] in setl_parms]);
+  if #l_parms = 0 then
+    l_parms := 'void';
+  else
+    l_parms := l_parms(2..);
+  end if;
+  c_sig := l_head+' ('+l_parms+')';
+  printa(h_file, 'extern '+c_sig+';');
+  c_sigs with:= c_sig;
+end loop;
+printa(h_file, 'extern integer *l_'+pkg_prefix+'get_sizeof (integer *type_num);');
+printa(h_file, 'extern integer *l_'+pkg_prefix+'get_offset (integer *struct_num, integer *field_num);');
+close(h_file);
+
+-- spew custom.c
+c_file := open(custom_prefix+'c', 'w');
+printa(c_file, '/*  ===  Implementation of the GNU SETL GLUT/Mesa interface  =======  */');
+printa(c_file);
+printa(c_file, '/*  Free software (c) dB - see file COPYING for license (GPL).  */');
+printa(c_file);
+printa(c_file, '/*  The code in this file was generated by ' + generator_name + '  */');
+printa(c_file);
+printa(c_file, '#include "setlrun.h"');
+printa(c_file, '#include "custom.h"');
+for header in include_tup | header /= '"auxi.h"' loop
+  printa(c_file, '#include '+header);
+end loop;
+printa(c_file);
+printa(c_file, getfile (srcdir_prefix + "auxi.h"));
+printa(c_file, getfile (srcdir_prefix + "auxi.c"));
+for [routine_name, [yield_type, formals]] = routine_tup(i) loop
+  c_sig := c_sigs(i);
+  printa(c_file);
+  printa(c_file, c_sig+' {');
+  c_dcls := [];
+  copy_ins := [];
+  c_args := [];
+  copy_outs := [];
+  for j in [1..#formals] loop
+    p := formal_info(routine_name, formals, j);
+    c_dcls    +:= [p.c_dcl];
+    copy_ins  +:= [p.copy_in];
+    c_args    +:= [' '+p.c_arg];
+    copy_outs +:= [p.copy_out];
+  end loop;
+  y := yield_info(routine_name, yield_type);
+  setl_yield := y.setl_type;
+  if setl_yield /= 'om' then
+    c_dcls +:= [y.c_dcl];
+  end if;
+  for c_dcl in c_dcls loop
+    printa(c_file, '  '+c_dcl+';');
+  end loop;
+  for copy_in in copy_ins loop
+    printa(c_file, '  '+copy_in+';');
+  end loop;
+  c_list := comma_separated(c_args);
+  c_list('^ ') := '';
+  c_call := routine_name+' ('+c_list+')';
+  if setl_yield = 'om' then
+    printa(c_file, '  '+c_call+';');
+  else
+    printa(c_file, '  '+y.local_name+' = '+c_call+';');
+  end if;
+  for copy_out in copy_outs loop
+    printa(c_file, '  '+copy_out+';');
+  end loop;
+  if setl_yield /= 'om' then
+    printa(c_file, '  return '+y.constructor+';');
+  end if;
+  printa(c_file, '}');
+end loop;
+printa(c_file);
+printa(c_file, 'integer *l_'+pkg_prefix+'get_sizeof (integer *type_num) {');
+printa(c_file, '  long i,r;');
+printa(c_file, '  i = get_long_in(type_num, 1,'+str #sizeable_tup+', "type number passed to '+to_upper pkg_prefix+'GET_SIZEOF");');
+printa(c_file, '  switch (i) {');
+for typexpr = sizeable_tup(i) loop
+  printa(c_file, '  case '+str i +':  r = sizeof('+typexpr+'); break;');
+end loop;
+printa(c_file, '  default:  unexpected(i);');
+printa(c_file, '  }');
+printa(c_file, '  return new_integer(r);');
+printa(c_file, '}');
+printa(c_file);
+printa(c_file, 'integer *l_'+pkg_prefix+'get_offset (integer *struct_num, integer *field_num) {');
+if #struct_tup > 0 then
+  printa(c_file, '  long s,n,o;');
+else
+  printa(c_file, '  long s,o;');
+end if;
+printa(c_file, '  s = get_long_in(struct_num, 1,'+str #struct_tup+', "struct number passed to '+to_upper pkg_prefix+'GET_OFFSET");');
+if #struct_tup > 0 then
+  printa(c_file, '  n = get_long_in(field_num, 1,INT_MAX, "field number passed to '+to_upper pkg_prefix+'GET_OFFSET");');
+end if;
+printa(c_file, '  switch (s) {');
+for [structname, members] = struct_tup(s) loop
+  printa(c_file, '  case '+str s+':  {'+structname+' *t = ('+structname+' *) 0;');
+  printa(c_file, '    switch (n) {');
+  for [-, fieldname] = members(n) loop
+    printa(c_file, '    case '+str n+':  o = (char *)&t->'+fieldname+' - (char *)t; break;');
+  end loop;
+  printa(c_file, '    default:  runerr("For struct \"'+structname+'\", field number (%ld) is out of range 1..'+str #members+'", n);');
+  printa(c_file, '    }');
+  printa(c_file, '  }');
+end loop;
+printa(c_file, '  default:  unexpected(s);');
+printa(c_file, '  }');
+printa(c_file, '  return new_integer(o);');
+printa(c_file, '}');
+close(c_file);
+
+
+proc formal_info(routine_name, formals, formal_index);
+  info := {};
+  [formal_type, formal_name] := formals(formal_index);
+  -- Defaults (good for opaque or malloc'd pointer)
+  info.setl_mode := 'rd';
+  info.setl_type := 'integer';
+  info.setl_name := formal_name+'_';
+  info.local_type := array_to_pointer(formal_type);
+  info.local_name := '_'+formal_name;
+  cast := '('+info.local_type+')';
+  what := '"argument '+str formal_index+' ('+formal_name+') to '+
+           routine_name+'"';
+  info.c_dcl := declare(info.local_name, info.local_type);
+  c_fetch := cast+' get_ptr('+info.setl_name+', '+what+')';
+  info.c_arg := info.local_name;
+  -- Freeglut regressed from GLUT in changing the declaration of
+  -- gluPickMatrix's viewport parameter from 'const GLint [ 4 ]' to
+  -- 'GLint *':
+  if routine_name = 'gluPickMatrix' and
+     formal_type = 'GLint *' then
+    formal_type := 'const GLint [ 4 ]';
+  end if;
+  case formal_type of
+  ('GLUnurbsObj *', 'GLUnurbs *',
+   'GLUquadricObj *', 'GLUquadric *',
+   'GLUtriangulatorObj *', 'GLUtesselator *',
+   'GLvoid *',
+   'const GLvoid *',
+   'void *',
+   'const void *'):  -- opaque or malloc'd pointer
+    pass;
+  ('GLboolean'):
+    info.setl_type := 'boolean';
+    c_fetch := 'get_bool('+info.setl_name+', '+what+')';
+  ('GLbyte'):
+    c_fetch := 'get_long_in('+info.setl_name+', SCHAR_MIN,SCHAR_MAX, '+what+')';
+  ('GLubyte'):
+    c_fetch := 'get_long_in('+info.setl_name+', 0,UCHAR_MAX, '+what+')';
+  ('GLshort'):
+    c_fetch := 'get_long_in('+info.setl_name+', SHRT_MIN,SHRT_MAX, '+what+')';
+  ('GLushort'):
+    c_fetch := 'get_long_in('+info.setl_name+', 0,USHRT_MAX, '+what+')';
+  ('GLenum',
+   'GLint',
+   'GLsizei',
+   'int'):
+    c_fetch := 'get_long_in('+info.setl_name+', INT_MIN,INT_MAX, '+what+')';
+  ('GLbitfield',
+   'GLuint',
+   'unsigned int'):
+    c_fetch := 'get_uint('+info.setl_name+', '+what+')';
+  ('GLclampd',
+   'GLclampf',
+   'GLdouble',
+   'GLfloat'):
+    what('a') := 'A';  -- change "argument" to "Argument"
+    info.setl_type := 'real';
+    c_fetch := 'get_double('+info.setl_name+', '+what+')';
+  ('const GLboolean *'):
+    if routine_name = 'glEdgeFlagv' then
+      -- This routine takes an array containing a single boolean element
+      v := '1';
+      info.setl_type := 'tuple';  -- of booleans
+      info.c_dcl := declare(info.local_name, 'GLboolean [ '+v+' ]');
+      c_fetch := 'get_booleans('+info.local_name+', '+v+', '+
+                                    info.setl_name+', '+what+')';
+      info.copy_in := c_fetch;
+    else
+      pass;  -- treat as opaque pointer
+    end if;
+  ('const GLbyte *'):
+    v := routine_name('[1-4]bv');
+    if v /= om then
+      v := v(1);
+      info.setl_type := 'tuple';  -- of small integers
+      info.c_dcl := declare(info.local_name, 'GLbyte [ '+v+' ]');
+      c_fetch := 'get_bytes('+info.local_name+', '+v+', '+
+                                   info.setl_name+', '+what+')';
+      info.copy_in := c_fetch;
+    else
+      pass;  -- treat as opaque pointer
+    end if;
+  ('const GLubyte *'):
+    v := if routine_name = 'glIndexubv' then '1'
+       else routine_name('[1-4]ubv') end if;
+    if v /= om then
+      v := v(1);
+      info.setl_type := 'tuple';  -- of small non-neg integers
+      info.c_dcl := declare(info.local_name, 'GLubyte [ '+v+' ]');
+      c_fetch := 'get_ubytes('+info.local_name+', '+v+', '+
+                                    info.setl_name+', '+what+')';
+      info.copy_in := c_fetch;
+    else
+      pass;  -- treat as opaque pointer
+    end if;
+  ('const GLshort *'):
+    v := if routine_name = 'glIndexsv' then '1'
+     elseif routine_name = 'glRectsv' then '2'
+       else routine_name('[1-4]sv') end if;
+    if v /= om then
+      v := v(1);
+      info.setl_type := 'tuple';  -- of short integers
+      info.c_dcl := declare(info.local_name, 'GLshort [ '+v+' ]');
+      c_fetch := 'get_shorts('+info.local_name+', '+v+', '+
+                                    info.setl_name+', '+what+')';
+      info.copy_in := c_fetch;
+    else
+      pass;  -- treat as opaque pointer
+    end if;
+  ('const GLushort *'):
+    v := routine_name('[1-4]usv');
+    if v /= om then
+      v := v(1);
+      info.setl_type := 'tuple';  -- of short non-neg integers
+      info.c_dcl := declare(info.local_name, 'GLushort [ '+v+' ]');
+      c_fetch := 'get_ushorts('+info.local_name+', '+v+', '+
+                                     info.setl_name+', '+what+')';
+      info.copy_in := c_fetch;
+    else
+      pass;  -- treat as opaque pointer
+    end if;
+  ('const GLint *',
+   'const GLint [ 4 ]'):
+    v := if '[ 4 ]' in formal_type then '4'
+     elseif routine_name = 'glIndexiv' then '1'
+     elseif routine_name = 'glRectiv' then '2'
+     elseif routine_name = 'gluLoadSamplingMatrices' then '4'
+     elseif routine_name = 'gluProject' then '4'
+     elseif routine_name = 'gluUnProject' then '4'
+     elseif routine_name = 'gluUnProject4' then '4'
+       else routine_name('[1-4]iv') end if;
+    if v /= om or is_params(formals, formal_index) then
+      if v = om then
+        v := 'MAX_PARAMS';
+        w := 'n_params(_pname)';
+      else
+        v := v(1);
+        w := v;
+      end if;
+      info.setl_type := 'tuple';  -- of integers
+      info.c_dcl := declare(info.local_name, 'GLint [ '+v+' ]');
+      c_fetch := 'get_ints('+info.local_name+', '+w+', '+
+                  info.setl_name+', '+what+')';
+      info.copy_in := c_fetch;
+    else
+      pass;  -- treat as opaque pointer
+    end if;
+  ('const GLuint *'):
+    v := routine_name('[1-4]uiv');
+    if v /= om then
+      v := v(1);
+      info.setl_type := 'tuple';  -- of non-neg integers
+      info.c_dcl := declare(info.local_name, 'GLuint [ '+v+' ]');
+      c_fetch := 'get_uints('+info.local_name+', '+v+', '+
+                                   info.setl_name+', '+what+')';
+      info.copy_in := c_fetch;
+    else
+      pass;  -- treat as opaque pointer
+    end if;
+  ('const GLfloat *',
+   'const GLfloat [ 16 ]',
+   'const GLclampf *'):
+    v := if '[ 16 ]' in formal_type then '16'
+     elseif routine_name = 'glIndexfv' then '1'
+     elseif routine_name = 'glRectfv' then '2'
+     elseif routine_name = 'glLoadMatrixf' then '16'
+     elseif routine_name = 'glMultMatrixf' then '16'
+     elseif routine_name = 'gluLoadSamplingMatrices' then '16'
+       else routine_name('[1-4]fv') end if;
+    if v /= om or is_params(formals, formal_index) then
+      if v = om then
+        v := 'MAX_PARAMS';
+        w := 'n_params(_pname)';
+      else
+        v := v('[0-9]*');
+        w := v;
+      end if;
+      info.setl_type := 'tuple';  -- of reals
+      info.c_dcl := declare(info.local_name, 'GLfloat [ '+v+' ]');
+      c_fetch := 'get_floats('+info.local_name+', '+w+', '+
+                  info.setl_name+', '+what+')';
+      info.copy_in := c_fetch;
+    else
+      pass;  -- treat as opaque pointer
+    end if;
+  ('const GLdouble *',
+   'const GLdouble [ 16 ]'):
+    v := if '[ 16 ]' in formal_type then '16'
+     elseif routine_name = 'glClipPlane' then '4'
+     elseif routine_name = 'glIndexdv' then '1'
+     elseif routine_name = 'glRectdv' then '2'
+     elseif routine_name = 'glLoadMatrixd' then '16'
+     elseif routine_name = 'glMultMatrixd' then '16'
+     elseif routine_name = 'gluProject' then '16'
+     elseif routine_name = 'gluUnProject' then '16'
+     elseif routine_name = 'gluUnProject4' then '16'
+       else routine_name('[1-4]dv') end if;
+    if v /= om or is_params(formals, formal_index) then
+      if v = om then
+        v := 'MAX_PARAMS';
+        w := 'n_params(_pname)';
+      else
+        v := v('[0-9]*');
+        w := v;
+      end if;
+      info.setl_type := 'tuple';  -- of reals
+      info.c_dcl := declare(info.local_name, 'GLdouble [ '+v+' ]');
+      c_fetch := 'get_doubles('+info.local_name+', '+w+', '+
+                  info.setl_name+', '+what+')';
+      info.copy_in := c_fetch;
+    else
+      pass;  -- treat as opaque pointer
+    end if;
+  -- 'GLdouble [ 3 ]' only arose with the advent of the
+  -- *SierpinskiSponge routines, and should have been const even there:
+  ('GLdouble [ 3 ]',
+   'const GLdouble [ 3 ]'):
+    v := '3';
+    w := v;
+    info.setl_type := 'tuple';  -- of reals
+    info.c_dcl := declare(info.local_name, 'GLdouble [ '+v+' ]');
+    c_fetch := 'get_doubles('+info.local_name+', '+w+', '+
+                info.setl_name+', '+what+')';
+    info.copy_in := c_fetch;
+  ('GLboolean *'):
+    if is_params(formals, formal_index) then
+      -- e.g., glGetBooleanv
+      info.setl_mode := 'wr';
+      info.setl_type := 'tuple';  -- of booleans
+      info.c_dcl := declare(info.local_name, 'GLboolean [ MAX_PARAMS ]');
+      info.copy_in := '';
+      info.copy_out := '*'+info.setl_name+' = new_boolean_tuple(n_params(_pname), '+info.local_name+')';
+    else
+      pass;  -- treat as opaque pointer
+    end if;
+  ('GLubyte *'):
+    pass;  -- opaque pointer
+  ('GLushort *'):
+    pass;  -- opaque pointer
+  ('GLint *'):
+    if is_params(formals, formal_index) then
+      -- e.g., glGetIntegerv
+      info.setl_mode := 'wr';
+      info.setl_type := 'tuple';  -- of integers
+      info.c_dcl := declare(info.local_name, 'GLint [ MAX_PARAMS ]');
+      info.copy_in := '';
+      info.copy_out := '*'+info.setl_name+' = new_int_tuple(n_params(_pname), '+info.local_name+')';
+    else
+      pass;  -- treat as opaque pointer
+    end if;
+  ('GLuint *'):
+    pass;  -- opaque pointer
+  ('GLfloat *'):  -- e.g., glGetFloatv
+    v := if routine_name = 'gluGetNurbsProperty' then '1'
+     else om end if;
+    if v /= om or is_params(formals, formal_index) then
+      info.setl_mode := 'wr';
+      if v = om then
+        v := 'MAX_PARAMS';
+        w := 'n_params(_pname)';
+      else
+        w := v;
+      end if;
+      info.setl_type := 'tuple';  -- of reals
+      info.c_dcl := declare(info.local_name, 'GLfloat [ '+v+' ]');
+      info.copy_in := '';
+      info.copy_out := '*'+info.setl_name+' = new_float_tuple('+w+', '+info.local_name+')';
+    else
+      -- Note that gluNurbsCurve, gluNurbsSurface, and gluPwlCurve take
+      -- 'GLfloat *' parameters that are treated here as opaque pointers.
+      pass;  -- treat as opaque pointer
+    end if;
+  ('GLdouble *'):
+    if routine_name = 'gluProject' or
+       routine_name = 'gluUnProject' or
+       routine_name = 'gluUnProject4' then
+      info.setl_mode := 'wr';
+      info.setl_type := 'real';
+      info.c_dcl := declare(info.local_name, 'GLdouble [ 1 ]');
+      info.copy_in := '';
+      info.copy_out := '*'+info.setl_name+' = new_real('+info.local_name+'[0])';
+    else
+      v := if routine_name = 'glGetClipPlane' then '4'
+       else om end if;
+      if v /= om or is_params(formals, formal_index) then
+        info.setl_mode := 'wr';
+        if v = om then
+          v := 'MAX_PARAMS';
+          w := 'n_params(_pname)';
+        else
+          w := v;
+        end if;
+        info.setl_type := 'tuple';  -- of reals
+        info.c_dcl := declare(info.local_name, 'GLdouble [ '+v+' ]');
+        info.copy_in := '';
+        info.copy_out := '*'+info.setl_name+' = new_double_tuple('+w+', '+info.local_name+')';
+      else
+        pass;  -- treat as opaque pointer
+      end if;
+    end if;
+  ('const char *'):
+    info.setl_type := 'string';
+    c_fetch := 'see_strelt('+info.setl_name+', '+what+')';
+  ('const unsigned char *'):
+    info.setl_type := 'string';
+    c_fetch := '('+formal_type+')see_strelt('+info.setl_name+', '+what+')';
+  ('GLvoid * *'):
+    if is_params(formals, formal_index) then
+      info.setl_mode := 'wr';
+      info.setl_type := 'tuple';  -- of integers
+      info.c_dcl := declare(info.local_name, 'void * [ MAX_PARAMS ]');
+      info.copy_in := '';
+      info.copy_out := '*'+info.setl_name+' = new_pointer_tuple(n_params(_pname), '+info.local_name+')';
+    else
+      pass;  -- treat as opaque pointer
+    end if;
+  else
+    printa(stderr, 'Formal type not handled:',formal_type);
+  end case;
+  info.copy_in ?:= info.local_name+' = '+c_fetch;
+  if #info.copy_in = 0 then
+    info.copy_in := om;
+  end if;
+  return info;
+end proc formal_info;
+
+proc yield_info(routine_name, yield_type);
+  info := {};
+  info.local_name := '_'+routine_name;
+  info.c_dcl := declare(info.local_name, yield_type);
+  info.setl_type := 'om';
+  u := false;
+  case yield_type of
+  ('tuple *'):              info.setl_type := 'tuple';
+  ('GLUnurbsObj *',
+   'GLUnurbs *'):           info.setl_type := 'integer';  u := true;
+  ('GLUquadricObj *',
+   'GLUquadric *'):         info.setl_type := 'integer';  u := true;
+  ('GLUtriangulatorObj *',
+   'GLUtesselator *'):      info.setl_type := 'integer';  u := true;
+  ('GLboolean'):            info.setl_type := 'boolean';
+  ('GLdouble'):             info.setl_type := 'real';
+  ('GLenum'):               info.setl_type := 'integer';
+  ('GLfloat'):              info.setl_type := 'real';
+  ('GLint'):                info.setl_type := 'integer';
+  ('GLuint'):               info.setl_type := 'integer';  u := true;
+  ('const GLubyte *'):      info.setl_type := 'string';
+  ('int'):                  info.setl_type := 'integer';
+  ('void *'):               info.setl_type := 'integer';  u := true;
+  ('GLUTproc'):             info.setl_type := 'integer';  u := true;
+  ('void'):                 info.setl_type := 'om';
+  else printa(stderr, 'Yield type not handled:',yield_type);
+  end case;
+  cast := '';
+  if u and (yield_type(#yield_type) = '*' or yield_type = 'GLUTproc') then
+    cast := '(ulong)';
+  elseif yield_type = 'const GLubyte *' then
+    cast := '(const char *)';
+  end if;
+  local_yield := cast+info.local_name;
+  converter := 'new_'+info.setl_type;
+  if u then
+    converter := 'ulong_'+info.setl_type;
+  end if;
+  info.constructor := converter+'('+local_yield+')';
+  if yield_type = 'tuple *' then
+    info.constructor := local_yield;
+  end if;
+  return info;
+end proc yield_info;
+
+proc is_params(formals, formal_index);
+  [formal_type, formal_name] := formals(formal_index);
+  return formal_name = 'params' and
+         formal_index > 1 and
+         formals(formal_index - 1) = ['GLenum', 'pname'];
+end proc;
+
+proc declare(name, c_type);
+  if #([i,j] := mark(c_type, '\\( \\* \\)') ? []) = 2 then
+    -- function pointer
+    return c_type(1..j-1)+name+c_type(j-1..);
+  elseif #([i,j] := mark(c_type, '\\[[ A-Z_0-9]+\\]') ? []) = 2 then
+    -- array
+    return c_type(1..i-1)+name+c_type(i-1..);
+  else
+    return c_type+' '+name;
+  end if;
+end proc;
+
+proc array_to_pointer(c_type);
+  c_type('\\[[ 0-9]+\\]$') := '*';
+  return c_type;
+end proc;
+
+-- For most type expressions, this routine returns the empty set, but
+-- for those which represent arrays of known size, it returns the set
+-- of types that differ from the given type expression in having all
+-- their "[ n ]" tails cut off.
+proc bounded_array_prefixes(typexpr);
+  n := #typexpr;
+  if typexpr(n) = ']' then
+    typexpr(' \\[[ 0-9]+\\]$') := '';
+  end if;
+  if #typexpr < n then
+    return {typexpr} + bounded_array_prefixes(typexpr);
+  else
+    return {};
+  end if;
+end proc;
+
+proc resolve(typexpr);
+  t := substitute_leftmost(typexpr);  -- using typedef_map
+  if t = typexpr then
+    return t;
+  else
+    return resolve(t);
+  end if;
+end proc;
+
+proc aliases(typexpr);
+  t := substitute_leftmost(typexpr);  -- using typedef_map
+  if t = typexpr then
+    return {};
+  else
+    return {t} + aliases(t);
+  end if;
+end proc;
+
+proc substitute_leftmost(typexpr);  -- substitute using typedef_map
+  t := split(typexpr);
+  if exists token = t(i) | (replacement := typedef_map(token)) /= om
+            and (i = 1 or t(i-1) notin {'struct','union','enum'}) then
+    t(i..i) := split(replacement);
+  end if;
+  return join(t,' ');
+end proc;
+
+proc comma_separated(t);
+  return join(t,',');
+end proc;
+
+op sort(s);  -- quicksort
+  if #s = 0 then
+    return [];
+  elseif is_smap s then
+    return [[x,s(x)] : x in sort domain s];
+  elseif is_map s then
+    return [[x,y] : x in sort domain s, y in sort s{x}];
+  elseif is_set s then
+    return sort [e : e in s];
+  elseif is_tuple s then
+    a := random s;
+    return sort [e in s | e < a] +
+                [e in s | e = a] +
+           sort [e in s | e > a];
+  else
+    return om;
+  end if;
+end op sort;

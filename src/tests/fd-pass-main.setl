@@ -1,0 +1,15 @@
+-- Parent program.  Start by opening the child as a "pumping" subprocess:
+pd := fileno open('"$top_srcdir"/run-setl "$srcdir"/fd-pass-pump.setl', 'pump');
+for a in command_line loop  -- loop over our cmd line args
+  print ('<<', basename a, '>>');  -- report the cmd line arg filename
+  printa (pd, a);  -- send the filename to the pump
+  fd := recv_fd pd;  -- get the fd of the opened file from the pump
+  print (getfile fd);  -- read and echo the file's contents
+  close (fd);  -- close the fd of the file
+end loop;
+close (pd);  -- for neatness, close the pump fd
+
+$op basename (f);
+$  return split(filter('basename '+f))(1);
+$end op;
+#include "basename.setl"

@@ -1,0 +1,21 @@
+t := [1,2,[3,4]];
+[a,b,[t,d]] := t;
+print(a,b,t,d);
+
+t := [1,[2,3],4];
+[e,t,f] := t;
+print(e,t,f);
+
+t := [];
+t := [[],t,[]];
+print(t);
+[t] := t;
+print(t);
+
+a := 5; b := 6;
+p(a,b,a);
+print(a,b);
+
+procedure p(rw t(*));
+  t := [0,t,1];
+end p;

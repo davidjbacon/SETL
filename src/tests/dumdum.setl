@@ -1,0 +1,11 @@
+a := +/[c('[a-z]') ? '' : c IN +/[char(i): i IN [1..255]]];
+b := +/[c+c: c IN a];
+b := 3*a;
+print(b);
+LOOP FOR i IN [1..52] DO
+  j := (i-1) MOD #a + 1;
+  k := j MOD #a + 1;
+  b(1) := '';
+print(b);
+END LOOP;
+PRINT(b);

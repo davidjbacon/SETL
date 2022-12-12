@@ -1,0 +1,33 @@
+#! /bin/sh
+#
+# $Id: pax-avail,v 1.16 2022/12/11 17:09:27 setlorg Exp $
+#
+# Free software (c) dB - see file COPYING for license (GPL).
+#
+#
+# Echo the names of the customization packages currently available.
+#
+# Use:  pax-avail custom_root
+#
+# They are the names of subdirs of $custom_root, in an order
+# determined by the "SUBDIRS = " line in $custom_root/Makefile.am.
+
+sed -n '/^SUBDIRS *= */{
+s///p
+q
+}' <"$1"/Makefile.am
+exit
+
+# A more fussy alternative if you want to filter by dirs that actually
+# exist:
+cd "$1"
+order=`sed -n '/^SUBDIRS *=/{s///p;q}' <Makefile.am`
+space=
+for pkg in $order; do
+  for f in *; do
+    if test x"$f" = x"$pkg" && test -d "$f"; then
+      printf %s "$space$pkg"
+      space=' '
+    fi
+  done
+done

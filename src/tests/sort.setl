@@ -1,0 +1,28 @@
+            PROGRAM testsort;
+
+PRINT(SORT [8,7,0,2,9,9,3,5,4,1,6,6,6]);
+
+OP SORT(s);
+  VAR a, l, e, g;
+  IF IS_MAP s THEN
+    RETURN [[i,s{i}] : i IN SORT DOMAIN s];
+    $ you should put round parens instead of curly in an expression
+    $ just like the above if you want to enforce a single-valued
+    $ mapping
+  ELSEIF IS_SET s THEN
+    RETURN SORT [i : i IN s];
+  ELSEIF IS_TUPLE s THEN
+    $ The algorithm is "quicksort"
+    IF #s = 0 THEN RETURN [];
+    ELSE
+      a := RANDOM s;
+      l := SORT [i IN s | i < a];
+      e :=      [i IN s | i = a];
+      g := SORT [i IN s | i > a];
+      RETURN l + e + g;
+    END IF;
+  ELSE ASSERT FALSE; $ bad type passed to SORT
+  END IF;
+END;
+
+         END PROGRAM testsort;

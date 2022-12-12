@@ -1,0 +1,629 @@
+-- $Id: gears.setl,v 1.20 2022/12/11 17:09:27 setlorg Exp $
+
+-- Here are the comments that were at the top of the original gears.c
+-- (dated 1996, and still buildable as a demo that I've now planted
+-- in freeglut-setl/, currently our second cousin):
+/*
+ * 3-D gear wheels.  This program is in the public domain.
+ *
+ * Brian Paul
+ */
+
+/* Conversion to GLUT by Mark J. Kilgard */
+
+-- This is a translation of gears.c to SETL by dB.  Transliteration,
+-- more like.  In fact, a diff between gears.c and gears.setl shows a
+-- substantial fraction of unchanged lines.
+
+-- There are, however, several additions and modifications to illustrate
+-- mouse, menu, and timer event callbacks.
+
+-- Furthermore, there are comments showing what would be possible with
+-- "file descriptor event" callbacks if they were available (as they are
+-- in a version of GLUT 3.6 that I once patched but am not allowed to
+-- distribute - see glut-patch for details).
+
+-- Note that the SETL GLUT/Mesa interface is now to freeglut, not to the
+-- Mark Kilgard GLUT.
+
+
+-- In a more "production" setting, custom.setl would probably be renamed
+-- something like mesa.setl, placed in a standard location, and made
+-- findable via the SETL_INCLUDE_PATH environment variable or a "-I"
+-- option on the setl command line:
+--
+#include "custom.setl"
+
+                    program gears;
+
+use Mesa_pak;
+
+-- Global declarations
+
+const M_PI = 4 * atan 1;  -- 3.159...
+const golden_mean = (1 + sqrt 5) / 2;  -- 1.618...
+
+const default_hz = 30;  -- updates of 'angle' (see below) per sec
+
+const poll_T = 100;  -- ms between polls for glut events
+
+const sigint_fd = fileno open('SIGINT', 'signal');
+
+-- SETL wants enums...
+const menu_lit              = i :=1;
+const menu_textured         = i+:=1;
+const menu_reflect          = i+:=1;
+const menu_toggle_animation = i+:=1;
+const menu_faster           = i+:=1;
+const menu_slower           = i+:=1;
+const menu_quit             = i+:=1;
+
+var view_rotx := 20.0, view_roty := 30.0, view_rotz := 0.0;
+var view_delta := 5.0;
+var gear1, gear2, gear3;
+var angle := 0.0;
+var delta_angle := 1.0;
+
+var limit;
+var count := 1;
+var draw_calls,
+    update_calls,
+    idle_calls,
+    pulses;
+var cpu_ms;
+var t0;
+
+var animated := true;
+var now_visible := false;
+
+var angle_T := 1000 / default_hz;  -- ms between angle updates
+var angle_fd := om;  -- timer events for angle updates
+
+-- Main program
+
+main_like_in_c;
+
+
+/**
+
+  Draw a gear wheel.  You''ll probably want to call this function when
+  building a display list since we do a lot of trig here.
+ 
+  Input:  inner_radius - radius of hole at center
+          outer_radius - radius at center of teeth
+          width - width of gear
+          teeth - number of teeth
+          tooth_depth - depth of tooth
+
+ **/
+
+proc gear(inner_radius, outer_radius, width, teeth, tooth_depth);
+
+  var i;
+  var r0, r1, r2;
+  var angle, da;
+  var u, v, length;
+
+  r0 := inner_radius;
+  r1 := outer_radius - tooth_depth / 2.0;
+  r2 := outer_radius + tooth_depth / 2.0;
+
+  da := 2.0 * M_PI / teeth / 4.0;
+
+  glShadeModel(GL_FLAT);
+
+  glNormal3f(0.0, 0.0, 1.0);
+
+--/* draw front face */
+  glBegin(GL_QUAD_STRIP);
+  for i in [0..teeth] loop
+    angle := i * 2.0 * M_PI / teeth;
+    glVertex3f(r0 * cos(angle), r0 * sin(angle), width * 0.5);
+    glVertex3f(r1 * cos(angle), r1 * sin(angle), width * 0.5);
+    glVertex3f(r0 * cos(angle), r0 * sin(angle), width * 0.5);
+    glVertex3f(r1 * cos(angle + 3 * da), r1 * sin(angle + 3 * da), width * 0.5);
+  end loop;
+  glEnd();
+
+--/* draw front sides of teeth */
+  glBegin(GL_QUADS);
+  da := 2.0 * M_PI / teeth / 4.0;
+  for i in [0..teeth-1] loop
+    angle := i * 2.0 * M_PI / teeth;
+
+    glVertex3f(r1 * cos(angle), r1 * sin(angle), width * 0.5);
+    glVertex3f(r2 * cos(angle + da), r2 * sin(angle + da), width * 0.5);
+    glVertex3f(r2 * cos(angle + 2 * da), r2 * sin(angle + 2 * da), width * 0.5);
+    glVertex3f(r1 * cos(angle + 3 * da), r1 * sin(angle + 3 * da), width * 0.5);
+  end loop;
+  glEnd();
+
+  glNormal3f(0.0, 0.0, -1.0);
+
+--/* draw back face */
+  glBegin(GL_QUAD_STRIP);
+  for i in [0..teeth] loop
+    angle := i * 2.0 * M_PI / teeth;
+    glVertex3f(r1 * cos(angle), r1 * sin(angle), -width * 0.5);
+    glVertex3f(r0 * cos(angle), r0 * sin(angle), -width * 0.5);
+    glVertex3f(r1 * cos(angle + 3 * da), r1 * sin(angle + 3 * da), -width * 0.5);
+    glVertex3f(r0 * cos(angle), r0 * sin(angle), -width * 0.5);
+  end loop;
+  glEnd();
+
+--/* draw back sides of teeth */
+  glBegin(GL_QUADS);
+  da := 2.0 * M_PI / teeth / 4.0;
+  for i in [0..teeth-1] loop
+    angle := i * 2.0 * M_PI / teeth;
+
+    glVertex3f(r1 * cos(angle + 3 * da), r1 * sin(angle + 3 * da), -width * 0.5);
+    glVertex3f(r2 * cos(angle + 2 * da), r2 * sin(angle + 2 * da), -width * 0.5);
+    glVertex3f(r2 * cos(angle + da), r2 * sin(angle + da), -width * 0.5);
+    glVertex3f(r1 * cos(angle), r1 * sin(angle), -width * 0.5);
+  end loop;
+  glEnd();
+
+--/* draw outward faces of teeth */
+  glBegin(GL_QUAD_STRIP);
+  for i in [0..teeth-1] loop
+    angle := i * 2.0 * M_PI / teeth;
+
+    glVertex3f(r1 * cos(angle), r1 * sin(angle), width * 0.5);
+    glVertex3f(r1 * cos(angle), r1 * sin(angle), -width * 0.5);
+    u := r2 * cos(angle + da) - r1 * cos(angle);
+    v := r2 * sin(angle + da) - r1 * sin(angle);
+    length := sqrt(u * u + v * v);
+    u /:= length;
+    v /:= length;
+    glNormal3f(v, -u, 0.0);
+    glVertex3f(r2 * cos(angle + da), r2 * sin(angle + da), width * 0.5);
+    glVertex3f(r2 * cos(angle + da), r2 * sin(angle + da), -width * 0.5);
+    glNormal3f(cos(angle), sin(angle), 0.0);
+    glVertex3f(r2 * cos(angle + 2 * da), r2 * sin(angle + 2 * da), width * 0.5);
+    glVertex3f(r2 * cos(angle + 2 * da), r2 * sin(angle + 2 * da), -width * 0.5);
+    u := r1 * cos(angle + 3 * da) - r2 * cos(angle + 2 * da);
+    v := r1 * sin(angle + 3 * da) - r2 * sin(angle + 2 * da);
+    glNormal3f(v, -u, 0.0);
+    glVertex3f(r1 * cos(angle + 3 * da), r1 * sin(angle + 3 * da), width * 0.5);
+    glVertex3f(r1 * cos(angle + 3 * da), r1 * sin(angle + 3 * da), -width * 0.5);
+    glNormal3f(cos(angle), sin(angle), 0.0);
+  end loop;
+
+  glVertex3f(r1 * cos(0), r1 * sin(0), width * 0.5);
+  glVertex3f(r1 * cos(0), r1 * sin(0), -width * 0.5);
+
+  glEnd();
+
+  glShadeModel(GL_SMOOTH);
+
+--/* draw inside radius cylinder */
+  glBegin(GL_QUAD_STRIP);
+  for i in [0..teeth] loop
+    angle := i * 2.0 * M_PI / teeth;
+    glNormal3f(-cos(angle), -sin(angle), 0.0);
+    glVertex3f(r0 * cos(angle), r0 * sin(angle), -width * 0.5);
+    glVertex3f(r0 * cos(angle), r0 * sin(angle), width * 0.5);
+  end loop;
+  glEnd();
+
+end proc gear;
+
+proc draw;
+
+  draw_calls +:= 1;
+
+  glClear(GL_COLOR_BUFFER_BIT bit_or GL_DEPTH_BUFFER_BIT);
+
+  glPushMatrix();
+  glRotatef(view_rotx, 1.0, 0.0, 0.0);
+  glRotatef(view_roty, 0.0, 1.0, 0.0);
+  glRotatef(view_rotz, 0.0, 0.0, 1.0);
+
+  glPushMatrix();
+  glTranslatef(-3.0, -2.0, 0.0);
+  glRotatef(angle, 0.0, 0.0, 1.0);
+  glCallList(gear1);
+  glPopMatrix();
+
+  glPushMatrix();
+  glTranslatef(3.1, -2.0, 0.0);
+  glRotatef(-2.0 * angle - 9.0, 0.0, 0.0, 1.0);
+  glCallList(gear2);
+  glPopMatrix();
+
+  glPushMatrix();
+  glTranslatef(-3.1, 4.2, 0.0);
+  glRotatef(-2.0 * angle - 25.0, 0.0, 0.0, 1.0);
+  glCallList(gear3);
+  glPopMatrix();
+
+  glPopMatrix();
+
+  glutSwapBuffers();
+
+  count +:= 1;
+  if count = limit then
+    printa(stderr,'quitting on frame count limit of',limit);
+    bye;
+  end if;
+
+end proc draw;
+
+-- Called in response to gear rotation angle update timer events, which
+-- require the display to be updated if the gears are currently in
+-- motion and their graphics window is visible:
+proc update;
+  update_calls +:= 1;
+  if animated and now_visible then
+    glutPostRedisplay();
+  end if;
+end proc update;
+
+--/* change view angle, exit upon ESC */
+-- now adding other keys including h for help
+proc key(k, x, y);
+  printa(stderr,'key',k,x,y);
+  case k of
+  (abs 'a'):  -- avg Hz "made good" and CPU% since last reset_stats()
+    show_stats;
+  (abs 'd'):
+    mult_delta_angle(0.5);
+  (abs 'D'):
+    mult_delta_angle(golden_mean);
+  (abs 'f'):
+    go_faster;
+  (abs 's'):
+    go_slower;
+  (abs 'z'):
+    view_rotz +:= view_delta;
+  (abs 'Z'):
+    view_rotz -:= view_delta;
+  (27):  --/* Escape */
+    printa(stderr,'quitting on Esc');
+    bye;
+  (3):
+    printa(stderr,'quitting on ctrl-C');  -- :)
+    bye;
+  (abs 'q', abs 'Q'):
+    printa(stderr,'quitting on',char k,'(ha ha)');
+    bye;
+  (abs 'h', abs 'H', abs '?'):
+    help;
+  else
+    printa(stderr,'Key',k,
+           if k < 256 then '('+pretty char k+')' else '(non-ASCII)' end,
+           'has no effect.  Try h.');
+    return;
+  end case;
+  glutPostRedisplay();
+end proc key;
+
+--/* change view angle */
+proc special(k, x, y);
+  printa(stderr,'special',k,x,y);
+  case k of
+  (GLUT_KEY_UP):
+    view_rotx +:= view_delta;
+  (GLUT_KEY_DOWN):
+    view_rotx -:= view_delta;
+  (GLUT_KEY_LEFT):
+    view_roty +:= view_delta;
+  (GLUT_KEY_RIGHT):
+    view_roty -:= view_delta;
+  else
+    return;
+  end case;
+  glutPostRedisplay();
+end proc special;
+
+proc mouseHit(button, state, x, y);
+  printa(stderr,'mouse',button,state,x,y);
+end proc;
+
+proc mouseMotion(x, y);
+  printa(stderr,'drag',x,y);
+end proc;
+
+proc menu(entry);
+  printa(stderr,'menu entry',entry);
+  case entry
+  when menu_toggle_animation =>
+    animated := not animated;
+  when menu_faster =>
+    go_faster;
+  when menu_slower =>
+    go_slower;
+  when menu_quit =>
+    printa(stderr,'bye!');
+    bye;
+  -- We ignore the menu entries that suggest lighting changes.
+  end case;
+end proc;
+
+proc reset_stats;
+  draw_calls := 0;
+  update_calls := 0;
+  idle_calls := 0;
+  pulses := 0;
+  cpu_ms := time;
+  t0 := tod;
+end proc;
+
+proc show_stats;  -- since last reset_stats() call
+  delta_t := ((tod - t0) max 1) / 1000;
+  delta_cpu := (time - cpu_ms) / 1000;
+  printa(stderr,
+   '     draw    update      idle     pulse  ',
+   '(avg Hz in the last', fixed(delta_t, 0, 3), 'sec)');
+  printa(stderr,
+   fixed(draw_calls / delta_t, 9, 4),  -- like printf %9.4f
+   fixed(update_calls / delta_t, 9, 4),
+   fixed(idle_calls / delta_t, 9, 4),
+   fixed(pulses / delta_t, 9, 4),
+   '  CPU =', fixed(100 * (delta_cpu / delta_t), 0, 4), '%');
+end proc;
+
+-- "Faster" is by a factor of about 1.618, while "slower" is by a
+-- factor of 2.  Since the "clamping" is only done on a copy of
+-- angle_T when restarting the timer, you should in principle be
+-- able to get to any speed in the allowed interval, by going as
+-- far outside that interval as you like (short of floating-point
+-- overflow or underflow) and back in again.
+
+proc go_faster;
+  show_stats;
+  reset_stats;
+  start_angle_timer(angle_T / golden_mean);
+end proc;
+
+proc go_slower;
+  show_stats;
+  reset_stats;
+  start_angle_timer(angle_T * 2);
+end proc;
+
+proc mult_delta_angle(factor);
+  delta_angle *:= factor;
+  printa(stderr,'delta angle now',delta_angle,'degrees');
+end proc;
+
+--/* new window size or exposure */
+proc reshape(width, height);
+  const h = height / width;
+  glViewport(0, 0, width, height);
+  glMatrixMode(GL_PROJECTION);
+  glLoadIdentity();
+  glFrustum(-1.0, 1.0, -h, h, 5.0, 60.0);
+  glMatrixMode(GL_MODELVIEW);
+  glLoadIdentity();
+  glTranslatef(0.0, 0.0, -40.0);
+end proc reshape;
+
+proc my_init;
+
+  const posn = [5.0, 5.0, 10.0, 0.0];
+  const red = [0.8, 0.1, 0.0, 1.0];
+  const green = [0.0, 0.8, 0.2, 1.0];
+  const blue = [0.2, 0.2, 1.0, 1.0];
+
+  glLightfv(GL_LIGHT0, GL_POSITION, posn);
+  glEnable(GL_CULL_FACE);
+  glEnable(GL_LIGHTING);
+  glEnable(GL_LIGHT0);
+  glEnable(GL_DEPTH_TEST);
+
+--/* make the gears */
+  gear1 := glGenLists(1);
+  glNewList(gear1, GL_COMPILE);
+  glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, red);
+  gear(1.0, 4.0, 1.0, 20, 0.7);
+  glEndList();
+
+  gear2 := glGenLists(1);
+  glNewList(gear2, GL_COMPILE);
+  glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, green);
+  gear(0.5, 2.0, 2.0, 10, 0.7);
+  glEndList();
+
+  gear3 := glGenLists(1);
+  glNewList(gear3, GL_COMPILE);
+  glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, blue);
+  gear(1.3, 2.0, 0.5, 10, 0.7);
+  glEndList();
+
+  glEnable(GL_NORMALIZE);
+
+end proc my_init;
+
+proc visible(vis);
+  printa(stderr,"vis =", type vis, vis);
+  now_visible := vis = 1;
+  show_stats;
+  reset_stats;
+#if 0
+  -- This is equivalent to what gears.c does in its 'visible' callback:
+  if vis = GLUT_VISIBLE then
+    glutaIdleFunc(routine idle);
+  else
+    glutaIdleFunc(om);
+  end if;
+#endif
+end proc visible;
+
+-- Called when input is available on stdin.  If you change focus to the
+-- window from which you launched this program, and enter a line of
+-- characters, they will be echoed (surrounded by << >>) on stderr.
+-- Otherwise (i.e., with the focus on the graphics window), each
+-- keystroke will be picked up by the 'key' or 'special' callback:
+proc input(fd);
+  if fd /= stdin then
+    printa(stderr,"fd =",fd);
+    stop 1;
+  end if;
+  line := getline stdin;
+  if eof then
+    printa(stderr,"quitting on stdin EOF");
+    bye;
+  end if;
+  printa(stderr,"<<", line, ">>");
+  if line = 'quit' then
+    -- Respond to a healthy instinct on the part of the user.
+    printa(stderr,"And you thought you couldn't quit!");
+    bye;
+  end if;
+end proc input;
+
+proc start_angle_timer(t);
+  if angle_fd /= om then
+    close(angle_fd);
+  end if;
+  angle_T := t;
+  -- No faster than 1 kHz and no slower than 1 update per minute
+  ms := t max 1 min 60000;
+  angle_fd := fileno open(str round ms, 'real-ms');
+  -- Spew the nominal update rate and the rate we just asked for:
+  printa(stderr, 'Hz nom', fixed(1000 / angle_T, 0, 4),
+                    'req', fixed(1000 / round ms, 0, 4));
+end proc start_angle_timer;
+
+proc idle;
+  idle_calls +:= 1;
+  [ready] := select([{sigint_fd, stdin, angle_fd}], poll_T);
+  if sigint_fd in ready then
+$   dummy := getline sigint_fd;
+    reada(sigint_fd);  -- read the empty line (redundant here)
+    printa(stderr,'quitting on SIGINT');
+    bye;
+  end if;
+  if stdin in ready then  -- input is available on stdin
+    printa(stderr,'input on main SELECT');
+    input(stdin);  -- call the "callback" for stdin input
+  end if;
+  if angle_fd in ready then  -- timer "pulse"
+    -- Drain and count pulses, and advance the gear rotation angle
+    -- by a corresponding amount.  The use of an "until" loop,
+    -- putting the select() call at the end of the loop, instead of
+    -- the easier-understood "while {} /= select..." is nothing more
+    -- than a silly little efficiency move, exploiting the fact that
+    -- we already know input is available on angle_fd:
+    until {} = select([{angle_fd}], 0)(1) loop
+$     dummy := getline angle_fd;  -- accept the timer pulse
+      reada(angle_fd);  -- read the empty line to accept the timer pulse
+      angle +:= delta_angle;
+      pulses +:= 1;
+    end loop;
+    update;  -- redisplay given new gear angle, if animated and visible
+  end if;
+end proc idle;
+
+proc help;
+  printa(stderr);
+  printa(stderr,'Lines entered on stdin (e.g., launch console if any)');
+  printa(stderr,'are echoed with << >> around them.  Note however that');
+  printa(stderr,'a line with just the word "quit", an EOF on stdin, or');
+  printa(stderr,'a SIGINT (e.g., from ctrl-C) terminate the program.');
+  printa(stderr);
+  printa(stderr,'Keys hit when the graphics window has the focus are');
+  printa(stderr,'interpreted as follows:');
+  printa(stderr);
+  printa(stderr,'  a  spew stats on stderr (hopefully some console)');
+  printa(stderr,'  d  halve the incremental gear rotation angle');
+  printa(stderr,'  D  mult that angle by the golden mean (1.618...)');
+  printa(stderr,'  f  go faster by a factor of about 1.618');
+  printa(stderr,'  s  slow down by a factor of 2');
+  printa(stderr,'  z  rotate view one way about the gears'' z axis');
+  printa(stderr,'  Z  rotate view the other way');
+  printa(stderr,'  arrow keys  similarly for their x and y axes');
+  printa(stderr,'  h,H,?  this dubious help');
+  printa(stderr,'  q,Q,Esc,ctrl-C  quit');
+  printa(stderr);
+  printa(stderr,'Try also the mouse buttons, clicking and dragging.');
+  printa(stderr);
+end proc help;
+
+proc window_closed;
+  printa(stderr,'window closed');
+  bye;
+end proc window_closed;
+
+proc bye;
+  show_stats;
+  stop 0;
+end proc bye;
+
+proc main_like_in_c;
+
+  glutInitDisplayMode(GLUT_RGB bit_or GLUT_DEPTH bit_or GLUT_DOUBLE);
+
+  glutInitWindowPosition(0, 0);
+  glutInitWindowSize(300, 300);
+  printa(stderr,'Command line args before editing by glutaInit(): ',
+                 command_line);
+  -- This (glutaInit) replaces glutInit, and removes from command_line
+  -- certain args such as -display ... and -geometry ... which are
+  -- meaningful to X programs and are here interpreted and consumed by
+  -- glutInit:
+  glutaInit;
+  printa(stderr,'Command line args after editing by glutaInit(): ',
+                 command_line);
+  limit := val (command_line(1) ? "0");
+  glutCreateWindow("Gears");
+  my_init();
+  glutaCloseFunc(routine window_closed);
+  glutaDisplayFunc(routine draw);
+  glutaReshapeFunc(routine reshape);
+  glutaKeyboardFunc(routine key);
+  glutaSpecialFunc(routine special);
+  glutaMouseFunc(routine mouseHit);
+  glutaMotionFunc(routine mouseMotion);
+  glutaVisibilityFunc(routine visible);
+  glutaCreateMenu(routine menu);
+  glutAddMenuEntry("Lit", menu_lit);
+  glutAddMenuEntry("Textured", menu_textured);
+  glutAddMenuEntry("Reflect", menu_reflect);
+  glutAddMenuEntry("Toggle Animation", menu_toggle_animation);
+  glutAddMenuEntry("Faster", menu_faster);
+  glutAddMenuEntry("Slower", menu_slower);
+  glutAddMenuEntry("Quit", menu_quit);
+  glutAttachMenu(GLUT_RIGHT_BUTTON);
+  -- If this function were still available, it would cause input() to be
+  -- called whenever new input became available on stdin.  But it isn't,
+  -- so we instead watch stdin in idle() using select(), and call input()
+  -- to try to read a line from stdin when input is available:
+$ glutaFileInputFunc(stdin, routine input);
+
+  reset_stats;
+  start_angle_timer(1000 / default_hz);
+
+  -- The gears.c program uses an idle() callback that under freeglut
+  -- gets called repeatedly (consuming all available CPU) whenever
+  -- the graphics window is visible and there is no event to process.
+  --
+  -- We take a different approach here and call idle() from our own
+  -- main loop; idle() calls select() on a signal stream or two, on
+  -- stdin, and on a gear rotation angle timer stream.  There is also
+  -- a select() timeout of about 100 ms, which allows idle() to return
+  -- in a timely manner even if there are no events on any of the
+  -- select() input streams.  That lets us check for and process all
+  -- queued glut events (including window management events that do not
+  -- wake up the select()) often enough for humans and without
+  -- consuming much CPU.
+  --
+#if 0
+  -- In gears.c, this was actually turned on and off according to the
+  -- window visibility (which behaviour is not modelled in this
+  -- commented-out illustration):
+  glutaIdleFunc(routine idle);
+
+  glutaMainLoop;
+#else
+  loop  -- indefinitely
+    idle;
+    glutaDoAllEvents;  -- process all queued glut events
+  end loop;
+#endif
+
+end proc main_like_in_c;
+
+                     end program gears;

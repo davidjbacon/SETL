@@ -1,0 +1,22 @@
+18 Jan 2015 - This is a copy of freeglut-2.0.1, with (so far) just a
+one-line change to ltmain.sh to accommodate QNX Neutrino, whose "od"
+command does not recognize the XSI "-x" flag but needs "-t x2" for that.
+[Actually I will probably start making it possible to regenerate all
+those generic files soon anyway.]
+
+The ancientness of the FreeGLUT version used here is in fact due to
+the ancientness of the latest X11R6 support known by this author
+to be available for QNX 6.x, namely that provided by the version
+of XPhoton (based on XFree 4.2) in the qnxpub621.iso image that
+was once widely available on the Web (and may be still).  The relevant
+/opt/X11R6/include/GL/*.h files that come with that X11 implementation
+date from early 2001; and the X server (that's what XPhoton is) chokes
+on excessively modern requests.
+
+1 Dec 2015 - The foregoing needs revising, perhaps just to say what
+it's derived from and why.  (ltmain.sh is now generated, but I have
+made other tweaks, and the original freeglut-2.0.1 tarball is now
+distributed.)
+
+20 Sept 2017 - Transplanted the gears.c demo from ../../opt/mesa/ to
+here in progs/demos/Gears/.

@@ -1,0 +1,19 @@
+op basename(f);
+  var g;
+  -- POSIX has this in basename(), but does not require it in the
+  -- basename command.  It seems a somewhat questionable rule.
+  -- Returning '' (as the Linux basename command does) seems more
+  -- reasonable.  It's an unimportant corner case, but definiteness
+  -- is always nice:
+  if f = '' then
+    return '.';
+  end if;
+  g := f;
+  if rspan(f,'/') = g then
+    -- f consisted entirely of slashes
+    assert f = '';
+    return '/';
+  end if;
+  -- f has now lost its trailing slashes if any
+  return rbreak(f,'/');  -- f, or everything after its last slash
+end op;

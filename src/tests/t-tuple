@@ -1,0 +1,2 @@
+#! /bin/sh
+"$srcdir/simple-test" tuple "$srcdir/diff-read"

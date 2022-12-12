@@ -1,0 +1,53 @@
+#! /bin/sh
+#
+# $Id: simple-test,v 1.17 2022/12/11 17:09:27 setlorg Exp $
+#
+# Free software (c) dB - see file COPYING for license (GPL).
+#
+#
+# $srcdir should be as set in a "make check" or "make distcheck";
+# set it to "." (the default) if you want to test without "make".
+#
+# $1 names the test; $2 is optional and is used unquoted as the
+# differencing command (used on outputs) - it defaults to diff -c.
+
+test_name=$1
+
+# default diff command if none given in 2nd arg
+diff=${2:-'diff -c'}
+
+# default srcdir to . if undefined or null in envt
+: ${srcdir:=.}
+export srcdir
+
+# default top_srcdir to .. if undefined or null in envt
+: ${top_srcdir:=..}
+export top_srcdir
+
+stub=$srcdir/$test_name
+
+pgm=$stub.setl
+out=$stub.out
+sh=$stub.sh
+data=$stub.data
+
+cmd=$top_srcdir/run-setl
+
+test -r "$data" || data=/dev/null
+
+# We refer to -3 3<"$pgm" here instead of just "$pgm" so that any
+# error messages citing the program name will consistently call it -3
+# rather than for example seeing a different pathname for the program
+# in the check and distcheck cases, or in my build envt and yours:
+if test -r "$out"; then
+  "$cmd" -3 3<"$pgm" <"$data" | $diff "$out" -
+elif test -x "$sh"; then
+  tmpout=/tmp/test-$test_name-$$.out
+  "$sh" <"$data" >"$tmpout"
+  "$cmd" -3 3<"$pgm" <"$data" | $diff "$tmpout" -
+  rc=$?
+  rm "$tmpout"
+  exit $rc
+else
+  "$cmd" -3 3<"$pgm" <"$data"
+fi

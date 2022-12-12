@@ -1,0 +1,50 @@
+[fd1, fd2] := [ope(f) : f in command_line];
+rc := 0;
+loop
+  line1 := getline fd1;
+  line2 := getline fd2;
+  if line1 = om then
+    if line2 /= om then
+      print ('<< early EOF on "'+command_line(1)+'" >>');
+      stop 1;
+    end if;
+    stop rc;
+  end if;
+  if line2 = om then
+    print ('<< early EOF on "'+command_line(2)+'" >>');
+    stop 1;
+  end if;
+  if not approx_eq (unstr ('['+line1+']'),
+                    unstr ('['+line1+']')) then
+    print ('<', line1);
+    print ('>', line2);
+    rc := 1;
+  end if;
+end loop;
+
+proc ope(f);
+  if f = '-' then
+    return stdin;
+  end if;
+  return fileno open(f,'r');
+end proc;
+
+proc approx_eq (v, w);
+  if is_real v and is_real w then
+    return v = w or
+          (v /= 0 and w /= 0 and
+      expr
+        q := v / w;
+        epsilon := 1.0e-9;
+        yield 1 - epsilon < q and q < 1 + epsilon;
+      end
+    );
+  end if;
+  if is_tuple v and is_tuple w then
+    return #v = #w and forall x=v(i) | approx_eq(x,w(i));
+  end if;
+  if is_set v and is_set w then
+    return #v = #w and forall x in v | exists y in w | approx_eq(x,y);
+  end if;
+  return v = w;
+end proc;

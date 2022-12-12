@@ -1,0 +1,71 @@
+#! /bin/sh
+#
+# $Id: configure,v 1.33 2022/12/11 17:09:26 setlorg Exp $
+#
+# Free software (c) dB - see file COPYING for license (GPL).
+#
+#
+# Script to configure the SETL system for building and installing.
+#
+# Use:  ./configure [options]  (try --help for more details)
+#
+# Casual builders can skip this script and start with "make", which
+# seeks to guide and prompt the user for configuration options.
+#
+# For builders than need or want to skip the user interaction and
+# already know what to specify, invoking this script with 1 or more
+# args causes them to be saved away in a file that is usually called
+# config.parms (same as from user interaction), and used on invocations
+# of the GNU-style configure scripts that are in various source subdirs
+# (see create_config_status in main.mk).  Exception:  --help (-h) and
+# --version (-V) are intercepted here.
+
+prt () { printf '%s\n' "$*"; }
+
+# The presumed location of this script:
+myloc=`dirname "$0"`
+
+# Best guess on where GNU Make is:
+for cmd in gmake make; do
+  if $cmd --version 2>/dev/null | grep -q '^GNU Make'; then
+    make=$cmd
+    break
+  fi
+done
+if test -z "$make"; then
+  prt 'Need GNU Make (as gmake or make) in order to configure GNU SETL.'
+  exit 1
+fi
+
+for a in "$@"; do
+  case $a in
+
+  --help|-h)
+    cat <<EOF
+
+Use:  $0 [args]
+  or  $0 --help|-h|--version|-V
+
+This script does a "$make config", which makes sure a build environment
+is set up and config params are collected (interactively if necessary),
+and then goes on to attempt configuration in preparation for building.
+
+Try also "src/configure --help" and "doc/configure --help" for details
+on extra config parms you can supply.
+
+EOF
+    exit 0
+    ;;
+
+  --version|-V)
+    version=`cat "$myloc/VERSION_NUMBER"`
+    prt "GNU SETL $version"
+    exit 0
+    ;;
+
+  esac
+done
+
+# Capture our command-line args as a string-valued envt var that will be
+# seen by the $make config (and thus by the setup-parms script):
+configure_args=$* $make config

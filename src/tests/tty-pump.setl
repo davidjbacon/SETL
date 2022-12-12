@@ -1,0 +1,16 @@
+-- The subprogram to open as a tty-pump is a SETL program in tty-pump.data
+fd := open ('"$top_srcdir/run-setl" "$srcdir/tty-pump.data"', 'tty-pump');
+
+-- Change to srcdir for convenience
+chdir (getenv 'srcdir');
+
+-- Use the source text of this program as test input
+while (line := getline 'tty-pump.setl') /= om loop
+  print (line);
+  printa (fd, line);
+  print (getline fd);
+end loop;
+printa (stderr, is_open 'tty-pump.setl');  -- should be #F
+printa (stderr, is_open fd);  -- should be #T
+close (fd);
+printa (stderr, 'parent exiting');

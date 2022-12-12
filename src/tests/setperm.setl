@@ -1,0 +1,10 @@
+LOOP FOR i IN [1..5] DO
+  p := perm({1..i});
+  PRINT(i,#p,p);
+END LOOP;
+
+PROC perm(t);  -- all permutations of t
+  IF #t = 0 THEN RETURN {}; END IF;
+  IF #t = 1 THEN RETURN {[ARB t]}; END IF;
+  RETURN {[e]+s : e IN t, s IN perm(t-{e})};
+END PROC perm;

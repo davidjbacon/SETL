@@ -1,0 +1,2 @@
+#! /bin/sh
+"$top_srcdir/run-setl" "$srcdir/diff-read.setl" "$@"

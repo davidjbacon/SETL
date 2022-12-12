@@ -1,0 +1,137 @@
+-- horrid, old:
+f := '/tmp/spewage';
+putfile(f,+/[char i : i in [0..255]]);
+print(pretty (getfile f)(1..128));
+OPEN(f,'r+');
+SEEK(f,16#20#);
+PRINT(GETC f);
+PRINT(GETC f);
+PRINT(GETC f);
+PRINT(GETC f);
+gets(f,65,27,s);
+PRINT(s);
+PUTS(f,66+32,s(2..));
+CLOSE(f);
+print(pretty (getfile f)(1..128));
+
+-- newer, more dep-free, and cleans up:
+temp := '/tmp/tempXXXXXX';  -- template for temporary file
+fd := fileno mkstemp(temp);
+printa(fd,'abcdefghijklmnop');
+rewind(fd);
+print(getn(fd,3));
+print(seek(fd,4,seek_set));
+putc(fd,"xyz");
+
+#if 0
+print(seek(fd,-12,seek_end));
+-- this next bit, before the next putc, illustrates that even a
+-- "tell" (seeking an offset of 0 from current) causes draining
+-- of buffered input:
+print(getn(fd,3));
+ungetc(fd,"rst");
+print(x:=getn(fd,6));
+assert x = "rstijk";  -- depends on implem having pushed 3 chars back
+print(seek(fd,-6,seek_cur));
+print(getn(fd,3));
+ungetc(fd,"rst");
+print(seek(fd,0,SEEK_CUR));  -- "tell", causing drain
+print(y:=getn(fd,6));
+assert y = "yzhijk";  -- from fresh read of file
+#endif
+
+print(seek(fd,-8,seek_end));
+print(x:=getn(fd,3));
+ungetc(fd,x);
+assert(x=getn(fd,3));
+putc(fd,"uvw");
+print(seek(fd,-3,seek_cur));
+print(getn(fd,3));
+rewind(fd);
+-- can restore this if output diffing filters it out:
+$print('temp filename =',filename fd);
+print(pretty getfile fd);
+unlink(filename fd);
+close(fd);
+
+-- seeking now allowed in r,w,n modes
+OPEN(f,'r');
+SEEK(f,16#20#);
+PRINT(GETC f);
+PRINT(GETC f);
+PRINT(GETC f);
+PRINT(GETC f);
+print(filepos f);
+gets(f,65,27,s);
+PRINT(s);
+print(filepos f);
+CLOSE(f);
+print(pretty (getfile f)(1..128));
+
+g := getfile f;
+OPEN(f,'w');
+putc(f,g);
+puts(f,65,to_lower s);
+print(filepos f);
+CLOSE(f);
+print(pretty (getfile f)(1..128));
+
+OPEN(f,'w+');
+seek(f,5,seek_set);
+nprinta(f,'yoho');
+print(filepos f);
+rewind(f);
+print(pretty getfile f);
+seek(f,3,seek_set);
+getn(f,2);
+putc(f,'so');
+print(filepos f);
+CLOSE(f);
+print(pretty getfile f);
+
+OPEN(f,'a+');
+print(filepos f);
+nprinta(f,'ho');
+print(filepos f);
+rewind(f);
+print(pretty getfile f);
+print(filepos f);
+rewind(f);
+print(filepos f);
+nprinta(f,'ha');
+print(filepos f);
+flush(f);
+print(filepos f);
+CLOSE(f);
+print(pretty getfile f);
+print(#getfile f);
+
+OPEN(f,'a');
+print(filepos f);
+putc(f,'he');
+print(filepos f);
+CLOSE(f);
+print(pretty getfile f);
+print(#getfile f);
+
+ftrunc(f,11);
+print(pretty getfile f);
+print(#getfile f);
+
+OPEN(f,'a');
+ftrunc(f,9);
+putc(f,'da');
+ftrunc(f,13);
+putc(f,'cha');
+CLOSE(f);
+print(pretty getfile f);
+print(#getfile f);
+
+unlink(f);
+
+$print(last_error);
+-- This may be a bit bold, considering we haven't called clear_error
+-- anywhere:
+assert last_error = no_error;
+
+print('seek.setl done.');

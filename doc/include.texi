@@ -1,0 +1,462 @@
+@c -- Spam for all the setl*.texi files to @include --
+@c
+@c $Id: include.texi,v 1.44 2022/12/10 23:35:26 setlorg Exp $
+@c
+@c Free software (c) dB - see file COPYING for license (GPL).
+
+
+@c Since @ifcommanddefined wasn't defined until Texinfo 5.0 (March 2013),
+@c the sources here require 5.0 as the minimum Texinfo version.  The
+@c highest version that has been tested here is Texinfo 7.0.
+
+
+@c This is mainly to prevent things like "bit_and" from turning into
+@c "bit_\discretionary {}{}{}and" in the bowels of Texinfo, confusing
+@c pdfTeX and messing up all links in the PDF to things with underscores.
+@c
+@c N.B. @allowcodebreaks requires at least Texinfo 4.11.
+@c
+@c Note also the disgusting fact that in Texinfo 5.2 (and in who knows
+@c what other versions), you have to turn @allowcodebreaks back _on_
+@c around @uref occurrences, or the HTML comes out very bad indeed
+@c because some genius code often emits this kind of thing:
+@c <a href="<span class="nocodebreak">http:...</span>">see here</a>.
+@c
+@allowcodebreaks false
+
+
+@c Without this, makeinfo as of Texinfo 6.8 can go into an infinite
+@c recursion in HTML.pm on what are seen as "self" refs in @section
+@c lines:
+@ifcommanddefined xrefautomaticsectiontitle
+@xrefautomaticsectiontitle off
+@end ifcommanddefined
+
+
+@ignore
+@c This should probably be done with a --css-include=FILE option,
+@c if at all:
+@html
+<style type="text/css">
+<!--
+code {font-family: Courier}
+samp {font-family: Courier}
+pre {font-family: Courier}
+kbd {font-family: Courier}
+-->
+</style>
+@end html
+@end ignore
+
+
+@c This is for the sake of the printed (PDF) document, and takes
+@c advantage of how linkcolor and urlcolor are used internally in
+@c texinfo.tex.  When you have all the .pdf files in one folder,
+@c each link to a place in another document in that folder takes you
+@c directly to it, if you are using a decent PDF viewer.
+@c (By the way, the "PDF Colors" section of the Texinfo manual gives
+@c an example of the same thing using the @tex command nowadays.)
+@c
+@iftex
+@def@rgbBlue{0 0 0.75}
+@def@linkcolor{@rgbBlue}
+@def@urlcolor{@rgbBlue}
+@end iftex
+
+
+@c Turns off slanted font for user input examples.
+@c @kbdinputstyle code
+
+
+@c For use in enclosing in-line fragments of SETL code and references to
+@c POSIX functions.  For the latter, we generally put () after the name.
+
+@ifnotinfo
+@alias setl = code
+@alias posix = code
+@end ifnotinfo
+
+@c In "info" output, we don't want the enclosing quotes.  Actually, in
+@c the case of @setl, perhaps we do, as many intrinsics are simple
+@c words...
+@ifinfo
+@alias setl = samp
+@alias posix = r
+@end ifinfo
+
+
+@c For SETL quoted string denotations.
+
+@ifnotinfo
+@macro str {x}
+@code{"\x\"}
+@end macro
+@end ifnotinfo
+
+@ifinfo
+@macro str {x}
+"\x\"
+@end macro
+@end ifinfo
+
+@c For SETL 'open' mode args, which I could conceivably want to
+@c render differently someday.
+@alias mode = str
+
+
+@c For quoting of ordinary text.
+@c
+@c I can never quite make up my mind which quoting convention I like,
+@c and different formatters have different ways of mangling different
+@c inputs, so again we encapsulate.  The ``...'' convention is
+@c recommended by the Texinfo documentation, and formats decently in
+@c info, pdf, and html.
+
+@macro q {x}
+``\x\''
+@end macro
+
+
+@c The @rf macro is sort of like a 1-arg @ref, but creates a simple
+@c hyperlink (showing just the text, in the @setl font) in the pdf and
+@c html outputs.  For info, you get the text with no hyperlink.
+
+@macro rf {node}
+@setl{@rfe{\node\}}
+@end macro
+
+
+@c Same again, but for use when you are already in an environment like
+@c @example, @setl, or @command.
+@c I seem to be using it within @dfn as well, for making the text of
+@c links to sections whose nodenames are not the names of the (glyphic)
+@c operators they describe be what @dfn gives (such as slanted) vs what
+@c @setl gives (such as typewriter).  Actually that @rfe within @dfn is
+@c only in @refglyph (see below).
+
+@iftex
+@c FIXME Should not really be using the undocumented (and rather fragile)
+@c @pdflink here, but it works and is simple and direct for the present
+@c limited purposes, except for the inconvenience of not allowing spaces
+@c in the referenced node.
+@alias rfe = pdflink
+@end iftex
+
+@ifhtml
+@alias rfe = ref
+@end ifhtml
+
+@ifinfo
+@alias rfe = w
+@end ifinfo
+
+
+@c Meant for refs in open text to operators that have non-alphanumeric
+@c forms but also alternative names (such as "/" and "slash"); you can
+@c use @rf{/} (or @rfe{/} within @setl or @example contexts), but (or
+@c also) @refglyph{slash} for something easier to see and click on.
+@c This usage is now also hyperextended a little to embrace other cases
+@c you want fonted in @dfn (which may be slanted) rather than as code,
+@c because they are descriptive (as in @refglyph{byte-packing}) rather
+@c than literal code keywords.
+
+@macro refglyph {node}
+@dfn{@rfe{\node\}}
+@end macro
+
+
+@c Refs from outside setl-lib.texi to nodes within it, to appear
+@c as hyperlinks showing just node names (usu one-word intrinsic
+@c names) in pdf and html, and a somewhat fussier xref in info.
+@c Scan for 'hyperjump' in the modified texinfo.tex for gory details
+@c on how this strange hack works.  Now adding userref for outside
+@c refs to nodes in setl-user.texi.
+
+@iftex
+@macro libref {node}
+@setl{@ref{\node\, , , setl-lib, hyperjump}}
+@end macro
+@macro userref {node}
+@setl{@ref{\node\, , , setl-user, hyperjump}}
+@end macro
+@end iftex
+
+@ifhtml
+@macro libref {node}
+@setl{@ref{\node\, , , setl-lib}}
+@end macro
+@macro userref {node}
+@setl{@ref{\node\, , , setl-user}}
+@end macro
+@end ifhtml
+
+@ifinfo
+@macro libref {node}
+@setl{\node\} (@pxref{\node\, , , setl-lib})
+@end macro
+@macro userref {node}
+@setl{\node\} (@pxref{\node\, , , setl-user})
+@end macro
+@end ifinfo
+
+
+@c This optref and envref spam was in setl-user.texi, but perh better
+@c to collect it all here...sorry about all the weird names...
+
+@c In these optref and envref macros, we're using 'hyperjump' to
+@c render internal links in an uncluttered way in the printed/PDF
+@c manual (contrast libref and userref, which make cross-manual xrefs).
+
+@iftex
+@macro optref {node}
+@ref{\node\, , @option{\node\}, , hyperjump}
+@end macro
+@macro envref {node}
+@env{@ref{\node\, , , , hyperjump}}
+@end macro
+@end iftex
+
+@ifhtml
+@macro optref {node}
+@ref{\node\, , @option{\node\}}
+@end macro
+@macro envref {node}
+@env{@ref{\node\}}
+@end macro
+@end ifhtml
+
+@ifinfo
+@macro optref {node}
+@option{\node\}
+@end macro
+@macro envref {node}
+@env{\node\}
+@end macro
+@end ifinfo
+
+
+@c More apologies for all the unhelpful macro names, but anyway
+@c this @refuser and @reflib are meant for cases that are like
+@c @userref and @libref resp except that we want a "fuller"
+@c cross-reference that will be meaningful even for a PDF that
+@c is actually printed, or a PDF viewed through a deficient
+@c PDF viewer like Chrome or M$ Edge which don't grok local-file
+@c doc-to-doc links (unlike 'evince' and 'xpdf' on e.g. Ubuntu,
+@c or Adobe Acrobat Reader DC on Windose, which do)...Firefox
+@c works well on those links when the PDF files are installed
+@c together at an https site such as setl.org too, by the way.
+@c
+@c We need both node and title args for these macros, as the
+@c titles (e.g. of sections) often have more than one word, and
+@c we are subject to the no-spaces restriction on node names in
+@c the non-info cases here.
+
+@ifinfo
+@macro reflib {node, title}
+@ref{\title\, , , setl-lib}
+@end macro
+@macro refuser {node, title}
+@ref{\title\, , , setl-user}
+@end macro
+@end ifinfo
+
+@ifnotinfo
+@macro reflib {node, title}
+see @ref{\node\, , \title\, setl-lib, @r{the} @libbook{}}
+@end macro
+@macro refuser {node, title}
+see @ref{\node\, , \title\, setl-user, @r{the} @userbook{}}
+@end macro
+@end ifnotinfo
+
+
+@c Ref to a Top.
+@c This doesn't work for pdf (appears to be a bug in the texinfo.tex
+@c for Texinfo 4.11 causing @xeatspaces to get an extra "}"), so use
+@c the omtop etc. macros below.
+@c Actually, I think that bug has gone away now in newer versions of
+@c texinfo.tex...
+
+@ifinfo
+@macro topref {title, file}
+@ref{, the \title\, , \file\}
+@end macro
+@end ifinfo
+
+@ifnotinfo
+@macro topref {title, file}
+see the @ref{, , , \file\, \title\}
+@end macro
+@end ifnotinfo
+
+@macro ombook
+GNU SETL Om
+@end macro
+@macro userbook
+GNU SETL User Guide
+@end macro
+@macro tutbook
+GNU SETL Tutorial
+@end macro
+@macro langbook
+GNU SETL Language Reference
+@end macro
+@macro libbook
+GNU SETL Library Reference
+@end macro
+@macro impbook
+GNU SETL Implementation Notes
+@end macro
+@macro extbook
+GNU SETL Extension Guide
+@end macro
+@macro maintbook
+GNU SETL Maintenance Manual
+@end macro
+
+@macro omtop
+@topref{@ombook{}, setl}
+@end macro
+@macro usertop
+@topref{@userbook{}, setl-user}
+@end macro
+@macro tuttop
+@topref{@tutbook{}, setl-tut} [stub]
+@end macro
+@macro langtop
+@topref{@langbook{}, setl-lang} [stub]
+@end macro
+@macro libtop
+@topref{@libbook{}, setl-lib}
+@end macro
+@macro imptop
+@topref{@impbook{}, setl-imp} [stub]
+@end macro
+@macro exttop
+@topref{@extbook{}, setl-ext} [stub]
+@end macro
+@macro mainttop
+@topref{@maintbook{}, setl-maint} [stub]
+@end macro
+
+
+@c Where a @node name corresponds directly to the single function
+@c (op, proc, etc.) described in that node, all is lovely, but
+@c where there are multiple functions described in the node, or
+@c where the op has a symbolic (non-alphanumeric) name, we resort
+@c to @anchor for the sake of cross-refs.  Unfortunately, when
+@c @anchor comes after @section, the jump goes after it also, and
+@c when it comes before, so goes the jump.  I have found no way of
+@c making the jump go _to_ the section title as it does when the
+@c jump is to the node name rather than to one of its @anchor
+@c "aliases".  So I choose just after, because for a section that
+@c begins a new page in the PDF, a jump to just before it is a
+@c jump to the end of the previous page, which is not good in the
+@c default "single page, not continuous" mode of viewing in
+@c Adobe Reader.  The jump to just after the section name is a
+@c jump to the @example giving the function signature(s), which is
+@c not as bad though still not great.
+@c
+@c Later that lifetime:  my patched texinfo.tex now defines macros
+@c @naI, @naII, etc. for first, second, etc. "node aliases".  Use
+@c them before the sectioning command (e.g. @section) you want as
+@c the target.  For convenience (in allowing the @node commands to
+@c have 1 arg instead of 4), put them just before @node rather than
+@c just after, even though just after might seem a bit more natural.
+@c
+@c @naI etc. are not defined when TeX is not in use, so we define
+@c them here then.  Have moved these here now (to include.texi), even
+@c though they originated in setl-lib.texi, because I want to try
+@c having alternate ways to refer to sections like "#! invocation"
+@c in setl-user.texi from outside it (using space-free aliases like
+@c "hashbang" - recall \pdflink restrictions).
+
+@c For the Info case, @rfe doesn't produce a link, so @naI et al. can
+@c just absorb the arg.
+@ifinfo
+@macro naI {node}
+@end macro
+@macro naII {node}
+@end macro
+@macro naIII {node}
+@end macro
+@macro naIV {node}
+@end macro
+@macro naV {node}
+@end macro
+@macro naVI {node}
+@end macro
+@macro naVII {node}
+@end macro
+@macro naVIII {node}
+@end macro
+@macro naIX {node}
+@end macro
+@macro naX {node}
+@end macro
+@macro naXI {node}
+@end macro
+@macro naXII {node}
+@end macro
+@macro naXIII {node}
+@end macro
+@end ifinfo
+
+@c For the HTML case, where we are using --no-split and --no-headers
+@c on the makeinfo invocation, an anchor just before the @node and
+@c sectioning command is fine.
+@ifhtml
+@alias naI = anchor
+@alias naII = anchor
+@alias naIII = anchor
+@alias naIV = anchor
+@alias naV = anchor
+@alias naVI = anchor
+@alias naVII = anchor
+@alias naVIII = anchor
+@alias naIX = anchor
+@alias naX = anchor
+@alias naXI = anchor
+@alias naXII = anchor
+@alias naXIII = anchor
+@end ifhtml
+
+
+@c Here @sv is the version of @var supposed to be used in @setl contexts,
+@c and @meta{x} is the same as @setl{@sv{x}}, suitable for citing formal
+@c parameter x in open text.  A slanted code font is approp if avail.
+@c Now using @sv in @example contexts too, which look like @code.
+
+@alias sv = var
+
+@ifinfo
+@alias meta = var
+@end ifinfo
+
+@ifnotinfo
+@macro meta {x}
+@setl{@sv{\x\}}
+@end macro
+@end ifnotinfo
+
+
+@c For SETL typenames in open text.
+@c @alias type = setl  <-- oops, can't have an alias of an alias!
+@macro type {x}
+@setl{\x\}
+@end macro
+
+
+@c For occurrences of the intrinsic being defined in the current node.
+@c This has the desired bold effect in the HTML, but looks like @setl
+@c in the PDF, which is less exciting but not the end of the world.
+@macro sdef {x}
+@b{@setl{\x\}}
+@end macro
+
+
+@c The html body begins with this link.
+@ifhtml
+@anchor{dir}
+@uref{index.html, Up to GNU SETL doc top}
+@end ifhtml

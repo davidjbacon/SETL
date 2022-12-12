@@ -1,0 +1,41 @@
+#! /bin/sh
+#
+# $Id: ask-yes,v 1.12 2022/12/11 17:09:26 setlorg Exp $
+#
+# Free software (c) dB - see file COPYING for license (GPL).
+#
+#
+# Script to ask question with affirmative default.
+#
+# Use:  ask-yes "your yes-or-no question, with trailing punctuation"
+#
+# The exit code is 0 for yes, 1 for no.
+#
+# Notes:
+#  The question is put on stdout.
+#  The response is read from stdin.
+#  If stdin does not appear to be connected to a terminal, the answer
+#  is assumed to be yes.
+#
+printf '%s [Y/n]' "$1"
+if tty >/dev/null; then
+  # Get response from stdin.
+  read ans
+  case $ans in
+    [nN]*)  # no
+      exit 1
+      ;;
+    "")  # yes (defaulted)
+      echo yes
+      exit 0
+      ;;
+    *)  # yes (any character other than N or n)
+      exit 0
+      ;;
+  esac
+else
+  # Standard input is not a terminal.
+  # Report the default assumption of "yes".
+  echo yes
+  exit 0
+fi

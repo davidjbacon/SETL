@@ -1,0 +1,7 @@
+a := {['b',2]};
+a{'b'} := {1,2,3};
+print(#a);
+print(a);
+a{'b'} := {};
+print(#a);
+print(a);

@@ -1,0 +1,23 @@
+$ Euler path (linear algorithm:  depth-first search)
+               PROGRAM euler;
+VAR g2;  $ "global" - make visible inside proc p below
+g := ({1..4} NPOW 2) + {{1,5},{2,5}};  $ the "little house"
+g2 := {[v, ARB (e LESS v)] : e IN g, v IN e};  $ adjacency list
+ASSERT g2 = {[v,w] : e IN g, v IN e, w IN e | v /= w};
+ASSERT g2 = {[v,w] : e IN g, v IN e, w IN e LESS v};
+ASSERT g2 = +/{{[v,w],[w,v]} : [v,w] IN {[v : v IN e] : e IN g}};
+print(g);
+print(g2);
+IF NOTEXISTS ns = g2{v} | ODD #ns THEN v := ARB ARB g; END;
+p(v);
+print(v);
+PROC p(v);
+  VAR w;  $ "local"
+  IF EXISTS w IN g2{v} | TRUE THEN
+    g2 -:= {[v,w],[w,v]};
+    p(w);
+    print(w);
+    p(v);
+  END;
+END;
+              END PROGRAM euler;

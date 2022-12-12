@@ -1,0 +1,5 @@
+t := +/[char(i):  i in [0..255]];
+u := 10*t;
+c := +/[c: c in u];
+v := +/c;
+assert(v=c);

@@ -1,0 +1,5 @@
+PROGRAM nothing;
+  m := {};
+  m{4} := {5};
+  PRINT(m);
+END PROGRAM nothing;

@@ -1,0 +1,26 @@
+-- $Id: typedef.setl,v 1.4 2022/12/11 17:09:27 setlorg Exp $
+
+-- Take 'preprocessed' on stdin and produce 'typedefs' on stdout.
+
+s := GETFILE '';
+w := '[ \f\n\r\t\v]';
+p := '+';
+h := 'typedef'+w+p;
+LOOP WHILE s(h) /= OM DO
+  s(1..h) := '';
+  a := 'typedef ' + SUB(s,[1,'[{;]']);
+  IF a(#a) = '{' THEN
+    v := 1;
+    LOOP WHILE v > 0 DO
+      ASSERT #s > 0;
+      c := s(1);
+      IF c = '{' THEN v +:= 1; END IF;
+      IF c = '}' THEN v -:= 1; END IF;
+      s(1) := '';
+      a +:= c;
+    END LOOP WHILE v > 0;
+    a +:= SUB(s,[1,';']);
+  END IF;
+  GSUB(a,w+p,' ');
+  PRINT(a);
+END LOOP WHILE s(h) /= OM;

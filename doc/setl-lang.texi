@@ -1,0 +1,86 @@
+\input texinfo @c -*-texinfo-*-
+@c %**start of header
+@c
+@c $Id: setl-lang.texi,v 1.28 2022/12/10 23:35:26 setlorg Exp $
+@c
+@c Free software (c) dB - see file COPYING for license (GPL).
+@c
+@setfilename setl-lang.info
+@settitle GNU SETL Language Reference
+@finalout
+@c @setchapternewpage odd
+@paragraphindent none
+@c
+@c %**end of header
+
+@include version-setl-lang.texi
+@include include.texi
+
+
+@ifinfo
+@dircategory High-level programming
+@direntry
+* SETL language:        (setl-lang).   GNU SETL Language Reference.
+@end direntry
+@end ifinfo
+
+@titlepage
+@title GNU SETL Language Reference
+@subtitle Edition @value{EDITION}, for GNU SETL Version @value{VERSION}
+@subtitle Updated @value{UPDATED}
+@author by dB
+@end titlepage
+
+@contents
+
+
+@ifnottex
+
+@node Top
+@top GNU SETL Language Reference
+
+@ifinfo
+This info file describes the SETL language in general and GNU SETL
+in particular.
+
+SETL is of course the world's most wonderful programming language.
+GNU SETL implements it along with some proposed extensions.
+
+This file is designed to be viewed with @w{@code{info setl-lang}}.
+
+GNU SETL normally comes with HTML and PDF versions too, and current
+documents should always be at @uref{https://setl.org/setl/doc/}.
+@end ifinfo
+
+@c Placeholder menu:
+@menu
+* Overview::      Generalities, and pointers to other documents.
+* Index::         Subject index.
+@end menu
+
+@end ifnottex
+
+
+@node Overview
+@unnumbered SETL and GNU SETL
+
+@emph{*** To be written.}
+
+For a more tutorial introduction to the language supported by GNU SETL,
+@tuttop{}.
+
+For information on how to @emph{run} and @emph{use} GNU SETL,
+@usertop{}.
+
+For the primary document in the present set,
+@omtop{}.
+
+
+@node Index
+@unnumbered Index
+
+@printindex cp
+
+@bye
+
+@c setl-lang.texi ends here
