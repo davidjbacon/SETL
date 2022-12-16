@@ -4789,7 +4789,7 @@ cpp_get_token (pfile)
           cpp_buffer *next_buf
             = CPP_PREV_BUFFER (CPP_BUFFER (pfile));
           CPP_BUFFER (pfile)->seen_eof = 1;
-          if (CPP_BUFFER (pfile)->nominal_fname && next_buf != 0)
+          if (CPP_BUFFER (pfile)->nominal_fname && next_buf != CPP_NULL_BUFFER (pfile))
             {
               /* We're about to return from an #include file.
                  Emit #line information now (as part of the CPP_POP) result.
