@@ -1,4 +1,4 @@
-$Id: INSTALL,v 1.23 2018/01/24 02:39:52 setlorg Exp $
+$Id: INSTALL,v 1.24 2022/12/17 18:04:27 setlorg Exp $
 
 Free software (c) dB - see file COPYING for license (GPL).
 
@@ -40,6 +40,37 @@ can be ignored if you are driving all operations from the top level,
 which is recommended for most casual users and installers.  But if you
 are a maintainer familiar with GNU conventions, the Makefiles created
 in build subdirs provide friendly sub-environments too.
+
+
+Apple Mac / Darwin
+------------------
+
+Currently (2022), the best way to get a suitable build environment
+appears to be to install Homebrew.  The website mac.install.guide
+gives instructions on that.  If it has been properly installed, the
+"brew" command in the Terminal app should work.
+
+Note carefully the instructions on setting the PATH and other
+Homebrew-related environment variables.  In particular, you should
+make sure to do
+
+  eval "$(/path/to/brew shellenv)"
+
+in your shell (typically in a startup file such as .profile, .bashrc,
+.zprofile, or .zshrc), substituting for /path/to/brew either
+/usr/local/bin/brew or /opt/homebrew/bin/brew depending on where the
+brew command got installed.
+
+Installing brew should give you a gcc command that is actually a
+wrapper for clang (as "gcc -v" should then indicate).
+
+Use of the gmp-6.1.2 that is bundled with GNU SETL is not recommended,
+as the version that comes with Homebrew (currently 6.2.1_1) is newer
+and can be installed with
+
+  brew install gmp
+
+before starting the GNU SETL build.
 
 
 Cross-compiling
@@ -106,24 +137,35 @@ code is to run as the "target", at odds with how GNU uses the terms:
 (The GNU sense of "target" is not relevant to the SETL interpreter, as
 it does not generate machine code.)
 
+TODO:  update the above for QNX 7 versions.
+
 
 GNU Make
 --------
 
-If your "make" command tells you that you need GNU Make, you should
-install it, as gmake if possible, and then use the gmake command to
+Many systems already use GNU Make as their native "make" command, so
+the addition of "gmake" should rarely be necessary.  On Ubuntu, for
+example, if "make" isn't present at all on your system, it can be
+installed with
+
+  $ sudo apt install make
+
+Similar comments apply for components such as gcc, bison, and m4.
+
+If, however, you already have a "make" command but it tells you that
+you need GNU Make when you try to apply it to GNU SETL, you should
+install it as "gmake" if possible, and then use the gmake command to
 drive all building, checking, installing, uninstalling, cleaning, and
 redistributing operations in GNU SETL distributions.
 
-Unless you happen to know the right incantations to grab a prepackaged
-gmake for your system (and maybe even then), it is usually easiest to
-go to the GNU Make page (https://www.gnu.org/software/make/) and
-download the (very portable) source.  In the unpacked archive do this
+To install gmake, unless you happen to know the right incantations to
+grab a prepackaged gmake for your system (and maybe even then), it is
+usually easiest to go to the GNU Make page (www.gnu.org/software/make/)
+and download its very portable source.  In the unpacked archive do this
 (possibly with an extra --prefix={installation-root} on the configure
-command if you don't want /usr/local as the stem for the install):
+command if you don't want it to go into /usr/local/...):
 
   $ ./configure --program-prefix=g
   $ make
   ... privilege elevation if necessary ...
   # make install
-

@@ -1,6 +1,6 @@
 /*  ===  Operating system interface wrappers  ======================  */
 
-/*  $Id: os.c,v 1.132 2022/11/17 14:16:07 setlorg Exp $  */
+/*  $Id: os.c,v 1.133 2022/12/17 18:04:28 setlorg Exp $  */
 
 /*  Free software (c) dB - see file COPYING for license (GPL).  */
 
@@ -1062,7 +1062,7 @@ int os_recv_fd(int fd) {
     char cmsg[CMSG_SPACE(sizeof received_fd)] ALIGNMENT(ALIGNOF_INT);
   } cmsg_storage;
   struct cmsghdr *p_cmsg = &cmsg_storage.hdr;
-  int *pfd = (int *)CMSG_DATA(p_cmsg);  /* ptr to fd */
+  int *pfd = (int *)(void *)CMSG_DATA(p_cmsg);  /* ptr to fd */
 # endif
   init_msg (&msg, iov, buf);
 # if USE_ANCILLARY_DATA
@@ -1218,7 +1218,7 @@ int os_send_fd(int fd, int fd_to_send) {
     char cmsg[CMSG_SPACE(sizeof fd_to_send)] ALIGNMENT(ALIGNOF_INT);
   } cmsg_storage;
   struct cmsghdr *p_cmsg = &cmsg_storage.hdr;
-  int *pfd = (int *)CMSG_DATA(p_cmsg);  /* ptr to fd */
+  int *pfd = (int *)(void *)CMSG_DATA(p_cmsg);  /* ptr to fd */
 # endif
   buf[0] = CHECK_BYTE;
   init_msg (&msg, iov, buf);

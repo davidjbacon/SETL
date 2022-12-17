@@ -1,6 +1,6 @@
 /*  ===  Rigorous semantic analysis and symtab completion  =========  */
 
-/*  $Id: canonize.c,v 1.28 2021/03/02 21:00:13 setlorg Exp $  */
+/*  $Id: canonize.c,v 1.29 2022/12/17 18:04:28 setlorg Exp $  */
 
 /*  Free software (c) dB - see file COPYING for license (GPL).  */
 
@@ -1805,11 +1805,11 @@ bits need,ability;
 /* .................................................................. */
 
 /* Another local utility, perhaps the most important in the system:  */
-static void c_call(tn,y,p,vactual)
-int tn;  /* point of call */
-symbol *y;  /* symbol representing routine to call */
-node *p;  /* list of actual args (null or a list of nodes) */
-bool vactual;  /* "(*)" after actual args */
+static void c_call(
+int tn,  /* point of call */
+symbol *y,  /* symbol representing routine to call */
+node *p,  /* list of actual args (null or a list of nodes) */
+bool vactual)  /* "(*)" after actual args */
 {
   int i;
   int nformal,nactual;  /* number of formal, actual args */
@@ -1888,9 +1888,9 @@ bool vactual;  /* "(*)" after actual args */
 
 /* .................................................................. */
 
-static void c_check_caller_variadicity(tn,vactual)
-int tn;  /* point of call */
-bool vactual;  /* "(*)" after actual args */
+static void c_check_caller_variadicity(
+int tn,  /* point of call */
+bool vactual)  /* "(*)" after actual args */
 {
   if (vactual) {
     /* Make sure the caller is also variadic */

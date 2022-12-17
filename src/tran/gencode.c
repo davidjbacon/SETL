@@ -1,6 +1,6 @@
 /*  ===  Virtual Code Generation  =================================== */
 
-/*  $Id: gencode.c,v 1.33 2021/03/02 21:00:13 setlorg Exp $  */
+/*  $Id: gencode.c,v 1.34 2022/12/17 18:04:28 setlorg Exp $  */
 
 /*  Free software (c) dB - see file COPYING for license (GPL).  */
 
@@ -2487,10 +2487,10 @@ int i;          /* labelling number */
 /* .................................................................. */
 
 /* Call a routine and throw away the result */
-static void void_call(y,p,vactual)
-symbol *y;      /* symbol representing routine to call */
-node *p;        /* arg list (or NULL) */
-bool vactual;   /* trailing (*) on list of actual args */
+static void void_call(
+symbol *y,      /* symbol representing routine to call */
+node *p,        /* arg list (or NULL) */
+bool vactual)   /* trailing (*) on list of actual args */
 {
   call((const char *)NULL,y,p,vactual);
 }
@@ -2500,11 +2500,11 @@ bool vactual;   /* trailing (*) on list of actual args */
 /* Acceptable node types for the arg list p (p->type) are at least
  * N_expr_list, N_lhs_list, N_rw_list, N_lhs_or_dash_list, N_cmdargs;
  * but really any list of plausible args will do.  */
-static void call(r,y,p,vactual)
-const char *r;  /* where to return the result (or NULL) */
-symbol *y;      /* symbol representing routine to call */
-node *p;        /* arg list (or NULL) */
-bool vactual;   /* trailing (*) on list of actual args */
+static void call(
+const char *r,  /* where to return the result (or NULL) */
+symbol *y,      /* symbol representing routine to call */
+node *p,        /* arg list (or NULL) */
+bool vactual)   /* trailing (*) on list of actual args */
 {
   int i,nformal,nactual;
   const char **a;

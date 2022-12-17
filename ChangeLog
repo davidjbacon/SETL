@@ -1,4 +1,4 @@
-$Id: ChangeLog,v 1.2 2022/12/10 23:35:25 setlorg Exp $
+$Id: ChangeLog,v 1.3 2022/12/17 18:41:43 setlorg Exp $
 
 Free software (c) dB - see file COPYING for license (GPL).
 
@@ -7,3 +7,10 @@ This file is part of GNU SETL.
 2022-12-12  David Bacon  <David.Bacon@nyu.edu>
 
         * 3.5.8 release.
+
+2022-12-17  David Bacon  <David.Bacon@nyu.edu>
+
+        * INSTALL: update for Apple/Mac per observations by Paul McJones.
+        * setlcpp: fix OOB array access with STATIC_BUFFERS
+          (contributed by Finn Wilcox to davidjbacon/SETL at GitHub).
+        * setltran, setlrun: fix warnings raised by clang on Mac.
