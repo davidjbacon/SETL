@@ -1,6 +1,6 @@
 /*  ===  Declarations shared by programs in the SETL package  ======  */
 
-/*  $Id: common.h,v 1.52 2022/12/10 23:35:26 setlorg Exp $  */
+/*  $Id: common.h,v 1.53 2024/04/08 18:57:22 setlorg Exp $  */
 
 /*  Free software (c) dB - see file COPYING for license (GPL).  */
 
@@ -52,7 +52,7 @@
 # define GCC_DIAG_JOINSTR(x,y)  GCC_DIAG_STR(x ## y)
 # define GCC_DIAG_DO_PRAGMA(x)  _Pragma (#x)
 # define GCC_DIAG_PRAGMA(x)     GCC_DIAG_DO_PRAGMA(GCC diagnostic x)
-/* If the push/pop pragmas are available, this mechanism can only
+/* If the push/pop pragmas are available, this mechanism will only
  * disable a warning through a region, not enable one that is off in
  * the environment - and that is how it is meant to be used.  */
 # if HAVE_PRAGMA_GCC_DIAGNOSTIC_PUSHPOP
@@ -203,6 +203,10 @@ typedef unsigned char  _Bool;
 # include <memory.h>
 #endif
 /* This #if is adapted from autoconf.info (as of autoconf 2.10):  */
+/* but by autoconf 2.71, STDC_HEADERS was considered obsolete;    */
+/* but the old cpp code likes testing for it, so we #define it    */
+/* unconditionally now (everyone has the std headers these days)  */
+#define STDC_HEADERS 1
 #if STDC_HEADERS
 # include <string.h>
 #else
@@ -503,6 +507,42 @@ struct timeval {
 #elif SIZEOF_DOUBLE == SIZEOF_LLONG
 #define BE_DOUBLE(x)  BE_LLONG(x)
 #define int_double_holder  long long
+#endif
+
+/*
+ *  Min, max, abs val, sign.  Beware of side-effects in args!
+ */
+#undef MIN
+#define MIN(a,b) ((a)<(b)?(a):(b))
+#define MIN3(a,b,c) (MIN(a,MIN(b,c)))
+#undef MAX
+#define MAX(a,b) ((a)>(b)?(a):(b))
+#define MAX3(a,b,c) (MAX(a,MAX(b,c)))
+#undef ABS
+#define ABS(a) ((a)<0?-(a):(a))
+#undef SIGN
+#define SIGN(a) ((a)<0?-1:(a)>0?1:0)
+
+/* Test for satisfaction of all bits in a mask:  */
+#undef test_all
+#define test_all(a,mask) (((a)&(mask))==(mask))
+
+/* Test for satisfaction of any bits in a mask:  */
+#undef test_any
+#define test_any(a,mask) (((a)&(mask))!=0)
+
+/*
+ *  C string equality, inequality.
+ */
+#define leq(s,t) (strcmp(s,t)==0)  /* "lexically equal" */
+#define lne(s,t) (strcmp(s,t)!=0)
+#define leqn(s,t,n) (strncmp(s,t,n)==0)
+#define lnen(s,t,n) (strncmp(s,t,n)!=0)
+#define lpfx(s,t) (strncmp(s,t,strlen(t))==0)  /* s begins with t */
+#if HAVE_STRCASECMP && HAVE_DECL_STRCASECMP
+#define leq_ic(s,t) (strcasecmp(s,t)==0)  /* leq but "ignore case" */
+#else
+#define leq_ic(s,t) (case_insensitively_equal(s,t))
 #endif
 
 /*

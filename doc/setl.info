@@ -1,4 +1,4 @@
-This is setl.info, produced by makeinfo version 7.0 from setl.texi.
+This is setl.info, produced by makeinfo version 7.0.3 from setl.texi.
 
 INFO-DIR-SECTION High-level programming
 START-INFO-DIR-ENTRY
@@ -706,21 +706,21 @@ Index
 
 
 Tag Table:
-Node: Top209
-Node: Introduction1205
-Node: Overview1448
-Ref: primes1793
-Node: History3731
-Node: To the Student of Programming Languages8590
-Node: GNU SETL17609
-Node: SETL Variations20703
-Node: Links21223
-Node: Other GNU SETL Manuals21474
-Node: External Links22518
-Node: Administrivia25785
-Node: Copying26020
-Node: Problems26779
-Node: Index27295
+Node: Top211
+Node: Introduction1207
+Node: Overview1450
+Ref: primes1795
+Node: History3733
+Node: To the Student of Programming Languages8592
+Node: GNU SETL17611
+Node: SETL Variations20705
+Node: Links21225
+Node: Other GNU SETL Manuals21476
+Node: External Links22520
+Node: Administrivia25787
+Node: Copying26022
+Node: Problems26781
+Node: Index27297
 
 End Tag Table
 

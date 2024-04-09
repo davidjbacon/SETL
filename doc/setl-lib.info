@@ -1,4 +1,4 @@
-This is setl-lib.info, produced by makeinfo version 7.0 from
+This is setl-lib.info, produced by makeinfo version 7.0.3 from
 setl-lib.texi.
 
 INFO-DIR-SECTION High-level programming
@@ -3690,8 +3690,8 @@ For mode "real-ms", the first arg to ‘open’ should be a pair of integers
 timer expiry and between subsequent expiries.
 
 The degenerate form ‘[INTERVAL]’, meaning ‘[INTERVAL, INTERVAL]’, may
-also be used, and for back-compatibility, the latter may be given as a
-decimal string rather than a tuple.
+also be used, and for back-compatibility, the interval may be given as a
+decimal string rather than in a tuple.
 
 As with a signal stream, the fd returned by ‘open’ is a pseudo-fd.
 
@@ -5213,7 +5213,7 @@ If POSIX getaddrinfo() fails on the given DEST, or all POSIX sendto()
 attempts on the Internet address(es) found for it fail, ‘last_error’ is
 set according to the last of those failures.
 
-If F is of ‘open’ mode "udp-datagram-server", PATHNAME is the
+If F is of ‘open’ mode "unix-datagram-server", PATHNAME is the
 Unix-domain socket of another server.  Errors in POSIX sendto() are
 reflected in ‘last_error’.
 
@@ -7658,260 +7658,260 @@ Concept Index
 
 
 Tag Table:
-Node: Top225
-Node: Overview1071
-Node: The Library1515
-Node: sharp15214
-Node: star15619
-Node: power17069
-Node: plus18235
-Node: minus20761
-Node: slash21826
-Node: equalities23269
-Node: comparatives23847
-Node: query25451
-Node: abs25933
-Node: accept26581
-Node: acos27586
-Node: and27868
-Node: any28819
-Node: arb29797
-Node: asin30142
-Node: atan30418
-Node: atan230672
-Node: bitwise logical ops31457
-Node: break32086
-Node: call32855
-Node: callout33487
-Node: ceil34384
-Node: char34904
-Node: chdir35401
-Node: clear_error36258
-Node: clock36758
-Node: close37210
-Node: close constants41136
-Node: command_line41523
-Node: command_name41897
-Node: cos42934
-Node: cosh43166
-Node: date43413
-Node: denotype43669
-Node: div44218
-Node: domain44622
-Node: dup; dup244999
-Node: eof46366
-Node: even49425
-Node: exec49915
-Node: exp52509
-Node: false52826
-Node: fdate53089
-Node: fexists54222
-Node: filename55223
-Node: fileno57431
-Node: filepos58202
-Node: filter59216
-Node: fix61463
-Node: fixed61982
-Node: float62983
-Node: floating63965
-Node: floor65116
-Node: flush65641
-Node: fork66445
-Node: from67874
-Node: fromb68434
-Node: frome68990
-Node: fsize69534
-Node: ftrunc70476
-Node: get71341
-Node: geta71798
-Node: getb73204
-Node: getc74590
-Node: getchar75799
-Node: getegid76041
-Node: getenv76435
-Node: geteuid76808
-Node: getfile77200
-Node: getgid78878
-Node: getline79341
-Node: getn80765
-Node: getpgrp81621
-Node: getpid82037
-Node: getppid82391
-Node: gets82665
-Node: getsid83893
-Node: getuid84408
-Node: getwd84784
-Node: glob85040
-Node: gmark85677
-Node: gsub86550
-Node: hex87508
-Node: hostaddr87887
-Node: hostname88709
-Node: ichar89182
-Node: impl89565
-Node: in90474
-Node: incs91846
-Node: intslash92243
-Node: ip_addresses92766
-Node: ip_names93687
-Node: type-testing94628
-Node: is_open95935
-Node: join96925
-Node: kill97574
-Node: last_error99412
-Node: len100164
-Node: less100717
-Node: lessf101052
-Node: lexists101457
-Node: link102444
-Node: log103263
-Node: lpad103517
-Node: magic103962
-Node: mark104741
-Node: match106604
-Node: max107217
-Node: min108445
-Node: mkstemp109554
-Node: mod110492
-Node: nargs111553
-Node: newat112030
-Node: no_error112680
-Node: not113020
-Node: notany113561
-Node: notin114227
-Node: npow114544
-Node: nprint114989
-Node: nprinta115314
-Node: odd116165
-Node: om116454
-Node: open117132
-Node: open arguments119120
-Node: Network sockets124405
-Node: Local sockets127677
-Node: Pipes and pumps130477
-Node: Signal streams132727
-Node: Timer streams138031
-Node: Predefined streams138833
-Node: Automatic opening140056
-Node: Buffering142487
-Node: open apocrypha148683
-Node: or152399
-Node: peekc153021
-Node: peekchar153709
-Node: peer_address153974
-Node: peer_name154896
-Node: peer_port155672
-Node: peer_sockaddr156357
-Node: pexists157131
-Node: pid158020
-Node: pipe158755
-Node: pipe_from_child159123
-Node: pipe_to_child159741
-Node: port160343
-Node: pow160944
-Node: pretty161218
-Node: print162516
-Node: printa162788
-Node: pump163463
-Node: put164991
-Node: puta165446
-Node: putb165990
-Node: putc166798
-Node: putchar167251
-Node: putfile167529
-Node: putline168443
-Node: puts169003
-Node: random170283
-Node: range172158
-Node: rany172513
-Node: rbreak173177
-Node: rlen173950
-Node: rmatch174509
-Node: rnotany175114
-Node: rspan175786
-Node: read176479
-Node: reada176762
-Node: readlink178534
-Node: reads179258
-Node: recv179805
-Node: recvfrom180705
-Node: recv_fd182222
-Node: rem183755
-Node: rename184428
-Node: reverse184796
-Node: rewind185011
-Node: round185247
-Node: routine185781
-Node: rpad186558
-Node: seek187009
-Node: seek constants188973
-Node: select189310
-Node: send195189
-Node: sendto195847
-Node: send_fd197200
-Node: setctty199075
-Node: setegid200870
-Node: setenv201286
-Node: seteuid201848
-Node: setgid202260
-Node: setpgid202653
-Node: setrandom204012
-Node: setsid204478
-Node: setuid205397
-Node: set_intslash207300
-Node: set_magic207704
-Node: shutdown208071
-Node: shutdown constants209549
-Node: sign209901
-Node: sin210206
-Node: sinh210426
-Node: sockaddr210651
-Node: socketpair211672
-Node: span213304
-Node: split213995
-Node: sqrt215045
-Node: status215263
-Node: standard streams217558
-Node: str217955
-Node: strad219667
-Node: sub220690
-Node: subset222395
-Node: symlink222735
-Node: system223815
-Node: sys_read225767
-Node: sys_write226407
-Node: tan227007
-Node: tanh227282
-Node: tcgetpgrp227512
-Node: tcsetpgrp228132
-Node: tie229387
-Node: time230248
-Node: to_lower230840
-Node: to_upper231192
-Node: tod231543
-Node: true231903
-Node: tty_pump232289
-Node: type232899
-Node: umask233250
-Node: ungetc234332
-Node: ungetchar235313
-Node: unhex235582
-Node: unlink235951
-Node: unpretty236575
-Node: unsetctty239020
-Node: unsetenv239718
-Node: unstr240126
-Node: untie241901
-Node: val242163
-Node: wait242735
-Node: waitpid243063
-Node: whole245637
-Node: with246497
-Node: write246799
-Node: writea247083
-Node: Operator Precedence247924
-Node: Restricted Mode250231
-Node: Index252196
+Node: Top227
+Node: Overview1073
+Node: The Library1517
+Node: sharp15216
+Node: star15621
+Node: power17071
+Node: plus18237
+Node: minus20763
+Node: slash21828
+Node: equalities23271
+Node: comparatives23849
+Node: query25453
+Node: abs25935
+Node: accept26583
+Node: acos27588
+Node: and27870
+Node: any28821
+Node: arb29799
+Node: asin30144
+Node: atan30420
+Node: atan230674
+Node: bitwise logical ops31459
+Node: break32088
+Node: call32857
+Node: callout33489
+Node: ceil34386
+Node: char34906
+Node: chdir35403
+Node: clear_error36260
+Node: clock36760
+Node: close37212
+Node: close constants41138
+Node: command_line41525
+Node: command_name41899
+Node: cos42936
+Node: cosh43168
+Node: date43415
+Node: denotype43671
+Node: div44220
+Node: domain44624
+Node: dup; dup245001
+Node: eof46368
+Node: even49427
+Node: exec49917
+Node: exp52511
+Node: false52828
+Node: fdate53091
+Node: fexists54224
+Node: filename55225
+Node: fileno57433
+Node: filepos58204
+Node: filter59218
+Node: fix61465
+Node: fixed61984
+Node: float62985
+Node: floating63967
+Node: floor65118
+Node: flush65643
+Node: fork66447
+Node: from67876
+Node: fromb68436
+Node: frome68992
+Node: fsize69536
+Node: ftrunc70478
+Node: get71343
+Node: geta71800
+Node: getb73206
+Node: getc74592
+Node: getchar75801
+Node: getegid76043
+Node: getenv76437
+Node: geteuid76810
+Node: getfile77202
+Node: getgid78880
+Node: getline79343
+Node: getn80767
+Node: getpgrp81623
+Node: getpid82039
+Node: getppid82393
+Node: gets82667
+Node: getsid83895
+Node: getuid84410
+Node: getwd84786
+Node: glob85042
+Node: gmark85679
+Node: gsub86552
+Node: hex87510
+Node: hostaddr87889
+Node: hostname88711
+Node: ichar89184
+Node: impl89567
+Node: in90476
+Node: incs91848
+Node: intslash92245
+Node: ip_addresses92768
+Node: ip_names93689
+Node: type-testing94630
+Node: is_open95937
+Node: join96927
+Node: kill97576
+Node: last_error99414
+Node: len100166
+Node: less100719
+Node: lessf101054
+Node: lexists101459
+Node: link102446
+Node: log103265
+Node: lpad103519
+Node: magic103964
+Node: mark104743
+Node: match106606
+Node: max107219
+Node: min108447
+Node: mkstemp109556
+Node: mod110494
+Node: nargs111555
+Node: newat112032
+Node: no_error112682
+Node: not113022
+Node: notany113563
+Node: notin114229
+Node: npow114546
+Node: nprint114991
+Node: nprinta115316
+Node: odd116167
+Node: om116456
+Node: open117134
+Node: open arguments119122
+Node: Network sockets124407
+Node: Local sockets127679
+Node: Pipes and pumps130479
+Node: Signal streams132729
+Node: Timer streams138033
+Node: Predefined streams138840
+Node: Automatic opening140063
+Node: Buffering142494
+Node: open apocrypha148690
+Node: or152406
+Node: peekc153028
+Node: peekchar153716
+Node: peer_address153981
+Node: peer_name154903
+Node: peer_port155679
+Node: peer_sockaddr156364
+Node: pexists157138
+Node: pid158027
+Node: pipe158762
+Node: pipe_from_child159130
+Node: pipe_to_child159748
+Node: port160350
+Node: pow160951
+Node: pretty161225
+Node: print162523
+Node: printa162795
+Node: pump163470
+Node: put164998
+Node: puta165453
+Node: putb165997
+Node: putc166805
+Node: putchar167258
+Node: putfile167536
+Node: putline168450
+Node: puts169010
+Node: random170290
+Node: range172165
+Node: rany172520
+Node: rbreak173184
+Node: rlen173957
+Node: rmatch174516
+Node: rnotany175121
+Node: rspan175793
+Node: read176486
+Node: reada176769
+Node: readlink178541
+Node: reads179265
+Node: recv179812
+Node: recvfrom180712
+Node: recv_fd182229
+Node: rem183762
+Node: rename184435
+Node: reverse184803
+Node: rewind185018
+Node: round185254
+Node: routine185788
+Node: rpad186565
+Node: seek187016
+Node: seek constants188980
+Node: select189317
+Node: send195196
+Node: sendto195854
+Node: send_fd197208
+Node: setctty199083
+Node: setegid200878
+Node: setenv201294
+Node: seteuid201856
+Node: setgid202268
+Node: setpgid202661
+Node: setrandom204020
+Node: setsid204486
+Node: setuid205405
+Node: set_intslash207308
+Node: set_magic207712
+Node: shutdown208079
+Node: shutdown constants209557
+Node: sign209909
+Node: sin210214
+Node: sinh210434
+Node: sockaddr210659
+Node: socketpair211680
+Node: span213312
+Node: split214003
+Node: sqrt215053
+Node: status215271
+Node: standard streams217566
+Node: str217963
+Node: strad219675
+Node: sub220698
+Node: subset222403
+Node: symlink222743
+Node: system223823
+Node: sys_read225775
+Node: sys_write226415
+Node: tan227015
+Node: tanh227290
+Node: tcgetpgrp227520
+Node: tcsetpgrp228140
+Node: tie229395
+Node: time230256
+Node: to_lower230848
+Node: to_upper231200
+Node: tod231551
+Node: true231911
+Node: tty_pump232297
+Node: type232907
+Node: umask233258
+Node: ungetc234340
+Node: ungetchar235321
+Node: unhex235590
+Node: unlink235959
+Node: unpretty236583
+Node: unsetctty239028
+Node: unsetenv239726
+Node: unstr240134
+Node: untie241909
+Node: val242171
+Node: wait242743
+Node: waitpid243071
+Node: whole245645
+Node: with246505
+Node: write246807
+Node: writea247091
+Node: Operator Precedence247932
+Node: Restricted Mode250239
+Node: Index252204
 
 End Tag Table
 

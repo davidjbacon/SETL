@@ -1,6 +1,6 @@
 /*  ===  The SETL assembler/linker/loader  =========================  */
 
-/*  $Id: assemble.c,v 1.70 2022/12/10 23:35:26 setlorg Exp $  */
+/*  $Id: assemble.c,v 1.71 2024/04/08 18:57:22 setlorg Exp $  */
 
 /*  Free software (c) dB - see file COPYING for license (GPL).  */
 
@@ -947,7 +947,7 @@ machine *assemble(tuple *vcode, tuple *sources) {
                                  tame(gblid));
         }
         if (!isdigit((uchar)begin[0]) ||
-            !isdigit((uchar)begin[1])) {
+            (ndig_radix == 2 && !isdigit((uchar)begin[1]))) {
           tranerr("Malformed radix indicator in '%s'",
                                            tame(gblid));
         }

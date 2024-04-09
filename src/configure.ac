@@ -7,7 +7,7 @@ dnl
 dnl This "subproject" for maintaining the GNU SETL executables is
 dnl generally managed/driven by the top-level Makefile (one dir up).
 dnl
-AC_REVISION([$Id: configure.ac,v 1.117 2022/11/17 14:16:07 setlorg Exp $])
+AC_REVISION([$Id: configure.ac,v 1.118 2024/04/08 18:57:22 setlorg Exp $])
 AC_COPYRIGHT([[Free software (c) dB - see file COPYING for license (GPL).]])
 
 AC_PREREQ([2.69])
@@ -17,7 +17,7 @@ m4_include([version.m4])
 
 dnl The 4th arg must agree with the setting of pkgname in ../main.mk:
 AC_INIT([GNU SETL],
-        VERSION_NUMBER,
+        [VERSION_NUMBER],
         [David.Bacon@nyu.edu],
         [setl],
         [https://setl.org])
@@ -110,12 +110,16 @@ fi
 saved_CFLAGS=$CFLAGS
 CFLAGS="$CFLAGS -Wall -Werror"
 
-dnl Check for "#pragma GCC diagnostic" support:
+dnl Check for "#pragma GCC diagnostic" support.
+dnl Note that for convenience, this makes the test using a warning that
+dnl is far from the oldest in GCC's repertoire, so that the use of
+dnl GCC_DIAG_ON(implicit-fallthrough) (see "common.h") within function
+dnl definitions will expand to nothing:
 AH_TEMPLATE([HAVE_PRAGMA_GCC_DIAGNOSTIC],
             [Define to 1 if "#pragma GCC diagnostic" is supported.])
 AC_MSG_CHECKING([[for "#pragma GCC diagnostic" support]])
 AC_COMPILE_IFELSE([AC_LANG_SOURCE(
-  [[#pragma GCC diagnostic warning "-Wsign-compare"]])],
+  [[#pragma GCC diagnostic warning "-Wimplicit-fallthrough"]])],
   [AC_DEFINE([HAVE_PRAGMA_GCC_DIAGNOSTIC], [1])
    have_pragma_gcc_diag=yes],
   [have_pragma_gcc_diag=no])
@@ -265,11 +269,6 @@ AM_CONDITIONAL([COND_MESA],
                [test x"$with_mesa" != x && test x"$with_mesa" != xno])
 
 dnl Checks for header files:
-dnl This macro is now said to be obsolete; in any case it was just
-dnl checking for the most basic Unix headers, and given the coverage
-dnl below (and somewhere above, which is triggering checks for stdio.h
-dnl and all that crowd anyway), why bother:
-dnl AC_HEADER_STDC
 AC_HEADER_SYS_WAIT
 AC_HEADER_STAT
 AC_HEADER_STDBOOL
@@ -312,6 +311,7 @@ dnl libtool with the help of our *_LIBADD settings in Makefile.am files:
 AC_SEARCH_LIBS([atan2],[m])  dnl not [cos], 'cos cos chokes on SunOS 5.4
 AC_SEARCH_LIBS([timer_settime],[rt])
 AC_SEARCH_LIBS([socket],[socket])
+AC_SEARCH_LIBS([regcomp],[regex])
 AS_IF([test x"$with_bundled_gmp" != xyes],
   [AC_SEARCH_LIBS([__gmpz_init],[gmp],[], dnl add -lgmp to LIBS
     [AC_MSG_ERROR([cannot find installed GNU MP library (libgmp)])])],
@@ -330,7 +330,11 @@ AC_TYPE_SIZE_T
 AC_TYPE_UID_T
 AC_TYPE_INT64_T
 AC_TYPE_UINT64_T
-dnl AC_HEADER_TIME
+AC_CHECK_HEADERS_ONCE([sys/time.h])
+dnl TIME_WITH_SYS_TIME is obsolete, but some old code likes to check for it:
+if test $ac_cv_header_sys_time_h = yes; then
+  AC_DEFINE([TIME_WITH_SYS_TIME],[1],[Define to 1 if you can safely include both <sys/time.h> and <time.h>.  This macro is obsolete.])
+fi
 AC_STRUCT_TM
 AC_CHECK_TYPES([ptrdiff_t])
 AC_CHECK_TYPES([socklen_t], [], [], [[#include <sys/socket.h>]])

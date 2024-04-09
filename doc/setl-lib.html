@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html>
-<!-- Created by GNU Texinfo 7.0, https://www.gnu.org/software/texinfo/ -->
+<!-- Created by GNU Texinfo 7.0.3, https://www.gnu.org/software/texinfo/ -->
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 <title>GNU SETL Library Reference</title>
@@ -5094,8 +5094,8 @@ subsequent expiries.
 </p>
 <p>The degenerate form <code class="code">[<var class="var">interval</var>]</code>, meaning
 <code class="code">[<var class="var">interval</var>,&nbsp;<var class="var">interval</var>]</code><!-- /@w -->, may also be used, and for
-back-compatibility, the latter may be given as a decimal string rather
-than a tuple.
+back-compatibility, the interval may be given as a decimal string rather
+than in a tuple.
 </p>
 <p>As with a signal stream, the fd returned by <code class="code"><a class="ref" href="#open">open</a></code> is a
 pseudo-fd.
@@ -7157,7 +7157,7 @@ is taken to mean a loopback interface such as <code class="code">&quot;127.0.0.1
 POSIX <code class="code">sendto()</code> attempts on the Internet address(es) found for it
 fail, <code class="code"><a class="ref" href="#last_005ferror">last_error</a></code> is set according to the last of those failures.
 </p>
-<p>If <code class="code"><var class="var">f</var></code> is of <code class="code"><a class="ref" href="#open">open</a></code> mode <code class="code">&quot;udp-datagram-server&quot;</code>,
+<p>If <code class="code"><var class="var">f</var></code> is of <code class="code"><a class="ref" href="#open">open</a></code> mode <code class="code">&quot;unix-datagram-server&quot;</code>,
 <code class="code"><var class="var">pathname</var></code> is the Unix-domain socket of another server.
 Errors in POSIX <code class="code">sendto()</code> are reflected in <code class="code"><a class="ref" href="#last_005ferror">last_error</a></code>.
 </p>

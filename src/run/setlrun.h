@@ -1,6 +1,6 @@
 /*  ===  Declarations shared by the SETL run-time modules  =========  */
 
-/*  $Id: setlrun.h,v 1.231 2022/11/17 14:16:07 setlorg Exp $  */
+/*  $Id: setlrun.h,v 1.232 2024/04/08 18:57:22 setlorg Exp $  */
 
 /*  Free software (c) dB - see file COPYING for license (GPL).  */
 
@@ -1487,40 +1487,6 @@ struct pid_list_struct {
 } while (0)
 
 
-/* Min, max, abs val, sign.  Beware of side-effects in args! */
-#undef MIN
-#define MIN(a,b) ((a)<(b)?(a):(b))
-#define MIN3(a,b,c) (MIN(a,MIN(b,c)))
-#undef MAX
-#define MAX(a,b) ((a)>(b)?(a):(b))
-#define MAX3(a,b,c) (MAX(a,MAX(b,c)))
-#undef ABS
-#define ABS(a) ((a)<0?-(a):(a))
-#undef SIGN
-#define SIGN(a) ((a)<0?-1:(a)>0?1:0)
-
-/* Test for satisfaction of all bits in a mask:  */
-#undef test_all  /* just in case */
-#define test_all(a,mask) (((a)&(mask))==(mask))
-
-/* Test for satisfaction of any bits in a mask:  */
-#undef test_any  /* just in case */
-#define test_any(a,mask) (((a)&(mask))!=0)
-
-/*
- *  C string equality, inequality.
- */
-#define leq(s,t) (strcmp(s,t)==0)  /* "lexically equal" */
-#define lne(s,t) (strcmp(s,t)!=0)
-#define leqn(s,t,n) (strncmp(s,t,n)==0)
-#define lnen(s,t,n) (strncmp(s,t,n)!=0)
-#define lpfx(s,t) (strncmp(s,t,strlen(t))==0)  /* s begins with t */
-#if HAVE_STRCASECMP && HAVE_DECL_STRCASECMP
-#define leq_ic(s,t) (strcasecmp(s,t)==0)  /* leq but "ignore case" */
-#else
-#define leq_ic(s,t) (case_insensitively_equal(s,t))
-#endif
-
 /*
  *  An alternative to strndup() that uses os_malloc() to get the space.
  */
@@ -1561,7 +1527,7 @@ struct pid_list_struct {
 
 /*
  *  A comparison result convention:  -1, 0, and 1 must not be changed,
- *  and additional result cases must be +ve.  See also the SIGN macro.
+ *  and additional result cases must be +ve.
  */
 #define A_LT_B  (-1)  /* A < B */
 #define A_EQ_B    0   /* A = B */

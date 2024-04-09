@@ -1,6 +1,6 @@
 /*  ===  Operating system interface wrappers  ======================  */
 
-/*  $Id: os.c,v 1.133 2022/12/17 18:04:28 setlorg Exp $  */
+/*  $Id: os.c,v 1.134 2024/04/08 18:57:22 setlorg Exp $  */
 
 /*  Free software (c) dB - see file COPYING for license (GPL).  */
 
@@ -1304,9 +1304,20 @@ int os_pselect(int nfds,
                const sigset_t *sigmask) {
   int saved_errno = errno;
 #if HAVE_PSELECT && HAVE_DECL_PSELECT
-  int r = pselect(nfds, readfds,
-                        writefds,
-                        exceptfds, timeout, sigmask);
+  /* pselect() does not modify the timeout arg, but for historical
+   * reasons that arg is non-const anyway; so make a local copy and
+   * pass that instead:  */
+  int r;
+  struct timespec t, *tp;
+  if (timeout) {
+    t = *timeout;  /* local non-const copy */
+    tp = &t;
+  } else {
+    tp = NULL;
+  }
+  r = pselect(nfds, readfds,
+                    writefds,
+                    exceptfds, tp, sigmask);
   if (r != -1) {
     errno = saved_errno;
     return r;  /* success */

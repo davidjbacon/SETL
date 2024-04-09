@@ -1,4 +1,4 @@
-This is setl-user.info, produced by makeinfo version 7.0 from
+This is setl-user.info, produced by makeinfo version 7.0.3 from
 setl-user.texi.
 
 INFO-DIR-SECTION High-level programming
@@ -1164,54 +1164,54 @@ Index
 
 
 Tag Table:
-Node: Top453
-Node: setl1323
-Node: examples2388
-Node: details4925
-Ref: --cpp5201
-Ref: --compile8350
-Ref: setl --font-hints8663
-Ref: setl --keyword-case13770
-Ref: setl --identifier-case13770
-Ref: --maxmem option14193
-Ref: --restricted14577
-Ref: --allow-...15470
-Ref: --allow-open15470
-Ref: --allow-fd-open15470
-Ref: --allow-mkstemp15470
-Ref: --allow-filter15470
-Ref: --allow-system15470
-Ref: --setlcpp18307
-Ref: --setltran19276
-Ref: setl --help20225
-Ref: setl --version20312
-Ref: setl --verbose20409
-Ref: setl --debug20519
-Node: #! invocation21792
-Node: envt vars25866
-Ref: SETL_LINEBUF_STDERR26932
-Node: signals27972
-Node: exit status28248
-Node: setlcpp30015
-Node: setlcpp examples30730
-Node: setlcpp details33226
-Ref: setlcpp --help33535
-Ref: setlcpp --version33622
-Ref: -lang-setl33724
-Ref: cpp-option34066
-Node: setlcpp envt vars35499
-Ref: SETL_INCLUDE_PATH35632
-Node: setltran36105
-Node: setltran examples36659
-Node: setltran details38977
-Ref: setltran --help39258
-Ref: setltran --version39345
-Ref: setltran --font-hints39448
-Ref: setltran --verbose39888
-Ref: setltran --debug40042
-Ref: setltran --keyword-case40372
-Ref: setltran --identifier-case40372
-Node: Index42075
+Node: Top455
+Node: setl1325
+Node: examples2390
+Node: details4927
+Ref: --cpp5203
+Ref: --compile8352
+Ref: setl --font-hints8665
+Ref: setl --keyword-case13772
+Ref: setl --identifier-case13772
+Ref: --maxmem option14195
+Ref: --restricted14579
+Ref: --allow-...15472
+Ref: --allow-open15472
+Ref: --allow-fd-open15472
+Ref: --allow-mkstemp15472
+Ref: --allow-filter15472
+Ref: --allow-system15472
+Ref: --setlcpp18309
+Ref: --setltran19278
+Ref: setl --help20227
+Ref: setl --version20314
+Ref: setl --verbose20411
+Ref: setl --debug20521
+Node: #! invocation21794
+Node: envt vars25868
+Ref: SETL_LINEBUF_STDERR26934
+Node: signals27974
+Node: exit status28250
+Node: setlcpp30017
+Node: setlcpp examples30732
+Node: setlcpp details33228
+Ref: setlcpp --help33537
+Ref: setlcpp --version33624
+Ref: -lang-setl33726
+Ref: cpp-option34068
+Node: setlcpp envt vars35501
+Ref: SETL_INCLUDE_PATH35634
+Node: setltran36107
+Node: setltran examples36661
+Node: setltran details38979
+Ref: setltran --help39260
+Ref: setltran --version39347
+Ref: setltran --font-hints39450
+Ref: setltran --verbose39890
+Ref: setltran --debug40044
+Ref: setltran --keyword-case40374
+Ref: setltran --identifier-case40374
+Node: Index42077
 
 End Tag Table
 

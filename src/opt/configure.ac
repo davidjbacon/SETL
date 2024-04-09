@@ -3,7 +3,7 @@ dnl
 dnl This "subproject" for maintaining optional customization packages
 dnl is generally managed/driven by the very top-level Makefile.
 dnl
-AC_REVISION([$Id: configure.ac,v 1.26 2021/07/12 20:19:58 setlorg Exp $])
+AC_REVISION([$Id: configure.ac,v 1.27 2024/04/08 18:57:22 setlorg Exp $])
 AC_COPYRIGHT([[Free software (c) dB - see file COPYING for license (GPL).]])
 
 AC_PREREQ([2.69])
@@ -15,7 +15,7 @@ dnl The 4th arg (TARNAME) to AC_INIT is effectively a placeholder
 dnl (nothing is meant to be distributed or installed directly from this
 dnl subproject, though "make dist" gives setl-opt-*.tar.gz):
 AC_INIT([GNU SETL opt pax],
-        VERSION_NUMBER,
+        [VERSION_NUMBER],
         [David.Bacon@nyu.edu],
         [setl-opt],
         [https://setl.org])

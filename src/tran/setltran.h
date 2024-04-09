@@ -1,6 +1,6 @@
 /*  --  Declarations shared by the SETL translator modules  --  */
 
-/*  $Id: setltran.h,v 1.27 2021/08/25 23:03:22 setlorg Exp $  */
+/*  $Id: setltran.h,v 1.28 2024/04/08 18:57:22 setlorg Exp $  */
 
 /*  Free software (c) dB - see file COPYING for license (GPL).  */
 
@@ -431,10 +431,6 @@ extern csect *virtcode;       /* list of routines made by 'gencode' */
 #define allocnode(p,k)    p = (node *) mem_alloc(nodesize(k))
 #define allocsym(p,k)     p = (symbol *) mem_alloc(symsize(k))
 #define release(p)        mem_free(p)
-
-#define leq(s,t)  (strcmp(s,t)==0)  /* s equals t */
-#define lne(s,t)  (strcmp(s,t)!=0)  /* s differs from t */
-#define lpfx(s,t) (strncmp(s,t,strlen(t))==0)  /* t is a pfx of s */
 
 #define sub0(p)   ((p)->sub[0])
 #define sub1(p)   ((p)->sub[1])

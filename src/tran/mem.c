@@ -1,6 +1,6 @@
 /*  ===  Translator memory management  =============================  */
 
-/*  $Id: mem.c,v 1.14 2022/12/10 23:35:26 setlorg Exp $  */
+/*  $Id: mem.c,v 1.15 2024/04/09 16:32:31 setlorg Exp $  */
 
 /*  Free software (c) dB - see file COPYING for license (GPL).  */
 
@@ -97,7 +97,11 @@ void *mem_realloc(void *p, size_t nbytes) {
     exit(2);
   }
   if (ephemeral && (r != p)) {
+    /* Turn off diagnostic where applicable because mem_remove does
+     * not "use" (dereference) p, just searches for it:  */
+GCC_DIAG_OFF(use-after-free)
     mem_remove(p);  /* remove the old pointer from our notes */
+GCC_DIAG_ON(use-after-free)
     mem_note(r);  /* and add the new one */
   }
   return r;

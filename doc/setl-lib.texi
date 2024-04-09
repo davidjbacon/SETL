@@ -1,7 +1,7 @@
 \input texinfo @c -*-texinfo-*-
 @c %**start of header
 @c
-@c $Id: setl-lib.texi,v 1.401 2022/12/10 23:35:26 setlorg Exp $
+@c $Id: setl-lib.texi,v 1.402 2024/04/08 18:57:22 setlorg Exp $
 @c
 @c Free software (c) dB - see file COPYING for license (GPL).
 @c
@@ -5267,8 +5267,8 @@ subsequent expiries.
 
 The degenerate form @setl{[@sv{interval}]}, meaning
 @w{@setl{[@sv{interval}, @sv{interval}]}}, may also be used, and for
-back-compatibility, the latter may be given as a decimal string rather
-than a tuple.
+back-compatibility, the interval may be given as a decimal string rather
+than in a tuple.
 
 As with a signal stream, the fd returned by @rf{open} is a
 pseudo-fd.
@@ -7420,7 +7420,7 @@ If POSIX @posix{getaddrinfo()} fails on the given @meta{dest}, or all
 POSIX @posix{sendto()} attempts on the Internet address(es) found for it
 fail, @rf{last_error} is set according to the last of those failures.
 
-If @meta{f} is of @rf{open} mode @mode{udp-datagram-server},
+If @meta{f} is of @rf{open} mode @mode{unix-datagram-server},
 @meta{pathname} is the Unix-domain socket of another server.
 Errors in POSIX @posix{sendto()} are reflected in @rf{last_error}.
 
