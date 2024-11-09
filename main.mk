@@ -853,6 +853,8 @@ superclean:
 	-rm -f $(ssrc)/version.m4
 	-rm -f $(sdoc)/version.m4
 	-rm -f $(sdoc)/texinfo.tex~
+# Clean out even these distributed files if present:
+	-rm -f $(sdoc)/setl*.html $(sdoc)/setl*.info $(sdoc)/setl*.pdf
 
 
 # "make distcheck" makes a "distribution" from $(ssrc) and from $(sdoc).
