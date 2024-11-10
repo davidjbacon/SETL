@@ -1,6 +1,6 @@
 # Used by a makefile to build, check, install, and distribute GNU SETL
 #
-# $Id: main.mk,v 1.53 2022/12/11 17:09:26 setlorg Exp $
+# $Id: main.mk,v 1.54 2024/11/10 04:03:11 setlorg Exp $
 #
 # Free software (c) dB - see file COPYING for license (GPL).
 #

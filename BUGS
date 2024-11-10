@@ -1,4 +1,4 @@
-$Id: BUGS,v 1.36 2022/12/10 23:35:25 setlorg Exp $
+$Id: BUGS,v 1.37 2024/11/10 04:03:11 setlorg Exp $
 
 Free software (c) dB - see file COPYING for license (GPL).
 
@@ -127,6 +127,13 @@ Known bugs in GNU SETL
 
 - Strings to be matched by regular expressions cannot contain NUL (0)
   characters.  (No problem when MAGIC is FALSE, though.)
+  Actually that restriction is now lifted for Linux and every platform
+  with BSD genes, as they #define REG_STARTEND in or via <regex.h>.
+
+- It would be nice if back-refs in q in a p..q or [p,q] pattern could
+  refer to groups in p and use the same numbering system as the
+  replacement does (start in p and continue in q); but the current
+  simpl impl takes \1 in q to refer to the first group within q, etc.
 
 - The demo programs in src/run/freeglut-setl/progs/demos/*/*.c all
   segfault during exit when you use the Esc key on the graphics window

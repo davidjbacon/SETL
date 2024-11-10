@@ -9,6 +9,8 @@ LOOP DO
   t +:= [s];
 END LOOP;
 
+ASSERT REVERSE t = [t(i) : i in [#t,#t-1..1]];
+
 (FOR i IN [#t,#t-1..1])
    PRINT(t(i));
 END FOR;

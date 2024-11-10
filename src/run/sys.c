@@ -1,6 +1,6 @@
 /*  ===  SETL run-time fundamentals  ===============================  */
 
-/*  $Id: sys.c,v 1.310 2022/12/10 23:35:26 setlorg Exp $  */
+/*  $Id: sys.c,v 1.311 2024/11/10 04:03:13 setlorg Exp $  */
 
 /*  Free software (c) dB - see file COPYING for license (GPL).  */
 
@@ -1665,7 +1665,7 @@ tuple *tup_join(tuple *a, tuple *b) {
   na = a->nelt;
   nb = b->nelt;
   n = na + nb;
-  r = alloc_tuple(n,0,0);
+  r = new_tuple(n);
   for (i=1; i<=na; i++) tupelt(r,i) = tupelt(a,i);
   for (i=1; i<=nb; i++) tupelt(r,i+na) = tupelt(b,i);
   retire(hb);
@@ -3921,7 +3921,7 @@ tuple *copy_tuple(tuple *p) {
   assert (is_tuple(p));
   hp = ref(p);
   nelt = p->nelt;
-  r = alloc_tuple(nelt,0,0);  /* nelt, npre, nsuf */
+  r = new_tuple(nelt);
   hr = ref(r);
   for (i=1; i<=nelt; i++) {
     let (tupelt(r,i), copy_value(tupelt(p,i)));

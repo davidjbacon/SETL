@@ -44,8 +44,30 @@ s(1..':') := ''; print(s);
 s('turd'..) := ''; print(s);
 print(mark(t,['/\\*','\\*/']));
 print(gmark(t,['/\\*','\\*/']));
-print(gsub(t,['/\\*','\\*/']));
-print(t);
+
+s :=
+'      #endif\n' +
+'\n' +
+'      #ifdef ARC22_PORT80\n' +
+'      WritePORT80(0xf5);\n' +
+'      #endif\n' +
+'   }\n' +
+'\n' +
+'...\n' +
+'\n' +
+'   #ifdef ARC22_PORT80\n' +
+'   WritePORT80(0xf7);\n' +
+'   #endif\n' +
+'\n' +
+'   if ( spinlock )\n';
+print('orig:');
+putchar(s);
+l := '\n  ( *#ifdef ARC22_PORT80)\n  ';
+r := '\n  ( *#endif)\n';
+print('matched:');
+print(gsub(s,[l,r],'\n//\\1\n//\\-\n//\\2\n'));
+print('new:');
+putchar(s);
 
 cs := +/[c in +/[char(i): i in [0...255]] | c('[a-z]') /= om];
 t := +/[random cs: i in [1..1000]];

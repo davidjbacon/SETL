@@ -1,6 +1,6 @@
 /*  ===  String matching using regular expressions  ================  */
 
-/*  $Id: rex.c,v 1.33 2021/05/20 18:09:09 setlorg Exp $  */
+/*  $Id: rex.c,v 1.34 2024/11/10 04:03:13 setlorg Exp $  */
 
 /*  Free software (c) dB - see file COPYING for license (GPL).  */
 
@@ -10,27 +10,30 @@
 
 #include "setlrun.h"
 
-#ifdef USE_REGEX  /* POSIX */
+#ifndef USE_REGEX  /* POSIX EREs */
+#error  POSIX regex support required - see setlrun.h
+#endif
 
 #include <regex.h>
 
-typedef regex_t  pat;  /* regex pattern buffer */
-#define NOMINAL_BUFSIZ  64
+typedef struct {long i; long j;}  intpair;  /* 1-origined indices */
+static const intpair zero_intpair = {0};
 
-#else /* !USE_REGEX */
-
-#include <regexp.h>
-
-typedef struct {char *buffer; int circf;}  pat;
-#define INIT_BUFSIZ  32
-
-#endif /* !USE_REGEX */
-
-typedef struct {long i; long j;}  intpair;
-#define MAX_MATCHGROUPS 10  /* including \0, a.k.a. & */
-typedef struct {
-  long nmatches;  /* -1 for integers or non-MAGIC (suppress rhs subst) */
-  intpair matches[MAX_MATCHGROUPS];
+#define MAX_MATCHGROUPS  10  /* including "group 0" (\0 aka &) */
+typedef struct {  /* descriptor for a match, or integer bound */
+  /* nmatches is 1 more than re_nsub, the number of parenthesized
+   * (sub)groups found in the pattern; or -1 for an integer bound or
+   * non-MAGIC match in matches[0]; or 0 (default) for non-match.  */
+  long nmatches;  /* up to MAX_MATCHGROUPS, including group 0 */
+  /* The meaning of \- in a replacement string for s(p..q) when p and q
+   * are string patterns is everything between p and q _exclusive_.
+   * But when either bound is an integer, \- includes that bound; so
+   * for s(p..) aka s(p..#s), \- is everything after p; and for s(..q)
+   * aka s(1..q), \- is everything before q.  \- is only meaningful
+   * for p..q and [p,q] patterns.  */
+  intpair between;  /* for \-; between.i == 0 means no "between" */
+  intpair matches[MAX_MATCHGROUPS];  /* for each \{digit} */
+  #define whole_match  matches[0]  /* group 0, or nmatches == -1 */
 } matchgroups;
 
 
@@ -42,35 +45,38 @@ static intpair rex_slicebounds(string *s, block *p, block *q);
 /* Gimme matches in mg */
 static void rex_matches(string *s, block *p, matchgroups *mg);
 static void rex_stringmatches(string *s, long k, string *p,
-                                             matchgroups *mg);
+                               matchgroups *mg);
 static void rex_slicematches(string *s, block *p, block *q,
-                                             matchgroups *mg);
+                              matchgroups *mg);
 
 static void rex_combinegroups(const matchgroups *mgp,
                               const matchgroups *mgq,
                                     matchgroups *mg);
 
-/* Substitute in host, using mg and \digit (and &) in x */
-static void rex_replace(string **host, string *x,
-                                       const matchgroups *mg);
-static string *rex_replacement(string *s, string *x,
-                                       const matchgroups *mg);
+/* Replace matched substr of *host with rex_replacement(*host,x,mg) */
+static void rex_replace(string **host, string *x, const matchgroups *mg);
+/* Replacement for s substr given match mg and replacement pattern x */
+static string *rex_replacement(string *s, string *x, const matchgroups *mg);
 
-/* Non-magic rex_step and rex_matchstep */
-static bool rex_find(string *s, long k, string *p, intpair *ind);
+/* Non-magic rex_markstep and rex_matchstep */
+static bool rex_markfind(string *s, long k, string *p,
+                          intpair *ind);
 static bool rex_matchfind(string *s, long k, string *p,
-                                             matchgroups *mg);
+                           matchgroups *mg);
+
+/* true if ind := where p occurs in s, starting at s(k) */
+static bool rex_markstep(string *s, long k, const regex_t *p,
+                          intpair *ind);
+/* true if mg := where p occurs in s, and groups, starting at s(k) */
+static bool rex_matchstep(string *s, long k, const regex_t *p,
+                           matchgroups *mg);
 
 /* Foundations */
-static void rex_comp(pat *r, string *p);
-static bool rex_step(string *s, long k, const pat *p, intpair *ind);
-static bool rex_matchstep(string *s, long k, const pat *p,
-                                             matchgroups *mg);
-static void rex_done(pat *p);
+static void rex_comp(regex_t *r, string *p);
+static bool rex_exec(string *s, long k, const regex_t *p,
+                      matchgroups *mg, size_t max_matchgroups);
+static void rex_done(regex_t *p);
 
-#ifndef USE_REGEX
-static void rex_error(int c) NO_RETURN;
-#endif
 
 #define infinitely_many_nulls \
  runerr("Infinitely many occurrences of the empty string");
@@ -78,8 +84,7 @@ static void rex_error(int c) NO_RETURN;
 
 string *rex_fetch(string *s, string *p) {
   string *r = OM;
-  intpair t;
-  t = rex_stringbounds(s,1,p);
+  intpair t = rex_stringbounds(s,1,p);
   if (t.i > 0) r = copy_substring(s,t.i,t.j);
   return r;
 } /* end rex_fetch */
@@ -94,8 +99,7 @@ void rex_store(string **host, string *p, string *x) {
 
 string *rex_getslice(string *s, block *p, block *q) {
   string *r = OM;
-  intpair t;
-  t = rex_slicebounds(s,p,q);
+  intpair t = rex_slicebounds(s,p,q);
   if (t.i > 0) r = copy_substring(s,t.i,t.j);
   return r;
 } /* end rex_getslice */
@@ -127,7 +131,7 @@ string *rex_sub(string **host, block *p, string *x) {
   if (mg.nmatches != 0) {
     HANDLE hs = ref(s);
     HANDLE hx = ref(x);
-    intpair t = mg.matches[0];
+    intpair t = mg.whole_match;
     string *r = copy_substring(s,t.i,t.j);
     HANDLE hr = ref(r);
     rex_replace(&s,x,&mg);
@@ -164,12 +168,12 @@ tuple *rex_gmark(string *s, block *p) {
         k = j + 1;                                            \
       }
       if (get_magic()) {
-        pat b;
+        regex_t b;
         rex_comp(&b,(string *)p);
-        gmark_do_string(rex_step(s,k,&b,&ind))
+        gmark_do_string(rex_markstep(s,k,&b,&ind))
         rex_done(&b);
       } else {
-        gmark_do_string(rex_find(s,k,(string *)p,&ind))
+        gmark_do_string(rex_markfind(s,k,(string *)p,&ind))
       }
     }
     break;
@@ -196,18 +200,18 @@ tuple *rex_gmark(string *s, block *p) {
         }                                                     \
       }
       if (get_magic()) {
-        pat b1, b2;
+        regex_t b1, b2;
         rex_comp(&b1,(string *)tupelt((tuple *)p,1));
         rex_comp(&b2,(string *)tupelt((tuple *)p,2));
         gmark_do_tuple(
-         rex_step(s,k,&b1,&ind1),
-         rex_step(s,m,&b2,&ind2))
+         rex_markstep(s,k,&b1,&ind1),
+         rex_markstep(s,m,&b2,&ind2))
         rex_done(&b2);
         rex_done(&b1);
       } else {
         gmark_do_tuple(
-         rex_find(s,k,(string *)tupelt((tuple *)p,1),&ind1),
-         rex_find(s,m,(string *)tupelt((tuple *)p,2),&ind2))
+         rex_markfind(s,k,(string *)tupelt((tuple *)p,1),&ind1),
+         rex_markfind(s,m,(string *)tupelt((tuple *)p,2),&ind2))
       }
     }
     break;
@@ -237,7 +241,7 @@ tuple *rex_gsub(string **host, block *p, string *x) {
       #define gsub_do_string(STEP)                            \
       k = 1;                                                  \
       while (k <= s->nchar && (STEP)) {                       \
-        intpair ind = mg.matches[0];                          \
+        intpair ind = mg.whole_match;                         \
         long i = ind.i;                                       \
         long j = ind.j;                                       \
         if (j < i) infinitely_many_nulls                      \
@@ -249,7 +253,7 @@ tuple *rex_gsub(string **host, block *p, string *x) {
       }                                                       \
       str_concat_substring(&a,s,k,s->nchar);
       if (get_magic()) {
-        pat b;
+        regex_t b;
         rex_comp(&b,(string *)p);
         gsub_do_string(rex_matchstep(s,k,&b,&mg))
         rex_done(&b);
@@ -265,19 +269,21 @@ tuple *rex_gsub(string **host, block *p, string *x) {
       #define gsub_do_tuple(STEP1,STEP2)                      \
       k = 1;                                                  \
       while (k <= s->nchar && (STEP1)) {                      \
-        intpair ind1 = mg1.matches[0];                        \
+        intpair ind1 = mg1.whole_match;                       \
         long m = ind1.j + 1;                                  \
         if (m <= s->nchar && (STEP2)) {                       \
           matchgroups mg;                                     \
-          intpair ind2 = mg2.matches[0];                      \
+          intpair ind2 = mg2.whole_match;                     \
           long i = ind1.i;                                    \
           long j = ind2.j;                                    \
           if (j < i) infinitely_many_nulls                    \
           t = copy_substring(s,i,j);                          \
           tup_tackon(&r,(block *)t);                          \
           str_concat_substring(&a,s,k,i-1);                   \
-          mg.matches[0].i = i;                                \
-          mg.matches[0].j = j;                                \
+          mg.whole_match.i = i;                               \
+          mg.whole_match.j = j;                               \
+          mg.between.i = ind1.j + 1;  /* m */                 \
+          mg.between.j = ind2.i - 1;                          \
           rex_combinegroups(&mg1,&mg2,&mg);                   \
           str_concat(&a,rex_replacement(s,x,&mg));            \
           k = j + 1;                                          \
@@ -287,7 +293,7 @@ tuple *rex_gsub(string **host, block *p, string *x) {
       }                                                       \
       str_concat_substring(&a,s,k,s->nchar);
       if (get_magic()) {
-        pat b1, b2;
+        regex_t b1, b2;
         rex_comp(&b1,(string *)tupelt((tuple *)p,1));
         rex_comp(&b2,(string *)tupelt((tuple *)p,2));
         gsub_do_tuple(
@@ -322,27 +328,24 @@ tuple *rex_split(string *s, string *p) {
   HANDLE hp = ref(p);
   tuple *r = null_tuple();      HANDLE hr = ref(r);
   string *t;
-  pat b;
+  regex_t b;
   long k, n;
   long i_offset, j_offset;
-  intpair ind, first_ind, last_ind;
+  intpair ind = zero_intpair,
+    first_ind = zero_intpair,
+     last_ind = zero_intpair;
   bool magic = get_magic();
 
   assert (is_string(s));
   assert (is_string(p));
 
 # define split_a_gut(string,index) \
-  (magic ? rex_step(string,index,&b,&ind)  \
-         : rex_find(string,index,p,&ind))
+  (magic ? rex_markstep(string,index,&b,&ind)  \
+         : rex_markfind(string,index,p,&ind))
 
   if (s->nchar == 0) goto byebye_rex_split;  /* returning null tuple */
 
   if (magic) rex_comp(&b,p);
-
-  first_ind.i = 0;
-  first_ind.j = -1;  /* initialize to appease compilers */
-  last_ind.i = -1;  /* initialize to appease compilers */
-  last_ind.j = 0;
 
   for (k = 1; k <= s->nchar && split_a_gut(s,k); k += j_offset) {
     if (k == 1) first_ind = ind;
@@ -436,12 +439,12 @@ static intpair rex_bounds(string *s, block *p) {
 static intpair rex_stringbounds(string *s, long k, string *p) {
   intpair r;
   if (get_magic()) {
-    pat b;
+    regex_t b;
     rex_comp(&b,p);
-    rex_step(s,k,&b,&r);
+    rex_markstep(s,k,&b,&r);
     rex_done(&b);
   } else {
-    rex_find(s,k,p,&r);
+    rex_markfind(s,k,p,&r);
   }
   return r;
 } /* end rex_stringbounds */
@@ -490,9 +493,12 @@ static void rex_matches(string *s, block *p, matchgroups *mg) {
     rex_stringmatches(s,1,(string *)p,mg);
     break;
   case integer_type:
-    mg->nmatches = -1;
-    mg->matches[0].i = mg->matches[0].j =
-     get_pos_long((integer *)p, "string subscript");
+    {
+      long i = get_pos_long((integer *)p, "string subscript");
+      mg->nmatches = -1;
+      mg->whole_match.i = i;
+      mg->whole_match.j = i;
+    }
     break;
   case tuple_type:
     assert (((tuple *)p)->nelt == 2);
@@ -506,7 +512,7 @@ static void rex_matches(string *s, block *p, matchgroups *mg) {
 static void rex_stringmatches(string *s, long k, string *p,
                                                      matchgroups *mg) {
   if (get_magic()) {
-    pat b;
+    regex_t b;
     rex_comp(&b,p);
     rex_matchstep(s,k,&b,mg);
     rex_done(&b);
@@ -520,8 +526,6 @@ static void rex_slicematches(string *s, block *p, block *q,
   long i,j,k;
   matchgroups mgp, mgq;
   assert (is_string(s));
-  mgp.nmatches = 0;  /* default */
-  mgq.nmatches = 0;  /* default */
   switch (setl_type(p)) {
   case integer_type:
     i = get_pos_long((integer *)p, "string slice lower index");
@@ -531,42 +535,43 @@ static void rex_slicematches(string *s, block *p, block *q,
   case string_type:
     rex_stringmatches(s,1,(string *)p,&mgp);
     if (mgp.nmatches == 0) goto nomatch;
-    i = mgp.matches[0].i;
-    k = mgp.matches[0].j + 1;
+    i = mgp.whole_match.i;
+    k = mgp.whole_match.j + 1;
     break;
   default:
     unexpected (setl_type(p));
   }
+  mg->whole_match.i = i;  /* left end of the whole matched slice \0 */
+  mg->between.i = k;  /* left end of \- */
   switch (setl_type(q)) {
   case integer_type:
     j = get_nat_long((integer *)q, "string slice upper index");
     if (j < i-1) j = i-1;  /* the empty string slice just before i */
+    k = j;
     mgq.nmatches = -1;
     break;
   case string_type:
     rex_stringmatches(s,k,(string *)q,&mgq);
     if (mgq.nmatches == 0) goto nomatch;
-    j = mgq.matches[0].j;
+    j = mgq.whole_match.j;
+    k = mgq.whole_match.i - 1;
     break;
   default:
     unexpected (setl_type(q));
   }
-  /* Make \0 refer to the whole matched slice:  */
-  mg->matches[0].i = i;
-  mg->matches[0].j = j;
-  /* Make \1, \2, ... refer to the "concatenation" of parenthesized
-   * groups:  */
-  rex_combinegroups(&mgp,&mgq,mg);
+  mg->whole_match.j = j;  /* right end of the whole matched slice \0 */
+  mg->between.j = k;  /* right end of \- */
+  rex_combinegroups(&mgp,&mgq,mg);  /* "concatenate" subgroup matches */
   return;
 nomatch:
   mg->nmatches = 0;
 } /* end rex_slicematches */
 
+/* "Concatenate" (sub)group matches into mg->matches[1..] but assume
+ * caller inits mg->matches[0] (mg->whole_match) and mg->between.  */
 static void rex_combinegroups(const matchgroups *mgp,
                               const matchgroups *mgq,
                                     matchgroups *mg) {
-  /* Make \1, \2, ... refer to parenthesized groups in p followed by
-   * parenthesized groups in q.  */
   long i,j,k;
   long pm = mgp->nmatches;
   long qm = mgq->nmatches;
@@ -592,7 +597,7 @@ static void rex_replace(string **host, string *x,
                                                const matchgroups *mg) {
   string *s = *host;  HANDLE hs = ref(s);
   string *y = rex_replacement(s,x,mg);
-  intpair ind = mg->matches[0];
+  intpair ind = mg->whole_match;
   str_insert(&s,ind.i,ind.j,y);
   retire(hs);
   *host = s;
@@ -604,10 +609,12 @@ static string *rex_replacement(string *s, string *x,
   HANDLE hx;
   string *r;
   HANDLE hr;
-  intpair ind;
   long i;
+  bool between_is_defined;
   if (mg->nmatches < 0) return copy_string(x);
-  assert (mg->nmatches > 0);
+  assert (mg->nmatches > 0);  /* make sure mg isn't a non-match */
+  /* "between" is only defined for p..q and [p,q] patterns */
+  between_is_defined = mg->between.i > 0;
   hs = ref(s);
   hx = ref(x);
   r = NULL;
@@ -622,56 +629,64 @@ static string *rex_replacement(string *s, string *x,
         int d;
         c = strelt(x,i);
         d = digval[(uchar)c];
-        if (d >= 0) {
+        if (d >= 0) {  /* \0 thru \9 */
           if (d < mg->nmatches) {
-            ind = mg->matches[d];
+            intpair ind = mg->matches[d];
             if (ind.i > 0) {
-              str_concat_substring(&r,s,ind.i,ind.j);  /* d'th subexpr */
+              str_concat_substring(&r,s,ind.i,ind.j);
             }
           }
-          /* \digit for no such subexpr --> empty string */
+          /* if d >= nmatches or matches[d] <= 0, \{d} is empty */
+        } else if (between_is_defined && c == '-') {
+          intpair ind = mg->between;
+          str_concat_substring(&r,s,ind.i,ind.j);
         } else {
-          str_tackon(&r,c);  /* any non-digit after backslash */
+          str_tackon(&r,c);  /* anything else after backslash */
         }
       }
       break;
-    case '&':
-      ind = mg->matches[0];
-      str_concat_substring(&r,s,ind.i,ind.j);  /* whole matched substr */
+    case '&':  /* same as \0 */
+      {
+        intpair ind = mg->whole_match;  /* i.e., mg->matches[0] */
+        str_concat_substring(&r,s,ind.i,ind.j);
+      }
       break;
     default:
       str_tackon(&r,c);  /* normal char (not backslash or ampersand) */
     }
   }
-  /* The portion of s to be replaced is specified by mg->matches[0].  */
   retire(hr);
   retire(hx);
   retire(hs);
   return r;
-} /* end rex_replace */
+} /* end rex_replacement */
 
 
-static bool rex_find(string *s, long k, string *p, intpair *ind) {
+static bool rex_markfind(string *s, long k, string *p,
+                          intpair *ind) {
   long lim = s->nchar - p->nchar + 1;
-  while (k <= lim && memcmp(&strelt(s,k),&strelt(p,1),p->nchar) != 0) {
+  while (k <= lim) {
+    char *t = (char *)memchr(&strelt(s,k), strelt(p,1), p->nchar);
+    if (!t) goto nomatch;
+    k += t - &strelt(s,k);
+    if (memcmp(&strelt(s,k), &strelt(p,1), p->nchar) == 0) break;
     k++;
   }
-  if (k > lim) goto nomatch;  /* after the code pattern in rex_step() */
+  if (k > lim) goto nomatch;
   ind->i = k;
   ind->j = k + p->nchar - 1;
   return true;
 nomatch:
-  ind->i = 0;
-  ind->j = 0;
+  *ind = zero_intpair;
   return false;
-} /* end rex_find */
+} /* end rex_markfind */
 
 static bool rex_matchfind(string *s, long k, string *p,
-                                                     matchgroups *mg) {
+                           matchgroups *mg) {
   intpair ind;
-  if (!rex_find(s,k,p,&ind)) goto nomatch;
+  if (!rex_markfind(s,k,p,&ind)) goto nomatch;
   mg->nmatches = -1;
-  mg->matches[0] = ind;
+  mg->whole_match = ind;
   return true;
 nomatch:
   mg->nmatches = 0;
@@ -679,14 +694,31 @@ nomatch:
 } /* end rex_matchfind */
 
 
-#ifdef USE_REGEX
+static bool rex_markstep(string *s, long k, const regex_t *p,
+                          intpair *ind) {
+  matchgroups mg;
+  if (rex_exec(s, k, p, &mg, 1)) {
+    *ind = mg.whole_match;  /* i.e., mg.matches[0] */
+    return true;
+  } else {
+    *ind = zero_intpair;
+    return false;
+  }
+} /* end rex_markstep */
 
-static void rex_comp(pat *r, string *p) {
+static bool rex_matchstep(string *s, long k, const regex_t *p,
+                           matchgroups *mg) {
+  return rex_exec(s, k, p, mg, MAX_MATCHGROUPS);
+} /* end rex_matchstep */
+
+
+static void rex_comp(regex_t *r, string *p) {
   int rc;
   assert (is_string(p));
   if (strlen(&strelt(p,1)) != (size_t)p->nchar) {
     runerr("Regular expression pattern must not contain NUL characters");
   }
+  /* Compile as extended (ERE) not basic (BRE) regexp.  */
   rc = regcomp(r, &strelt(p,1), REG_EXTENDED);
   if (rc != 0) {
     char msg[100];
@@ -695,47 +727,39 @@ static void rex_comp(pat *r, string *p) {
   }
 } /* end rex_comp */
 
-static bool rex_step(string *s, long k, const pat *p, intpair *ind) {
+/* Populate n = mg->nmatches and n elements of mg->matches by
+ * applying regexec at s(k..) using compiled pattern p.  */
+static bool rex_exec(string *s, long k, const regex_t *p,
+                      matchgroups *mg, size_t max_matchgroups) {
   int rc;
-  regmatch_t pmatch[1];
+  long i;
+  long n = MIN(p->re_nsub + 1, max_matchgroups);
+  regmatch_t pmatch[n];
   assert (is_string(s));
   assert (k > 0);
-  if (strlen(&strelt(s,1)) != (size_t)s->nchar) {
+  if (k > s->nchar + 1) goto nomatch;
+#ifndef REG_STARTEND
+  if (strlen(&strelt(s,k)) != (size_t)(s->nchar + 1 - k)) {
     runerr("String to be matched by regexp must not contain NUL chars");
   }
-  if (k > s->nchar + 1) goto nomatch;
-  rc = regexec(p, &strelt(s,k), 1, pmatch, 0);
-  if (rc != 0) goto nomatch;
-  ind->i = pmatch[0].rm_so + k;
-  ind->j = pmatch[0].rm_eo + k - 1;
-  return true;
-nomatch:
-  ind->i = 0;
-  ind->j = 0;
-  return false;
-} /* end rex_step */
-
-static bool rex_matchstep(string *s, long k, const pat *p,
-                                                     matchgroups *mg) {
-  int rc;
-  size_t i,n;
-  regmatch_t pmatch[MAX_MATCHGROUPS];
-  assert (is_string(s));
-  assert (k > 0);
-  if (strlen(&strelt(s,1)) != (size_t)s->nchar) {
-    runerr("String to be matched by regexp must not contain NUL chars");
-  }
-  if (k > s->nchar + 1) goto nomatch;
-  n = MIN(p->re_nsub+1,MAX_MATCHGROUPS);
   rc = regexec(p, &strelt(s,k), n, pmatch, 0);
+#else  /* NUL chars are allowed */
+  pmatch[0].rm_so = 0;
+  pmatch[0].rm_eo = s->nchar + 1 - k;
+  rc = regexec(p, &strelt(s,k), n, pmatch, REG_STARTEND);
+#endif
   if (rc != 0) goto nomatch;
+  /* There is no "between" for foundational string matches.  */
+  mg->between = zero_intpair;
   mg->nmatches = n;
   for (i=0; i<n; i++) {
     if (pmatch[i].rm_so == -1) {
-      mg->matches[i].i = 0;
-      mg->matches[i].j = 0;
+      /* Assume this case can exist, say for a group that is part of an
+       * alternation branch not taken; an empty expansion would seem
+       * approp in replacements.  */
+      mg->matches[i] = zero_intpair;
     } else {
-      mg->matches[i].i = pmatch[i].rm_so + k;
+      mg->matches[i].i = pmatch[i].rm_so + k;  /* indices include k */
       mg->matches[i].j = pmatch[i].rm_eo + k - 1;
     }
   }
@@ -743,104 +767,8 @@ static bool rex_matchstep(string *s, long k, const pat *p,
 nomatch:
   mg->nmatches = 0;
   return false;
-} /* end rex_matchstep */
+} /* end rex_exec */
 
-static void rex_done(pat *p) {
+static void rex_done(regex_t *p) {
   regfree(p);
 } /* end rex_done */
-
-
-#else /* !USE_REGEX */
-
-#error Non-USE_REGEX case no longer supported.
-
-#if 0
-#include <setjmp.h>
-
-static jmp_buf context;
-
-static void rex_error(int c) {
-  switch (c) {
-  case 11:  runerr("Range endpoint too large in regular expression");
-  case 16:  runerr("Bad number in regular expression");
-  case 25:  runerr("\"\\digit\" out of range in regular expression");
-  case 36:  runerr("Illegal or missing delimiter in regular expression");
-  case 41:  runerr("No remembered search string in regular expression");
-  case 42:  runerr("\\( \\) imbalance in regular expression");
-  case 43:  runerr("Too many \\( in regular expression");
-  case 44:  runerr("More than 2 numbers given in \\{ \\} in regular expression");
-  case 45:  runerr("} expected after \\ in regular expression");
-  case 46:  runerr("First number exceeds second in \\{ \\} in regular expression");
-  case 48:  runerr("Invalid end point in range expression in regular expression");
-  case 49:  runerr("[ ] imbalance in regular expression");
-  case 50:  longjmp(context,1);  /* go try with more memory */
-  case 70:  runerr("Invalid endpoint in range in regular expression");
-  default:  runerr("Error of unknown code from <regexp.h>");
-  }
-} /* end rex_error */
-
-#define INIT        register char *sp = instring;
-#define GETC()     (*sp++)
-#define PEEKC()    (*sp)
-#define UNGETC(c)  (--sp)
-#define RETURN(c)   return c;
-#define ERROR(c)    rex_error(c)
-
-#include <regexp.h>
-
-static void rex_comp(pat *r, string *p) {
-  assert (is_string(p));
-  if (p->nchar > 0) {
-    static char *buf;
-    static long bufsiz;
-    buf = NULL;
-    bufsiz = INIT_BUFSIZ;
-    if (setjmp(context)) bufsiz *= 2;
-    if (!buf) buf = (char *)os_malloc(bufsiz);
-    else buf = (char *)os_realloc(buf, bufsiz);
-    compile(&strelt(p,1), &buf[0], &buf[bufsiz], '\0');
-    r->buffer = buf;
-    r->circf = circf;
-  } else {
-    r->buffer = NULL;
-    r->circf = false;
-  }
-} /* end rex_comp */
-
-static bool rex_step(string *s, long k, pat *p, intpair *ind) {
-  assert (is_string(s));
-  assert (k > 0);
-  if (k > s->nchar + 1) {
-    ind->i = 0;
-    ind->j = 0;
-    return false;
-  } else if (!p->buffer) {
-    loc1 = loc2 = &strelt(s,k);
-    ind->i = k;
-    ind->j = k - 1;
-    return true;
-  } else {
-    circf = p->circf;
-    if (step(&strelt(s,k), p->buffer)) {
-      char *base = &strelt(s,1);
-      ind->i = loc1 - base + 1;
-      ind->j = loc2 - base;
-      return true;
-    } else {
-      ind->i = 0;
-      ind->j = 0;
-      return false;
-    }
-  }
-} /* end rex_step */
-
-static void rex_done(pat *p) {
-  if (p->buffer) {
-    os_free(p->buffer);
-    p->buffer = NULL;
-  }
-} /* end rex_done */
-#endif
-
-
-#endif /* !USE_REGEX */

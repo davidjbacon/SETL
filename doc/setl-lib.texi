@@ -1,7 +1,7 @@
 \input texinfo @c -*-texinfo-*-
 @c %**start of header
 @c
-@c $Id: setl-lib.texi,v 1.402 2024/04/08 18:57:22 setlorg Exp $
+@c $Id: setl-lib.texi,v 1.403 2024/11/10 04:03:13 setlorg Exp $
 @c
 @c Free software (c) dB - see file COPYING for license (GPL).
 @c
@@ -343,7 +343,7 @@ of the SETL library, as does Cygwin (mostly).
 * recv_fd::    Receive file descriptor.
 * rem::    Integer remainder.
 * rename::    Rename file.
-* reverse::    Reverse string.
+* reverse::    Reverse string or tuple.
 * rewind::    Rewind direct-access stream.
 * round::    Round to nearest integer.
 * routine::    Create procedure reference.
@@ -6992,15 +6992,15 @@ See also @rf{link}, @rf{symlink}, @rf{unlink}, and @rf{system}.
 
 @node reverse
 @findex @rf{reverse}
-@section @rf{reverse} @w{ }-@w{ } reverse string
-@cindex @rf{reverse} (reverse string)
+@section @rf{reverse} @w{ }-@w{ } reverse string or tuple
+@cindex @rf{reverse} (reverse string or tuple)
 
 @example
 op reverse (string) : string
+op reverse (tuple) : tuple
 @end example
 
-Characters in reverse order.
-@c as in ''+/[s(i) : i in [#s..1]]
+Characters or tuple elements in reverse order.
 
 @node rewind
 @findex @rf{rewind}
@@ -8237,15 +8237,22 @@ The pattern @meta{p} is subject to the setting of @rf{magic}, and
 can be a string or a 2-tuple, as detailed under @rf{mark}.
 
 In the replacement pattern @meta{r}, when @rf{magic} is @rf{true},
-the ampersand character (@setl{&})
-is special, as is a backslash (@setl{\}) followed by a decimal digit.
+the ampersand character (@setl{&}) is special, as is a
+backslash (@setl{\}) followed by a decimal digit or a hyphen (@setl{\-}).
+
 The ampersand refers to the entire matched substring,
-and that is also the meaning of a backslash followed by zero (@setl{0}).
-Backslash followed by another digit @emph{k} refers to the substring
-matching the @emph{k}th parenthesized subexpression in the pattern
-@meta{p}.  When @meta{p} is a tuple @w{@setl{[@sv{p1}, @sv{p2}]}},
+which is also the meaning of a backslash followed by zero (@setl{\0}).
+
+Backslash followed by non-zero digit @emph{k} in @meta{r} refers to the
+substring matching the @emph{k}th parenthesized subexpression in the
+pattern @meta{p}.  When @meta{p} is a tuple @w{@setl{[@sv{p1}, @sv{p2}]}},
 parenthesized subexpressions are counted starting in @meta{p1} and
-continuing in @meta{p2}.
+continuing in @meta{p2} for @setl{\}@emph{k} subsitutions in @meta{r},
+and @setl{\0} means the entire substring @setl{@sv{s}({p1}..@sv{p2})}.
+
+Backslash followed by hyphen (@setl{\-}) in @meta{r} when @meta{p} has
+that @w{@setl{[@sv{p1}, @sv{p2}]}} form means everything in @meta{s}
+@emph{between} the enclosing @meta{p1} and @meta{p2} matches.
 
 If @rf{magic} is set to @rf{false}, @meta{r} is taken literally as
 the string to replace the matched substring, with no ampersand or
@@ -8265,7 +8272,7 @@ is similar to
 
 except that the value of the latter is not simply the substring that
 was replaced as it is in the @sdef{sub} case, but rather the new value
-of @setl{@sv{s}(@sv{p})}---a rematch!
+of @setl{@sv{s}(@sv{p})}---a rematch attempt!
 
 If @meta{p} is the tuple @w{@setl{[@sv{p1}, @sv{p2}]}}, the corresponding
 assignment is:
@@ -8273,6 +8280,9 @@ assignment is:
 @example
 @sv{s}(@sv{p1}..@sv{p2}) := @sv{r}
 @end example
+
+and the same rules regarding @sv{r} apply as for
+@w{@setl{[@sv{p1}, @sv{p2}]}}.
 
 See also @rf{gsub} and @rf{gmark}.
 

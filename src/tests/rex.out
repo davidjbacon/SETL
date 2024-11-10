@@ -35,5 +35,43 @@ C comment:    another one:    and a turd:  /*** burd ***/  and an unclosed openi
     another one:    and a 
 [13 20]
 [[13 20] [37 48] [64 77]]
-['/* hi */' '/* /* bye */' '/*** burd ***/']
-C comment:    another one:    and a turd:    and an unclosed opening:  /*
+orig:
+      #endif
+
+      #ifdef ARC22_PORT80
+      WritePORT80(0xf5);
+      #endif
+   }
+
+...
+
+   #ifdef ARC22_PORT80
+   WritePORT80(0xf7);
+   #endif
+
+   if ( spinlock )
+matched:
+['
+      #ifdef ARC22_PORT80
+      WritePORT80(0xf5);
+      #endif
+' '
+   #ifdef ARC22_PORT80
+   WritePORT80(0xf7);
+   #endif
+']
+new:
+      #endif
+
+//    #ifdef ARC22_PORT80
+//    WritePORT80(0xf5);
+//    #endif
+   }
+
+...
+
+// #ifdef ARC22_PORT80
+// WritePORT80(0xf7);
+// #endif
+
+   if ( spinlock )

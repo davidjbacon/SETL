@@ -1,6 +1,6 @@
 /*  ===  SETL run-time "library" routines  =========================  */
 
-/*  $Id: lib.c,v 1.269 2022/12/10 23:35:26 setlorg Exp $  */
+/*  $Id: lib.c,v 1.270 2024/11/10 04:03:13 setlorg Exp $  */
 
 /*  Free software (c) dB - see file COPYING for license (GPL).  */
 
@@ -5606,22 +5606,34 @@ void l_rename(string *a, string *b) {
 
 /*
  *  REVERSE a  -- characters of a in reverse order
+ *  REVERSE t  -- elements of TUPLE t in reverse order
  */
-string *l_reverse(string *a) {
-  HANDLE ha = ref(a);
-  string *r;
-  long i, n;
-  if (!is_string(a)) {
-    unary_op_error ("REVERSE", a, "STRING");
+block *l_reverse(block *a) {
+  if (is_string(a)) {
+    string *s = (string *)a;    HANDLE hs = ref(s);
+    long n = s->nchar;
+    string *r = new_estring(n);
+    long i;
+    for (i=1; i<=n; i++) {
+      strelt(r,n-i+1) = strelt(s,i);
+    }
+    strelt(r,n+1) = '\0';  /* redundant (done by new_estring()) */
+    retire(hs);
+    return (block *)r;
+  } else if (is_tuple(a)) {
+    tuple *t = (tuple *)a;      HANDLE ht = ref(t);
+    long n = t->nelt;
+    tuple *r = new_tuple(n);    HANDLE hr = ref(r);
+    long i;
+    for (i=1; i<=n; i++) {
+      let (tupelt(r,n-i+1), copy_value(tupelt(t,i)));
+    }
+    retire(hr);
+    retire(ht);
+    return (block *)r;
+  } else {
+    unary_op_error ("REVERSE", a, "STRING or TUPLE");
   }
-  n = a->nchar;
-  r = new_estring(n);
-  for (i=1; i<=n; i++) {
-    strelt(r,n-i+1) = strelt(a,i);
-  }
-  strelt(r,n+1) = '\0';
-  retire(ha);
-  return r;
 } /* end l_reverse */
 
 /*
@@ -6504,16 +6516,10 @@ tuple *l_split(string *a, tuple *b, long nargs) {
     tuple *t;
     bool saved_magic = set_magic(true);
 #ifdef USE_REGEX
-    /* USE_REGEX corresponds to POSIX "extended" syntax.  */
+    /* USE_REGEX means POSIX "extended" syntax (EREs).  */
     x = new_string("[ \f\n\r\t\v]+");
 #else
-    /*
-     *  I hate all these backslashes, and especially the fact that
-     *  this non-USE_REGEX case uses incompatible (meta)syntax...but
-     *  fortunately, I seem to have dropped support in rex.c for the
-     *  non-USE_REGEX case anyway.
-     */
-    x = new_string("[ \f\n\r\t\v]\\{1,\\}");
+#error Non-USE_REGEX case no longer supported.
 #endif
     retire(ha);
     t = rex_split(a,x);  /* compiling considered cheap, evidently */

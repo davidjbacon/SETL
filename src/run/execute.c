@@ -1,6 +1,6 @@
 /*  ===  The SETL virtual machine interpreter  =====================  */
 
-/*  $Id: execute.c,v 1.105 2021/11/26 03:26:27 setlorg Exp $  */
+/*  $Id: execute.c,v 1.106 2024/11/10 04:03:13 setlorg Exp $  */
 
 /*  Free software (c) dB - see file COPYING for license (GPL).  */
 
@@ -1794,7 +1794,7 @@ void execute(void) {
         break;
 
       case S_REVERSE:
-        unary (l_reverse, string *);
+        unary (l_reverse, block *);
         break;
 
       case S_REWIND:

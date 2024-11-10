@@ -1,6 +1,6 @@
 /*  ===  Declarations shared by the SETL run-time modules  =========  */
 
-/*  $Id: setlrun.h,v 1.232 2024/04/08 18:57:22 setlorg Exp $  */
+/*  $Id: setlrun.h,v 1.233 2024/11/10 04:03:13 setlorg Exp $  */
 
 /*  Free software (c) dB - see file COPYING for license (GPL).  */
 
@@ -2131,7 +2131,7 @@ extern tuple   *l_recvfrom(block *a);
 extern integer *l_recv_fd(block *a);
 extern integer *l_rem(integer *a, integer *b);
 extern void     l_rename(string *a, string *b);
-extern string  *l_reverse(string *a);
+extern block   *l_reverse(block *a);
 extern void     l_rewind(block *a);
 extern string  *l_rlen(string **a, integer *b);
 extern string  *l_rmatch(string **a, string *b);
