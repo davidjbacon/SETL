@@ -25,7 +25,7 @@ proc try (p, s);  -- try applying routine p to string s
   end if;
   -- If the child crashes rather than exiting normally, this gets the
   -- error report:
-  r := getfile fd;  -- gather entire child output as string to return
+  r := munge getfile fd;  -- gather entire child output as string to return
   close (fd);
   return r;
 end proc;
@@ -73,7 +73,7 @@ proc try_read (s);  -- the READ test doesn't quite fit the try() model
   printa (fd, s);  -- pass the test string to the child
   shutdown (fd, shut_wr);  -- + EOF in case s is nowt but whitespace
   -- As with try(), if the child crashes, this gets the error report:
-  r := getfile fd;  -- gather entire child output as string to return
+  r := munge getfile fd;  -- gather entire child output as string to return
   close (fd);
   return r;
 end proc;
@@ -82,3 +82,9 @@ proc test_read();
   read (x);
   return [type x, x];
 end proc;
+
+op munge (s);
+  gsub (s, 'This is version [0-9]+\\.[0-9]+\\.[0-9]+ of GNU SETL',
+           'This is version X.Y.Z of GNU SETL');
+  return s;
+end op;

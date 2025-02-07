@@ -1,6 +1,6 @@
 /*  ===  String matching using regular expressions  ================  */
 
-/*  $Id: rex.c,v 1.34 2024/11/10 04:03:13 setlorg Exp $  */
+/*  $Id: rex.c,v 1.35 2025/02/07 16:56:39 setlorg Exp $  */
 
 /*  Free software (c) dB - see file COPYING for license (GPL).  */
 
@@ -666,7 +666,7 @@ static bool rex_markfind(string *s, long k, string *p,
                           intpair *ind) {
   long lim = s->nchar - p->nchar + 1;
   while (k <= lim) {
-    char *t = (char *)memchr(&strelt(s,k), strelt(p,1), p->nchar);
+    char *t = (char *)memchr(&strelt(s,k), strelt(p,1), (lim - k) + 1);
     if (!t) goto nomatch;
     k += t - &strelt(s,k);
     if (memcmp(&strelt(s,k), &strelt(p,1), p->nchar) == 0) break;

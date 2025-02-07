@@ -1,7 +1,7 @@
 \input texinfo @c -*-texinfo-*-
 @c %**start of header
 @c
-@c $Id: setl-lib.texi,v 1.404 2024/11/10 05:16:03 setlorg Exp $
+@c $Id: setl-lib.texi,v 1.405 2025/02/07 16:56:39 setlorg Exp $
 @c
 @c Free software (c) dB - see file COPYING for license (GPL).
 @c
@@ -8271,12 +8271,16 @@ is similar to
 @sv{s}(@sv{p}) := @sv{r}
 @end example
 
-except that the value of the latter is not simply the substring that
-was replaced as it is in the @sdef{sub} case, but rather the new value
-of @setl{@sv{s}(@sv{p})}---a rematch attempt!
+except that the value of the latter assignment expression is not the
+substring of @sv{s} that was replaced as in the @sdef{sub} case, but
+rather the new value of @setl{@sv{s}(@sv{p})} after one replacement.
+That re-evaluation of @setl{@sv{s}(@sv{p})} is a rematch you probably
+don't want.  Such assignment expressions are thus best confined to
+simple assignment statements---not chained, nor passed as args, nor
+used as subexpressions.
 
-If @meta{p} is the tuple @w{@setl{[@sv{p1}, @sv{p2}]}}, the corresponding
-assignment is:
+If @meta{p} is the tuple @w{@setl{[@sv{p1}, @sv{p2}]}}, the
+corresponding assignment is:
 
 @example
 @sv{s}(@sv{p1}..@sv{p2}) := @sv{r}

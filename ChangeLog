@@ -25,3 +25,10 @@ This file is part of GNU SETL.
   * add \- as a string replacement pattern.
   * extend REVERSE to apply to tuples.
   * 8.13.21 release.
+
+2025-02-07  David Bacon  <David.Bacon@nyu.edu>
+
+  * fix a regression in non-MAGIC string matching.
+  * minor doc tweak.
+  * make unstr test output independent of GNU SETL version.
+  * 8.13.22 release.
